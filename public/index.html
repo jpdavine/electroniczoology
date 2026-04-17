@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Electronic Zoology — Field Notes from the Garage</title>
+  <meta name="description" content="The Tech-ologist — a maker, tinkerer, and documenter of electronic creatures from the Bellarine Peninsula. ESP32, Arduino, Raspberry Pi, and whatever else the garage can produce.">
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://electroniczoology.com/">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Electronic Zoology">
+  <meta property="og:title" content="Electronic Zoology — Field Notes from the Garage">
+  <meta property="og:description" content="Studying, documenting, and occasionally arguing with the strange creatures that live in the electronic wilderness.">
+  <meta property="og:url" content="https://electroniczoology.com/">
+  <meta property="og:image" content="https://electroniczoology.com/og-image.svg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:locale" content="en_AU">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Electronic Zoology — Field Notes from the Garage">
+  <meta name="twitter:description" content="Studying, documenting, and occasionally arguing with the strange creatures that live in the electronic wilderness.">
+  <meta name="twitter:image" content="https://electroniczoology.com/og-image.svg">
+
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <a class="site-name" href="index.html">Electronic<span>Zoology</span><small>field notes from the garage</small></a>
+  <nav aria-label="Primary">
+    <a href="index.html" class="active">About</a>
+    <a href="audio/pam8403-esp32-audio.html">Guides</a>
+    <a href="#">Projects</a>
+  </nav>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+  <h1>Electronic<em>Zoology</em></h1>
+  <p class="hero-byline">by The Tech-ologist</p>
+  <p class="hero-sub">Studying, documenting, and occasionally arguing with the strange creatures that live in the electronic wilderness.</p>
+  <div class="hero-badges">
+    <span class="badge"><span class="dot"></span>Bellarine Peninsula, VIC</span>
+    <span class="badge"><span class="dot green"></span>Garage-based operation</span>
+    <span class="badge"><span class="dot"></span>ESP32 &middot; Pi &middot; Salvage</span>
+  </div>
+</section>
+
+<main class="page-wrap">
+
+  <!-- Bio -->
+  <section class="section" id="bio">
+    <div class="section-label">The Specimen</div>
+    <h2>Who is the tech-ologist</h2>
+    <p>
+      I'm Josh, a maker, tinkerer, and self-described tech-ologist based on the Bellarine Peninsula. The garage out back is the lab. The workbench is permanently occupied. The floor has more project boxes on it than I'm prepared to admit.
+    </p>
+    <p>
+      I've been pulling things apart since I was a kid, long before I had any idea how to put them back together. These days I mostly put them back together, usually into something they were never meant to be. Motors become controllers. Salvaged panels become displays. A toy train becomes a WiFi-enabled rolling experiment in embedded systems.
+    </p>
+    <p>
+      Do I know what I'm doing? Not really. I'm kinda just making it up as I go along. If you're looking for a professional maker page this is not it, but I'm learning, growing, and building fun stuff. Stick around and together we can have some fun and maybe learn something in the process.
+    </p>
+    <p>
+      My tools of choice are microcontrollers, my preferred language is C++ (Arduino flavour), and my preferred debugging method is staring at something until it confesses. I run Arch Linux, work from a home garage, and have a wife and son who remain admirably tolerant of the whole operation.
+    </p>
+    <div class="bio-grid">
+      <div class="bio-card">
+        <div class="bio-card-label">Based</div>
+        <p>Bellarine Peninsula, Victoria</p>
+      </div>
+      <div class="bio-card">
+        <div class="bio-card-label">Habitat</div>
+        <p>Home garage: workbench, 3D printer, soldering station, too many half-finished projects</p>
+      </div>
+      <div class="bio-card">
+        <div class="bio-card-label">Field tools</div>
+        <p>ESP32, Raspberry Pi, Arch Linux, Arduino IDE, TinkerCAD, Meshroom, an Ender 3</p>
+      </div>
+      <div class="bio-card">
+        <div class="bio-card-label">Specimen count</div>
+        <p>Usually three to five active builds, plus a backlog I don't talk about</p>
+      </div>
+      <div class="bio-card">
+        <div class="bio-card-label">Pronouns</div>
+        <p>he/him (always felt a bit like an alien but don't think there's a pronoun for that yet)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Philosophy -->
+  <section class="section" id="philosophy">
+    <div class="section-label">Field Notes</div>
+    <h2>How I approach a build</h2>
+    <p>Making things is easy. Making things that actually work, that you understand, that you can fix when they break. That's the interesting part. A few principles I keep coming back to:</p>
+    <ul class="philosophy-list">
+      <li>
+        <span class="phi-num">01</span>
+        <span class="phi-body">
+          <strong>Break it into steps small enough to test</strong>
+          <span>The fastest way to build something complicated is to never build anything complicated. Get the LED blinking before you wire the motor driver. Flash a known-good sketch before you trust the hardware.</span>
+        </span>
+      </li>
+      <li>
+        <span class="phi-num">02</span>
+        <span class="phi-body">
+          <strong>Know your hardware</strong>
+          <span>Datasheets exist for a reason. A pinout diagram is worth three hours of debugging. If you're guessing at I2C addresses, you've already gone wrong.</span>
+        </span>
+      </li>
+      <li>
+        <span class="phi-num">03</span>
+        <span class="phi-body">
+          <strong>Salvage is not a compromise</strong>
+          <span>Some of the best parts come from e-waste. Laptop screens, motors from old appliances, heatsinks from dead PSUs. The question is always what it can become, not what it was.</span>
+        </span>
+      </li>
+      <li>
+        <span class="phi-num">04</span>
+        <span class="phi-body">
+          <strong>Proprietary protocols are just puzzles</strong>
+          <span>Anything with an undocumented protocol is an invitation, not a wall. Logic analysers, a bit of patience, and the willingness to read someone else's reverse engineering work. Most things give up their secrets eventually.</span>
+        </span>
+      </li>
+      <li>
+        <span class="phi-num">05</span>
+        <span class="phi-body">
+          <strong>Document what you build</strong>
+          <span>Future you will not remember why you chose those pins. Future someone else might need exactly this. Write it down. Draw the wiring. Explain the why, not just the what. This site is as much about sharing that record as it is about keeping it. If something I figured out saves someone else the same three hours, that's the point.</span>
+        </span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- AI -->
+  <section class="section" id="ai">
+    <div class="section-label">The Lab Assistant</div>
+    <h2>How I use AI</h2>
+    <p>
+      I use AI as a coding and technical collaborator, not as an oracle and not as a shortcut. The distinction matters. But I'll be straight about it: AI has me punching well above my class. Projects that would have taken me months to figure out, or that I simply wouldn't have attempted, are now within reach.
+    </p>
+    <p>
+      The workflow is deliberate: break a project into small, testable steps, then work through them one at a time with AI as a pair-programming partner. I bring the hardware knowledge, the physical intuition, and the ability to catch when something is technically plausible but electrically wrong. The AI brings speed, breadth, and the ability to draft code I can then read and try to understand.
+    </p>
+    <p>
+      The best way I can describe AI is an extraordinarily well-read assistant who has never actually touched anything, because it's got no hands. The knowledge is genuine and vast, but so is the confidence, and the two don't always match. The thing nobody tells you is that AI is most useful when you already know enough to recognise when it's wrong, and you mostly learn that by having it go wrong on you. A hallucinated pin number you didn't catch, a library that doesn't exist, a timing assumption that falls apart on real hardware. You find out the hard way, and next time you know to check. If you haven't been through enough of those cycles yet, it just won't work and you'll be chasing your tail for months.
+    </p>
+    <p>
+      So the guides here are genuinely mine. The AI helped write code and draft documentation. I built the circuit, ran the sketch, debugged what didn't work, and corrected what was wrong. Nothing gets published because the AI said it was right. It gets published because I tested it and it worked. At the end of the day AI is just another tool in the build, the same as the IDE or the oscilloscope.
+    </p>
+    <ul class="philosophy-list" style="margin-top:1.25rem;">
+      <li>
+        <span class="phi-num">✦</span>
+        <span class="phi-body">
+          <strong>AI as collaborator, not author</strong>
+          <span>I direct the work. The AI drafts. I review, correct, test, and own the result.</span>
+        </span>
+      </li>
+      <li>
+        <span class="phi-num">✦</span>
+        <span class="phi-body">
+          <strong>Hardware knowledge is the sanity check</strong>
+          <span>Enough time building real circuits means you develop a feel for when something is off, before you wire it up. That instinct is what AI can't replicate, and it's what makes the collaboration actually work.</span>
+        </span>
+      </li>
+      <li>
+        <span class="phi-num">✦</span>
+        <span class="phi-body">
+          <strong>Confirmed working means confirmed working</strong>
+          <span>Every guide on this site has been built on real hardware, run, and verified. The badge means something.</span>
+        </span>
+      </li>
+    </ul>
+  </section>
+
+  <!-- Contact -->
+  <section class="section" id="contact">
+    <div class="section-label">Make Contact</div>
+    <h2>Find the tech-ologist</h2>
+    <p>
+      If you've found something here useful, spotted an error, or you're working on something weird and want to compare notes, get in touch. Instagram is the best place to catch me.
+    </p>
+    <div class="contact-row">
+      <a class="contact-link" href="https://instagram.com/electrictronic_zootopia" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+        </svg>
+        @electrictronic_zootopia
+      </a>
+      <a class="contact-link secondary" href="https://ig.me/m/electrictronic_zootopia" target="_blank" rel="noopener noreferrer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+        Send a message
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  Electronic Zoology, field notes from the Bellarine Peninsula &nbsp;&middot;&nbsp;
+  <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">Back to top &uarr;</a>
+</footer>
+
+</body>
+</html>
