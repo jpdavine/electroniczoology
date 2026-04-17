@@ -1,0 +1,127 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="About">
+
+  <div class="section-label">The Specimen</div>
+  <h1>Who is the tech-ologist</h1>
+
+  <div class="content">
+    <p>
+      I'm Josh, a maker, tinkerer, and self-described tech-ologist based on the Bellarine Peninsula. The garage out back is the lab. The workbench is permanently occupied. The floor has more project boxes on it than I'm prepared to admit.
+    </p>
+    <p>
+      I've been pulling things apart since I was a kid, long before I had any idea how to put them back together. These days I mostly put them back together, usually into something they were never meant to be. Motors become controllers. Salvaged panels become displays. A toy train becomes a WiFi-enabled rolling experiment in embedded systems.
+    </p>
+    <p>
+      My tools of choice are microcontrollers, my preferred language is C++ (Arduino flavour), and my preferred debugging method is staring at something until it confesses. I run Arch Linux, work from a home garage, and have a wife and son who remain admirably tolerant of the whole operation.
+    </p>
+
+    <div class="bio-grid">
+      <div class="bio-card">
+        <div class="bio-card-label">Based</div>
+        <p>Bellarine Peninsula, Victoria</p>
+      </div>
+      <div class="bio-card">
+        <div class="bio-card-label">Habitat</div>
+        <p>Home garage: workbench, 3D printer, soldering station, too many half-finished projects</p>
+      </div>
+      <div class="bio-card">
+        <div class="bio-card-label">Field tools</div>
+        <p>ESP32, Raspberry Pi, Arch Linux, Arduino IDE, TinkerCAD, Meshroom, an Ender 3</p>
+      </div>
+      <div class="bio-card">
+        <div class="bio-card-label">Pronouns</div>
+        <p>he/him (always felt a bit like an alien but don't think there's a pronoun for that yet)</p>
+      </div>
+    </div>
+
+    <h2>Find the tech-ologist</h2>
+    <p>
+      Instagram is the best place to catch me. If you've found something useful, spotted an error, or you're working on something weird and want to compare notes, get in touch.
+    </p>
+    <div class="contact-row">
+      <a class="contact-link" href="https://instagram.com/electrictronic_zootopia" target="_blank" rel="noopener noreferrer">
+        @electrictronic_zootopia
+      </a>
+      <a class="contact-link secondary" href="https://ig.me/m/electrictronic_zootopia" target="_blank" rel="noopener noreferrer">
+        Send a message
+      </a>
+    </div>
+  </div>
+
+</Base>
+
+<style>
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #c77dff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+  }
+  h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1a1a2e;
+    margin-bottom: 1.5rem;
+  }
+  .content p { color: #444; margin-bottom: 1rem; line-height: 1.75; max-width: 680px; }
+  .content h2 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 2rem 0 0.75rem;
+  }
+
+  .bio-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1.75rem 0;
+  }
+  .bio-card {
+    background: #fafafa;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+  }
+  .bio-card-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #888;
+    margin-bottom: 0.4rem;
+  }
+  .bio-card p { font-size: 0.88rem; color: #555; margin: 0; }
+
+  .contact-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
+  .contact-link {
+    display: inline-flex;
+    align-items: center;
+    background: #1a1a2e;
+    color: #fff;
+    text-decoration: none;
+    padding: 0.6rem 1.25rem;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: background 0.15s;
+  }
+  .contact-link:hover { background: #2a2a4e; }
+  .contact-link.secondary {
+    background: transparent;
+    color: #1a1a2e;
+    border: 1.5px solid #e0e0e0;
+  }
+  .contact-link.secondary:hover { border-color: #a855f7; color: #a855f7; }
+
+  @media (max-width: 580px) {
+    .bio-grid { grid-template-columns: 1fr; }
+  }
+</style>

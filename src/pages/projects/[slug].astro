@@ -1,0 +1,159 @@
+---
+import Base from '../../layouts/Base.astro';
+import YouTube from '../../components/YouTube.astro';
+import PartsList from '../../components/PartsList.astro';
+
+export async function getStaticPaths() {
+  const modules = import.meta.glob('../../content/projects/*.md', { eager: true });
+  const projects = Object.values(modules);
+  return projects.map((p) => ({
+    params: { slug: p.frontmatter.slug },
+    props: { project: p },
+  }));
+}
+
+const { project } = Astro.props;
+const { title, description, date, category, tags, youtube, parts } = project.frontmatter;
+const { Content } = project;
+---
+<Base title={title} description={description}>
+
+  <div class="project-hero">
+    <div class="meta-row">
+      <span class="category">{category ?? "Project"}</span>
+      <span class="date">{new Date(date).toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+    </div>
+    <h1>{title}</h1>
+    {description && <p class="description">{description}</p>}
+    {tags && (
+      <div class="tags">
+        {tags.map((t) => <span class="tag">{t}</span>)}
+      </div>
+    )}
+  </div>
+
+  {youtube && <YouTube id={youtube} title={title} />}
+
+  {parts && <PartsList parts={parts} />}
+
+  <article class="content">
+    <Content />
+  </article>
+
+  <div class="back-link">
+    <a href="/projects">&larr; All projects</a>
+  </div>
+
+</Base>
+
+<style>
+  .project-hero {
+    margin-bottom: 2rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .meta-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+  }
+  .category {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    background: linear-gradient(135deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #c77dff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .date { font-size: 0.85rem; color: #888; }
+
+  h1 {
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 800;
+    color: #1a1a2e;
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+  }
+
+  .description {
+    font-size: 1.05rem;
+    color: #555;
+    line-height: 1.7;
+    max-width: 640px;
+  }
+
+  .tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
+  .tag {
+    font-size: 0.75rem;
+    background: #f0f0f0;
+    color: #555;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+  }
+
+  /* Markdown content styles */
+  .content { max-width: 720px; }
+  .content h2 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 2.5rem 0 0.75rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 2px solid #a855f7;
+    display: inline-block;
+  }
+  .content h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #333;
+    margin: 1.75rem 0 0.5rem;
+  }
+  .content p { color: #444; margin-bottom: 1rem; line-height: 1.75; }
+  .content ul, .content ol { padding-left: 1.4rem; margin-bottom: 1rem; }
+  .content li { margin-bottom: 0.3rem; color: #444; }
+  .content code {
+    font-family: "Fira Code", Consolas, monospace;
+    background: #f0f0f0;
+    padding: 0.15em 0.4em;
+    border-radius: 3px;
+    font-size: 0.875em;
+    color: #c0392b;
+  }
+  .content pre {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    border-radius: 6px;
+    padding: 1.25rem 1.5rem;
+    overflow-x: auto;
+    margin: 1rem 0 1.5rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+  .content pre code { background: none; padding: 0; color: inherit; }
+  .content a { color: #a855f7; }
+  .content blockquote {
+    border-left: 4px solid #a855f7;
+    padding: 0.5rem 1rem;
+    margin: 1rem 0;
+    background: #faf5ff;
+    color: #555;
+  }
+  .content img { max-width: 100%; border-radius: 6px; margin: 1rem 0; }
+
+  .back-link {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e0e0e0;
+  }
+  .back-link a {
+    color: #a855f7;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .back-link a:hover { text-decoration: underline; }
+</style>

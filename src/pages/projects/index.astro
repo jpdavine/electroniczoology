@@ -1,0 +1,108 @@
+---
+import Base from '../../layouts/Base.astro';
+const modules = import.meta.glob('../../content/projects/*.md', { eager: true });
+const projects = Object.values(modules);
+const sorted = projects.sort((a, b) => new Date(b.frontmatter.date) - new Date(a.frontmatter.date));
+---
+<Base title="Projects">
+
+  <div class="page-header">
+    <div class="section-label">All Projects</div>
+    <h1>The Builds</h1>
+    <p>Everything that's made it out of the garage in one piece. And a few things that didn't.</p>
+  </div>
+
+  {sorted.length === 0 && (
+    <p style="color:#888;margin-top:2rem">First project coming soon.</p>
+  )}
+
+  <div class="project-list">
+    {sorted.map((p) => (
+      <a class="project-row" href={`/projects/${p.frontmatter.slug}`}>
+        <div class="row-meta">
+          <span class="row-category">{p.frontmatter.category ?? "Project"}</span>
+          <span class="row-date">{new Date(p.frontmatter.date).toLocaleDateString('en-AU', { year: 'numeric', month: 'short' })}</span>
+        </div>
+        <h2>{p.frontmatter.title}</h2>
+        <p>{p.frontmatter.description}</p>
+        {p.frontmatter.tags && (
+          <div class="tags">
+            {p.frontmatter.tags.map((t) => <span class="tag">{t}</span>)}
+          </div>
+        )}
+      </a>
+    ))}
+  </div>
+
+</Base>
+
+<style>
+  .page-header { margin-bottom: 2.5rem; }
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #c77dff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+  }
+  .page-header h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #1a1a2e;
+    margin-bottom: 0.5rem;
+  }
+  .page-header p { color: #555; }
+
+  .project-list { display: flex; flex-direction: column; gap: 1rem; }
+
+  .project-row {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1.5rem 2rem;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .project-row:hover {
+    border-color: #a855f7;
+    box-shadow: 0 4px 16px rgba(168,85,247,0.08);
+  }
+
+  .row-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.4rem;
+  }
+  .row-category {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #a855f7;
+  }
+  .row-date { font-size: 0.8rem; color: #888; }
+
+  .project-row h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 0.4rem;
+  }
+  .project-row p { font-size: 0.9rem; color: #555; line-height: 1.6; }
+
+  .tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
+  .tag {
+    font-size: 0.75rem;
+    background: #f0f0f0;
+    color: #555;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+  }
+</style>

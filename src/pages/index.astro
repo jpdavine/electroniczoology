@@ -1,0 +1,199 @@
+---
+import Base from '../layouts/Base.astro';
+const modules = import.meta.glob('../content/projects/*.md', { eager: true });
+const projects = Object.values(modules);
+const recent = projects
+  .sort((a, b) => new Date(b.frontmatter.date) - new Date(a.frontmatter.date))
+  .slice(0, 3);
+---
+<Base title="Electronic Zoology">
+
+  <div class="hero">
+    <div class="hero-label">Electronic Zoology</div>
+    <h1>Field notes from<br><em>the garage</em></h1>
+    <p class="hero-sub">Building things, breaking things, documenting both. ESP32, Raspberry Pi, salvage electronics, and whatever else wanders into the lab.</p>
+    <div class="hero-badges">
+      <span class="badge"><span class="dot"></span>Bellarine Peninsula, VIC</span>
+      <span class="badge"><span class="dot green"></span>Garage-based operation</span>
+      <span class="badge"><span class="dot"></span>ESP32 &middot; Pi &middot; Salvage</span>
+    </div>
+  </div>
+
+  {recent.length > 0 && (
+    <section class="recent">
+      <div class="section-label">Latest Projects</div>
+      <div class="project-grid">
+        {recent.map((p) => (
+          <a class="project-card" href={`/projects/${p.frontmatter.slug}`}>
+            <div class="card-label">{p.frontmatter.category ?? "Project"}</div>
+            <h3>{p.frontmatter.title}</h3>
+            <p>{p.frontmatter.description}</p>
+            <span class="card-link">Read more &rarr;</span>
+          </a>
+        ))}
+      </div>
+      <div style="margin-top:1.5rem">
+        <a href="/projects" class="btn">All projects &rarr;</a>
+      </div>
+    </section>
+  )}
+
+  {recent.length === 0 && (
+    <section class="recent">
+      <div class="section-label">Projects</div>
+      <p style="color:#888;margin-top:0.5rem">First project coming soon.</p>
+      <div style="margin-top:1rem">
+        <a href="/about" class="btn">About the zoologist &rarr;</a>
+      </div>
+    </section>
+  )}
+
+</Base>
+
+<style>
+  .hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+    color: #fff;
+    padding: 4rem 3rem;
+    border-radius: 10px;
+    margin-bottom: 3rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 50%, rgba(168,85,247,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(77,150,255,0.06) 0%, transparent 40%);
+    pointer-events: none;
+  }
+  .hero-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    background: linear-gradient(135deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #c77dff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 1.25rem;
+  }
+  .hero h1 em {
+    font-style: normal;
+    background: linear-gradient(135deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #c77dff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero-sub {
+    font-size: 1rem;
+    color: #aaa;
+    max-width: 520px;
+    margin-bottom: 2rem;
+    line-height: 1.7;
+  }
+  .hero-badges {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: #ccc;
+    font-size: 0.8rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #a855f7;
+    flex-shrink: 0;
+  }
+  .dot.green { background: #2ecc71; }
+
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #c77dff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+  }
+
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1.25rem;
+  }
+
+  .project-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .project-card:hover {
+    border-color: #a855f7;
+    box-shadow: 0 4px 16px rgba(168,85,247,0.1);
+  }
+  .card-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #a855f7;
+  }
+  .project-card h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    line-height: 1.3;
+  }
+  .project-card p {
+    font-size: 0.88rem;
+    color: #555;
+    line-height: 1.6;
+    flex: 1;
+  }
+  .card-link {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #a855f7;
+  }
+
+  .btn {
+    display: inline-block;
+    background: #1a1a2e;
+    color: #fff;
+    text-decoration: none;
+    padding: 0.6rem 1.25rem;
+    border-radius: 6px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    transition: background 0.15s;
+  }
+  .btn:hover { background: #2a2a4e; }
+</style>

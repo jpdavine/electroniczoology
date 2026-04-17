@@ -1,0 +1,87 @@
+---
+const { parts } = Astro.props;
+// parts: array of { name, qty, price, link, notes? }
+---
+<div class="parts-list">
+  <h3>Parts List</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Part</th>
+        <th>Qty</th>
+        <th>Price (AUD)</th>
+        <th>Buy</th>
+      </tr>
+    </thead>
+    <tbody>
+      {parts.map((p) => (
+        <tr>
+          <td>
+            {p.name}
+            {p.notes && <span class="note">{p.notes}</span>}
+          </td>
+          <td>{p.qty}</td>
+          <td>{p.price ?? "-"}</td>
+          <td>
+            {p.link
+              ? <a href={p.link} target="_blank" rel="noopener noreferrer">Buy</a>
+              : <span class="muted">-</span>
+            }
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .parts-list { margin: 2rem 0; }
+
+  .parts-list h3 {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #888;
+    margin-bottom: 0.75rem;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  th {
+    background: #1a1a2e;
+    color: #fff;
+    text-align: left;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+  }
+
+  td {
+    padding: 0.55rem 1rem;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: #fafafa; }
+
+  .note {
+    display: block;
+    font-size: 0.78rem;
+    color: #888;
+    margin-top: 0.1rem;
+  }
+
+  a {
+    color: #a855f7;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  a:hover { text-decoration: underline; }
+
+  .muted { color: #bbb; }
+</style>
