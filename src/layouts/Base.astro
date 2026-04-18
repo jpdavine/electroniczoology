@@ -1,5 +1,5 @@
 ---
-const { title, description = "Field notes from the garage — Electronic Zoology" } = Astro.props;
+const { title, description = "Field notes from the garage — Electronic Zoology", fullWidth = false } = Astro.props;
 ---
 <!DOCTYPE html>
 <html lang="en">
@@ -131,9 +131,7 @@ const { title, description = "Field notes from the garage — Electronic Zoology
   </nav>
 </header>
 
-<div class="page-wrap">
-  <slot />
-</div>
+{fullWidth ? <slot /> : <div class="page-wrap"><slot /></div>}
 
 <footer>
   <a class="bmc-btn" href="https://buymeacoffee.com/yourawesome" target="_blank" rel="noopener">☕ Buy me a coffee</a><br>
