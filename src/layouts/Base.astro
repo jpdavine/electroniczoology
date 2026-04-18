@@ -100,6 +100,22 @@ const { title, description = "Field notes from the garage — Electronic Zoology
     footer a { color: var(--muted); text-decoration: none; }
     footer a:hover { color: var(--amber); }
 
+    .bmc-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: #FFDD00;
+      color: #000;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 0.4rem 0.9rem;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: opacity 0.15s;
+      margin-bottom: 0.75rem;
+    }
+    .bmc-btn:hover { opacity: 0.85; color: #000; }
+
     @media (max-width: 640px) {
       header { padding: 0 1rem; }
       .page-wrap { padding: 2rem 1rem 4rem; }
@@ -122,6 +138,9 @@ const { title, description = "Field notes from the garage — Electronic Zoology
 </div>
 
 <footer>
+  <a class="bmc-btn" href="https://buymeacoffee.com/yourawesome" target="_blank" rel="noopener">
+    ☕ Buy me a coffee
+  </a><br>
   Electronic Zoology, field notes from the Bellarine Peninsula &nbsp;&middot;&nbsp;
   <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">Back to top &uarr;</a>
 </footer>
