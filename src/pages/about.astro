@@ -6,6 +6,10 @@ import Base from '../layouts/Base.astro';
   <div class="section-label">The Specimen</div>
   <h1>Who is the tech-ologist</h1>
 
+  <blockquote class="philosophy">
+    We stand on the shoulders of giants when we build with knowledge gained from others' efforts. That doesn't make us giants. Be humble. Create with care. Open source is the way.
+  </blockquote>
+
   <div class="content">
     <p>
       I'm Josh, a maker, tinkerer, and self-described tech-ologist based on the Bellarine Peninsula. The garage out back is the lab. The workbench is permanently occupied. The floor has more project boxes on it than I'm prepared to admit.
@@ -53,6 +57,19 @@ import Base from '../layouts/Base.astro';
 </Base>
 
 <style>
+  .philosophy {
+    border-left: 4px solid var(--amber);
+    margin: 0 0 2rem;
+    padding: 0.9rem 1.25rem;
+    background: #faf8ff;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.95rem;
+    font-style: italic;
+    color: #444;
+    line-height: 1.75;
+    max-width: 680px;
+  }
+
   .section-label {
     font-size: 0.7rem;
     font-weight: 700;

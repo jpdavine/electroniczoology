@@ -127,6 +127,18 @@ import Base from '../layouts/Base.astro';
   }
   .bio-card p { font-size: 0.88rem; color: #555; margin: 0; }
 
+  .philosophy {
+    border-left: 4px solid var(--amber);
+    margin: 0 0 1.5rem;
+    padding: 0.9rem 1.25rem;
+    background: #faf8ff;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.95rem;
+    font-style: italic;
+    color: #444;
+    line-height: 1.75;
+  }
+
   .philosophy-list { list-style: none; padding: 0; margin-top: 1.25rem; }
   .philosophy-list li {
     display: flex;
@@ -198,6 +210,9 @@ import Base from '../layouts/Base.astro';
   <section class="section" id="bio">
     <div class="section-label">The Specimen</div>
     <h2>Who is the tech-ologist</h2>
+    <blockquote class="philosophy">
+      We stand on the shoulders of giants when we build with knowledge gained from others' efforts. That doesn't make us giants. Be humble. Create with care. Open source is the way.
+    </blockquote>
     <p>
       I'm Josh, a maker, tinkerer, and self-described tech-ologist based on the Bellarine Peninsula. The garage out back is the lab. The workbench is permanently occupied. The floor has more project boxes on it than I'm prepared to admit.
     </p>
