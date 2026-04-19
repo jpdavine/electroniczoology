@@ -78,6 +78,18 @@ const { title, description = "Field notes from the garage — Electronic Zoology
       transition: color 0.15s;
     }
     header nav a:hover { color: var(--white); }
+    header nav a.cookie-btn {
+      display: inline-block;
+      background: #FF813F;
+      color: #fff !important;
+      font-weight: 700;
+      font-size: 0.78rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 6px;
+      transform: rotate(-7deg);
+      transition: transform 0.15s, opacity 0.15s;
+    }
+    header nav a.cookie-btn:hover { opacity: 0.9; transform: rotate(0deg); }
     header nav a.active {
       background: var(--rainbow);
       -webkit-background-clip: text;
@@ -108,9 +120,11 @@ const { title, description = "Field notes from the garage — Electronic Zoology
       padding: 0.45rem 1rem;
       border-radius: 6px;
       text-decoration: none;
-      margin-bottom: 0.8rem;
+      margin-bottom: 1.2rem;
+      transform: rotate(-7deg);
+      transition: transform 0.15s, opacity 0.15s;
     }
-    .bmc-btn:hover { opacity: 0.85; }
+    .bmc-btn:hover { opacity: 0.9; transform: rotate(0deg); }
 
 
     @media (max-width: 640px) {
@@ -127,14 +141,13 @@ const { title, description = "Field notes from the garage — Electronic Zoology
     <a href="/">Home</a>
     <a href="/projects">Projects</a>
     <a href="/about">About</a>
-    <a href="https://buymeacoffee.com/yourawesome" target="_blank" rel="noopener">☕ Coffee</a>
+    <a href="https://buymeacoffee.com/yourawesome" target="_blank" rel="noopener" class="cookie-btn">🍪 <em>buy me a cookie</em></a>
   </nav>
 </header>
 
 {fullWidth ? <slot /> : <div class="page-wrap"><slot /></div>}
 
 <footer>
-  <a class="bmc-btn" href="https://buymeacoffee.com/yourawesome" target="_blank" rel="noopener">☕ Buy me a coffee</a><br>
   Electronic Zoology, field notes from the Bellarine Peninsula &nbsp;&middot;&nbsp;
   <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">Back to top &uarr;</a>
 </footer>

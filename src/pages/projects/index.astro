@@ -1,8 +1,18 @@
 ---
 import Base from '../../layouts/Base.astro';
 const modules = import.meta.glob('../../content/projects/*.md', { eager: true });
-const projects = Object.values(modules);
-const sorted = projects.sort((a, b) => new Date(b.frontmatter.date) - new Date(a.frontmatter.date));
+const mdProjects = Object.values(modules).sort((a, b) => new Date(b.frontmatter.date) - new Date(a.frontmatter.date));
+
+const staticProjects = [
+  {
+    slug: 'pam8403-esp32-audio',
+    title: 'PAM8403 Audio Amplifier with ESP32',
+    description: 'Playing audio clips from an ESP32 dev board through a PAM8403 amplifier and a speaker. Covers wiring, audio prep, WAV-to-header conversion, and the full Arduino sketch.',
+    category: 'Audio',
+    date: '2026-04-16',
+    tags: ['ESP32', 'PAM8403', 'Audio', 'Arduino'],
+  },
+];
 ---
 <Base title="Projects">
 
@@ -12,12 +22,27 @@ const sorted = projects.sort((a, b) => new Date(b.frontmatter.date) - new Date(a
     <p>Everything that's made it out of the garage in one piece. And a few things that didn't.</p>
   </div>
 
-  {sorted.length === 0 && (
+  {mdProjects.length === 0 && staticProjects.length === 0 && (
     <p style="color:#888;margin-top:2rem">First project coming soon.</p>
   )}
 
   <div class="project-list">
-    {sorted.map((p) => (
+    {staticProjects.map((p) => (
+      <a class="project-row" href={`/projects/${p.slug}`}>
+        <div class="row-meta">
+          <span class="row-category">{p.category}</span>
+          <span class="row-date">{new Date(p.date).toLocaleDateString('en-AU', { year: 'numeric', month: 'short' })}</span>
+        </div>
+        <h2>{p.title}</h2>
+        <p>{p.description}</p>
+        {p.tags && (
+          <div class="tags">
+            {p.tags.map((t) => <span class="tag">{t}</span>)}
+          </div>
+        )}
+      </a>
+    ))}
+    {mdProjects.map((p) => (
       <a class="project-row" href={`/projects/${p.frontmatter.slug}`}>
         <div class="row-meta">
           <span class="row-category">{p.frontmatter.category ?? "Project"}</span>
