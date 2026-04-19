@@ -26,5 +26,19 @@ import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
   <Fragment slot="desc">
     <p>The PAM8403 can drive any speaker between 4 and 8 ohms impedance. Laptop speakers, small hobby speakers, and salvaged speakers all work.</p>
     <p>Lower impedance (4 ohm) draws more current and plays louder; higher impedance (8 ohm) is easier on the amplifier. Connect the two wires to LOUT+ and LOUT-.</p>
+
+    <h2>Testing a speaker with a multimeter</h2>
+    <p>Set your multimeter to <strong>resistance (ohms, &Omega;)</strong> - the lowest range, usually 200&Omega;. Touch the probes to the two speaker terminals. A working speaker reads its rated impedance - typically 4-8&Omega;. You may see the cone give a small kick as the probes make contact; that's normal.</p>
+
+    <h3>What the reading means</h3>
+    <ul>
+      <li><strong>4-8&Omega;</strong> - speaker is good</li>
+      <li><strong>0&Omega; or very close to 0</strong> - voice coil is shorted, speaker is dead</li>
+      <li><strong>OL / open loop / infinite</strong> - wire is broken or voice coil is burnt out, speaker is dead</li>
+      <li><strong>Anything in between</strong> - note that AC impedance at audio frequencies is slightly higher than the DC resistance your multimeter reads, so a nominal 8&Omega; speaker often reads 6-7&Omega; on a multimeter - that's fine</li>
+    </ul>
+
+    <h3>Quick continuity check</h3>
+    <p>If your multimeter has a <strong>continuity / beep mode</strong>, use that instead. Touch probes to the terminals - a beep means the coil is intact. No beep means open circuit (dead speaker). This is faster than reading ohms when you just want a pass/fail result.</p>
   </Fragment>
 </GlossaryEntry>
