@@ -48,19 +48,19 @@ import Base from '../../layouts/Base.astro';
         <div class="card">
           <h3>Parts</h3>
           <ul>
-            <li><span class="term" data-term="esp32">ESP32 Dev Board (38-pin)</span></li>
-            <li><span class="term" data-term="pam8403">PAM8403 amplifier module</span></li>
-            <li><span class="term" data-term="speaker">4-8&#8486; speaker</span></li>
-            <li><span class="term" data-term="cap-coupling">10&#xB5;F electrolytic capacitor</span> <em>(coupling cap)</em></li>
-            <li><span class="term" data-term="cap-decoupling">100&#xB5;F electrolytic capacitor</span> <em>(decoupling cap)</em></li>
+            <li><a href="/glossary/esp32" class="term-link">ESP32 Dev Board (38-pin)</a></li>
+            <li><a href="/glossary/pam8403" class="term-link">PAM8403 amplifier module</a></li>
+            <li><a href="/glossary/speaker" class="term-link">4-8&#8486; speaker</a></li>
+            <li><a href="/glossary/cap-coupling" class="term-link">10&#xB5;F electrolytic capacitor</a> <em>(coupling cap)</em></li>
+            <li><a href="/glossary/cap-decoupling" class="term-link">100&#xB5;F electrolytic capacitor</a> <em>(decoupling cap)</em></li>
             <li>Jumper wires</li>
-            <li><span class="term" data-term="usb-cable">USB cable for flashing</span></li>
+            <li><a href="/glossary/usb-cable" class="term-link">USB cable for flashing</a></li>
           </ul>
         </div>
         <div class="card">
           <h3>Software</h3>
           <ul>
-            <li><span class="term" data-term="arduino-ide">Arduino IDE</span> with ESP32 board support</li>
+            <li><a href="/glossary/arduino-ide" class="term-link">Arduino IDE</a> with ESP32 board support</li>
             <li><code>espeak-ng</code> - generate voice clips</li>
             <li><code>ffmpeg</code> - convert audio files</li>
             <li>Python 3 - WAV to C header</li>
@@ -77,7 +77,7 @@ import Base from '../../layouts/Base.astro';
     <!-- How It Works -->
     <div class="section" id="how-it-works">
       <h2>How It Works</h2>
-      <p>The ESP32 has two built-in <span class="term" data-term="dac">DAC pins</span> (GPIO25 and GPIO26) that output a true analogue voltage (0-3.3V). We use one of these to output audio samples, which the <span class="term" data-term="pam8403">PAM8403</span> amplifies to drive the speaker.</p>
+      <p>The ESP32 has two built-in <a href="/glossary/dac" class="term-link">DAC pins</a> (GPIO25 and GPIO26) that output a true analogue voltage (0-3.3V). We use one of these to output audio samples, which the <a href="/glossary/pam8403" class="term-link">PAM8403</a> amplifies to drive the speaker.</p>
       <p style="margin-top:0.75rem;">The audio data is stored as a C byte array compiled directly into the sketch - no SD card or filesystem needed for short clips.</p>
     </div>
 
@@ -278,7 +278,7 @@ void loop() &#123;
       </div>
 
       <div class="callout callout-why">
-        <strong><span class="term" data-term="progmem">PROGMEM</span></strong>
+        <strong><a href="/glossary/progmem" class="term-link">PROGMEM</a></strong>
         Stores the audio data in flash instead of RAM. Without it, a large audio array would overflow the ESP32's 320KB RAM. <code>pgm_read_byte()</code> reads it back one byte at a time during playback.
       </div>
       <div class="callout callout-tip">
@@ -334,23 +334,6 @@ void loop() &#123;
 
   </main>
 </div>
-
-<!-- Glossary overlay & panel -->
-<div class="gloss-overlay" id="glossOverlay"></div>
-<aside class="gloss-panel" id="glossPanel">
-  <button class="gloss-close" id="glossClose" aria-label="Close">&#10005;</button>
-  <div class="gloss-image" id="glossImage"></div>
-  <div class="gloss-body">
-    <div class="gloss-category" id="glossCategory"></div>
-    <div class="gloss-title" id="glossTitle"></div>
-    <div class="gloss-subtitle" id="glossSubtitle"></div>
-    <div class="gloss-desc" id="glossDesc"></div>
-    <div class="gloss-highlights" id="glossHighlights">
-      <h4>Key details</h4>
-      <ul id="glossHighlightsList"></ul>
-    </div>
-  </div>
-</aside>
 
 </Base>
 
@@ -631,126 +614,16 @@ void loop() &#123;
   }
   .trouble-item ul { margin: 0; }
 
-  .term {
+  .term-link {
     color: var(--amber);
+    text-decoration: none;
     border-bottom: 1.5px dashed var(--amber);
-    cursor: pointer;
     border-radius: 2px;
-    transition: background 0.15s;
   }
-  .term:hover { background: #f5f0ff; }
-
-  .gloss-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.45);
-    z-index: 200;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s;
+  .term-link:hover {
+    background: #f5f0ff;
+    text-decoration: none;
   }
-  .gloss-overlay.open { opacity: 1; pointer-events: all; }
-
-  .gloss-panel {
-    position: fixed;
-    top: 0;
-    right: 0;
-    height: 100vh;
-    width: 400px;
-    max-width: 100vw;
-    background: #fff;
-    z-index: 201;
-    transform: translateX(100%);
-    transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
-    display: flex;
-    flex-direction: column;
-    box-shadow: -6px 0 32px rgba(0,0,0,0.18);
-  }
-  .gloss-panel.open { transform: translateX(0); }
-  .gloss-close {
-    position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-    background: rgba(255,255,255,0.15);
-    border: none;
-    border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    color: #fff;
-    font-size: 1rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1;
-    transition: background 0.15s;
-  }
-  .gloss-close:hover { background: rgba(255,255,255,0.25); }
-  .gloss-image {
-    background: #0f0f1a;
-    padding: 1.5rem 1rem 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 200px;
-    flex-shrink: 0;
-  }
-  .gloss-body {
-    padding: 1.25rem 1.5rem 2rem;
-    overflow-y: auto;
-    flex: 1;
-  }
-  .gloss-category {
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    background: var(--rainbow);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 0.3rem;
-  }
-  .gloss-title {
-    font-size: 1.3rem;
-    font-weight: 800;
-    color: #1a1a2e;
-    line-height: 1.2;
-  }
-  .gloss-subtitle {
-    font-size: 0.82rem;
-    color: #999;
-    margin-bottom: 0.9rem;
-    margin-top: 0.15rem;
-  }
-  .gloss-desc {
-    font-size: 0.88rem;
-    line-height: 1.75;
-    color: #333;
-    margin-bottom: 1rem;
-    white-space: pre-line;
-  }
-  .gloss-highlights {
-    background: #f7f7f9;
-    border-radius: 6px;
-    padding: 0.75rem 1rem;
-  }
-  .gloss-highlights h4 {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #999;
-    margin-bottom: 0.5rem;
-  }
-  .gloss-highlights ul { list-style: none; padding: 0; margin: 0; }
-  .gloss-highlights li {
-    font-size: 0.84rem;
-    padding: 0.22rem 0;
-    color: #444;
-    border-bottom: 1px solid #eee;
-  }
-  .gloss-highlights li:last-child { border-bottom: none; }
-  .gloss-highlights li::before { content: "-> "; color: var(--amber); font-weight: 700; }
 
   @media (max-width: 800px) {
     .pam-wrap { grid-template-columns: 1fr; }
@@ -763,7 +636,6 @@ void loop() &#123;
 </style>
 
 <script is:inline>
-  // Copy buttons
   document.querySelectorAll('.copy-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const pre = btn.closest('.code-wrap').querySelector('pre');
@@ -778,212 +650,6 @@ void loop() &#123;
     });
   });
 
-  // Glossary data
-  const glossary = {
-    esp32: {
-      category: 'Microcontroller',
-      title: 'ESP32 Dev Board',
-      subtitle: '38-pin development board',
-      desc: 'The ESP32 is a dual-core 240MHz microcontroller with built-in WiFi and Bluetooth. The 38-pin dev board breaks all GPIO pins out on two rows of headers. It includes two 8-bit DAC outputs on GPIO25 and GPIO26 that produce a true analogue voltage - used here to drive audio into the PAM8403.',
-      highlights: ['GPIO25 - DAC1, audio output (this guide)', 'GPIO26 - DAC2 (unused here)', '5V pin - powers the PAM8403', 'GND - common ground for all components'],
-      svg: `<svg viewBox="0 0 280 510" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:260px;display:block;margin:auto">
-  <rect x="68" y="8" width="144" height="484" rx="8" fill="#0d3320" stroke="#2a7a40" stroke-width="1.5"/>
-  <rect x="104" y="0" width="72" height="14" rx="3" fill="#888" stroke="#666" stroke-width="1"/>
-  <text x="140" y="10.5" fill="#ccc" font-size="7" font-family="monospace" text-anchor="middle">USB</text>
-  <rect x="95" y="190" width="90" height="86" rx="4" fill="#111" stroke="#444" stroke-width="1.5"/>
-  <rect x="99" y="194" width="82" height="78" rx="3" fill="#1e1e1e"/>
-  <text x="140" y="234" fill="#888" font-size="10" font-family="monospace" text-anchor="middle" font-weight="bold">ESP32</text>
-  <text x="140" y="248" fill="#555" font-size="7" font-family="monospace" text-anchor="middle">WROOM-32</text>
-  <rect x="58" y="217" width="10" height="6" rx="1" fill="#e8a020"/>
-  <text x="55" y="222" fill="#e8a020" font-size="8" font-family="monospace" text-anchor="end" font-weight="bold">25</text>
-  <text x="55" y="231" fill="#e8a020" font-size="6" font-family="monospace" text-anchor="end">DAC1</text>
-  <rect x="58" y="457" width="10" height="6" rx="1" fill="#e05050"/><text x="55" y="463" fill="#e05050" font-size="8" font-family="monospace" text-anchor="end">5V</text>
-  <rect x="58" y="337" width="10" height="6" rx="1" fill="#666"/><text x="55" y="343" fill="#888" font-size="8" font-family="monospace" text-anchor="end">GND</text>
-</svg>`
-    },
-    pam8403: {
-      category: 'Amplifier IC',
-      title: 'PAM8403',
-      subtitle: '3W stereo class-D audio amplifier',
-      desc: 'The PAM8403 is a compact audio amplifier that delivers up to 3W per channel from a 5V supply. It runs in class-D mode - switching rapidly to stay efficient. Modules break out L, G, R audio inputs on one side and speaker output pins on the other. For mono use, connect only the L channel.',
-      highlights: ['L - left channel audio input', 'G - ground reference for audio inputs', 'R - right channel (leave unconnected for mono)', 'LOUT+ / LOUT- - connect to your speaker', 'VCC - 5V supply', 'SD pin (if present) - tie HIGH to 3.3V'],
-      svg: `<svg viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:300px;display:block;margin:auto">
-  <rect x="90" y="50" width="120" height="120" rx="6" fill="#1e1e2e" stroke="#4a4a6a" stroke-width="2"/>
-  <rect x="94" y="54" width="112" height="112" rx="4" fill="#252535"/>
-  <text x="150" y="103" fill="#cdd6f4" font-size="12" font-family="monospace" text-anchor="middle" font-weight="bold">PAM8403</text>
-  <text x="150" y="120" fill="#666" font-size="8" font-family="monospace" text-anchor="middle">3W Class-D</text>
-  <line x1="50" y1="80" x2="90" y2="80" stroke="#e8a020" stroke-width="2"/>
-  <text x="38" y="84" fill="#e8a020" font-size="10" font-family="monospace" text-anchor="end" font-weight="bold">L</text>
-  <line x1="50" y1="110" x2="90" y2="110" stroke="#666" stroke-width="2"/>
-  <text x="38" y="114" fill="#888" font-size="10" font-family="monospace" text-anchor="end">G</text>
-  <line x1="50" y1="140" x2="90" y2="140" stroke="#7aa8d4" stroke-width="2"/>
-  <text x="38" y="144" fill="#7aa8d4" font-size="10" font-family="monospace" text-anchor="end">R</text>
-  <line x1="210" y1="75" x2="250" y2="75" stroke="#e8a020" stroke-width="2"/>
-  <text x="262" y="79" fill="#e8a020" font-size="9" font-family="monospace">LOUT+</text>
-  <line x1="210" y1="95" x2="250" y2="95" stroke="#e8a020" stroke-width="2"/>
-  <text x="262" y="99" fill="#c8841a" font-size="9" font-family="monospace">LOUT-</text>
-  <line x1="120" y1="20" x2="120" y2="50" stroke="#e05050" stroke-width="2"/>
-  <text x="120" y="10" fill="#e05050" font-size="9" font-family="monospace" text-anchor="middle">VCC</text>
-  <line x1="180" y1="170" x2="180" y2="200" stroke="#666" stroke-width="2"/>
-  <text x="180" y="216" fill="#888" font-size="9" font-family="monospace" text-anchor="middle">GND</text>
-</svg>`
-    },
-    'cap-coupling': {
-      category: 'Electronic Component',
-      title: 'Coupling Capacitor',
-      subtitle: '10uF electrolytic - signal path',
-      desc: 'A coupling capacitor sits between two circuits to pass AC signals (audio) while blocking DC voltage. The ESP32 DAC outputs 0-3.3V centred at ~1.65V DC. Without this cap, that DC offset enters the PAM8403 and causes a loud thump on power-on and distorts the audio. The cap strips the DC, leaving only the audio waveform.',
-      highlights: ['Value: 10uF electrolytic', 'Polarity matters - + leg toward ESP32 GPIO25', '- leg toward PAM8403 L input', 'Blocks DC, passes audio frequencies'],
-      svg: `<svg viewBox="0 0 240 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:200px;display:block;margin:auto">
-  <ellipse cx="120" cy="60" rx="44" ry="13" fill="#3a3a5a" stroke="#5a5a8a" stroke-width="1.5"/>
-  <rect x="76" y="60" width="88" height="110" fill="#3a3a5a" stroke="#5a5a8a" stroke-width="1.5"/>
-  <ellipse cx="120" cy="170" rx="44" ry="13" fill="#2e2e4e" stroke="#5a5a8a" stroke-width="1.5"/>
-  <text x="120" y="58" fill="#e8a020" font-size="18" font-family="monospace" text-anchor="middle" font-weight="bold">+</text>
-  <text x="120" y="94" fill="#ccc" font-size="9" font-family="monospace" text-anchor="middle">10uF</text>
-  <line x1="100" y1="170" x2="100" y2="230" stroke="#ccc" stroke-width="4" stroke-linecap="round"/>
-  <line x1="140" y1="170" x2="140" y2="220" stroke="#ccc" stroke-width="4" stroke-linecap="round"/>
-  <text x="100" y="248" fill="#e8a020" font-size="13" font-family="monospace" text-anchor="middle" font-weight="bold">+</text>
-  <text x="140" y="238" fill="#888" font-size="13" font-family="monospace" text-anchor="middle">-</text>
-</svg>`
-    },
-    'cap-decoupling': {
-      category: 'Electronic Component',
-      title: 'Decoupling Capacitor',
-      subtitle: '100uF electrolytic - power supply',
-      desc: 'A decoupling capacitor sits across a power rail to absorb sudden current spikes. When the PAM8403 plays a loud sound it draws a burst of current from the 5V line. Without this cap, that spike causes a tiny voltage drop which comes out as hiss or noise through the speaker. The cap provides instant local current, keeping the supply stable.',
-      highlights: ['Value: 100uF electrolytic', 'Polarity matters - + leg to PAM8403 VCC', '- leg to GND', 'Mount as close to the PAM8403 as possible', 'Smooths power-supply noise from audio bursts'],
-      svg: `<svg viewBox="0 0 240 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:200px;display:block;margin:auto">
-  <ellipse cx="120" cy="60" rx="52" ry="15" fill="#3a5a3a" stroke="#5a8a5a" stroke-width="1.5"/>
-  <rect x="68" y="60" width="104" height="110" fill="#3a5a3a" stroke="#5a8a5a" stroke-width="1.5"/>
-  <ellipse cx="120" cy="170" rx="52" ry="15" fill="#2e4e2e" stroke="#5a8a5a" stroke-width="1.5"/>
-  <text x="120" y="58" fill="#e8a020" font-size="18" font-family="monospace" text-anchor="middle" font-weight="bold">+</text>
-  <text x="120" y="94" fill="#ccc" font-size="9" font-family="monospace" text-anchor="middle">100uF</text>
-  <line x1="100" y1="170" x2="100" y2="230" stroke="#ccc" stroke-width="4" stroke-linecap="round"/>
-  <line x1="140" y1="170" x2="140" y2="220" stroke="#ccc" stroke-width="4" stroke-linecap="round"/>
-  <text x="100" y="248" fill="#e8a020" font-size="13" font-family="monospace" text-anchor="middle" font-weight="bold">+</text>
-  <text x="140" y="238" fill="#888" font-size="13" font-family="monospace" text-anchor="middle">-</text>
-</svg>`
-    },
-    dac: {
-      category: 'ESP32 Feature',
-      title: 'DAC',
-      subtitle: 'Digital-to-Analogue Converter',
-      desc: 'A DAC converts a digital number (0-255) into an analogue voltage (0-3.3V). The ESP32 has two: GPIO25 (DAC1) and GPIO26 (DAC2). Audio works by writing thousands of sample values per second - each number sets an exact voltage level, and the rapid succession of levels forms a waveform that the amplifier drives into the speaker.',
-      highlights: ['GPIO25 -> DAC1 (used here)', 'GPIO26 -> DAC2', '8-bit resolution: 0 = 0V, 128 = 1.65V, 255 = 3.3V', 'dacWrite(25, value) - sets output instantly', '8kHz sample rate = 8000 writes per second'],
-      svg: `<svg viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:320px;display:block;margin:auto">
-  <rect x="10" y="40" width="80" height="80" rx="6" fill="#1e1e2e" stroke="#4a4a6a" stroke-width="1.5"/>
-  <text x="50" y="86" fill="#e8a020" font-size="14" font-family="monospace" text-anchor="middle" font-weight="bold">128</text>
-  <text x="50" y="101" fill="#666" font-size="8" font-family="monospace" text-anchor="middle">0 - 255</text>
-  <line x1="90" y1="80" x2="118" y2="80" stroke="#555" stroke-width="2"/>
-  <polygon points="116,75 124,80 116,85" fill="#555"/>
-  <rect x="124" y="28" width="80" height="104" rx="6" fill="#2a1840" stroke="#8844cc" stroke-width="1.5"/>
-  <text x="164" y="68" fill="#cc88ff" font-size="11" font-family="monospace" text-anchor="middle" font-weight="bold">DAC</text>
-  <line x1="204" y1="80" x2="230" y2="80" stroke="#555" stroke-width="2"/>
-  <polygon points="228,75 236,80 228,85" fill="#555"/>
-  <rect x="236" y="36" width="74" height="88" rx="6" fill="#1a2a1a" stroke="#2ecc71" stroke-width="1.5"/>
-  <path d="M244 80 Q250 50 256 80 Q262 110 268 80 Q274 50 280 80 Q286 110 292 80 Q298 50 304 80" fill="none" stroke="#2ecc71" stroke-width="2.5"/>
-  <text x="273" y="115" fill="#2ecc71" font-size="8" font-family="monospace" text-anchor="middle">0 - 3.3V</text>
-</svg>`
-    },
-    progmem: {
-      category: 'Arduino / ESP32',
-      title: 'PROGMEM',
-      subtitle: 'Store data in flash, not RAM',
-      desc: 'PROGMEM is a compiler attribute that tells the ESP32 to store a variable in flash memory instead of RAM. The ESP32 has only 320KB of RAM - a 1-second audio clip at 8kHz is already 8KB, and a few clips would overflow it. Flash is 4MB and is not used at runtime, so storing audio data there leaves RAM free for the program.',
-      highlights: ['RAM: 320KB - limited, needed at runtime', 'Flash: 4MB - plenty, read-only during execution', 'Syntax: const uint8_t data[] PROGMEM = {...}', 'Read back with: pgm_read_byte(&data[i])', 'Without PROGMEM: large arrays crash at boot'],
-      svg: `<svg viewBox="0 0 300 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:300px;display:block;margin:auto">
-  <rect x="15" y="20" width="90" height="160" rx="6" fill="#1e1e2e" stroke="#cc3333" stroke-width="1.5"/>
-  <text x="60" y="42" fill="#e05050" font-size="10" font-family="monospace" text-anchor="middle" font-weight="bold">RAM</text>
-  <text x="60" y="55" fill="#888" font-size="8" font-family="monospace" text-anchor="middle">320 KB</text>
-  <text x="60" y="153" fill="#e05050" font-size="9" font-family="monospace" text-anchor="middle">FULL</text>
-  <text x="150" y="108" fill="#e8a020" font-size="8" font-family="monospace" text-anchor="middle">PROGMEM</text>
-  <rect x="195" y="20" width="90" height="160" rx="6" fill="#1e1e2e" stroke="#2ecc71" stroke-width="1.5"/>
-  <text x="240" y="42" fill="#2ecc71" font-size="10" font-family="monospace" text-anchor="middle" font-weight="bold">Flash</text>
-  <text x="240" y="55" fill="#888" font-size="8" font-family="monospace" text-anchor="middle">4 MB</text>
-  <text x="240" y="168" fill="#27ae60" font-size="9" font-family="monospace" text-anchor="middle">safe</text>
-</svg>`
-    },
-    'usb-cable': {
-      category: 'Common Gotcha',
-      title: 'USB Cable',
-      subtitle: 'Not all cables work for flashing',
-      desc: 'USB cables look identical from the outside but are not all the same inside. Charge-only cables contain just the power wires (VBUS and GND) - they will power your ESP32 but the computer will never see it, so you cannot upload a sketch. Data cables contain all four wires including D+ and D- which carry the serial communication needed for flashing.\n\nIf your ESP32 powers up but does not appear in the Arduino IDE port list, swap the cable first - it is the most common cause and takes 10 seconds to rule out.',
-      highlights: ['Charge-only cables: power only, no data - will not flash', 'Data cables: all 4 wires - required for flashing', 'ESP32 powers on either way - the LED is no proof', 'If port does not appear in IDE: swap cable first'],
-      svg: `<svg viewBox="0 0 300 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:300px;display:block;margin:auto">
-  <text x="75" y="18" fill="#e05050" font-size="10" font-family="monospace" text-anchor="middle" font-weight="bold">Charge Only</text>
-  <rect x="20" y="28" width="110" height="100" rx="8" fill="#1e1e2e" stroke="#e05050" stroke-width="1.5"/>
-  <text x="75" y="120" fill="#e05050" font-size="9" font-family="monospace" text-anchor="middle">Won't flash</text>
-  <text x="225" y="18" fill="#2ecc71" font-size="10" font-family="monospace" text-anchor="middle" font-weight="bold">Data Cable</text>
-  <rect x="170" y="28" width="110" height="100" rx="8" fill="#1e1e2e" stroke="#2ecc71" stroke-width="1.5"/>
-  <text x="225" y="120" fill="#2ecc71" font-size="9" font-family="monospace" text-anchor="middle">Flashes fine</text>
-</svg>`
-    },
-    speaker: {
-      category: 'Output Device',
-      title: '4-8 Ohm Speaker',
-      subtitle: 'Passive speaker, any small size',
-      desc: 'The PAM8403 can drive any speaker between 4 and 8 ohms impedance. Laptop speakers, small hobby speakers, and salvaged speakers all work. Lower impedance (4 ohm) draws more current and plays louder; higher impedance (8 ohm) is easier on the amplifier. Connect the two wires to LOUT+ and LOUT-.',
-      highlights: ['4 ohm - louder, draws more current', '8 ohm - safer for the amp, slightly quieter', 'Any physical size works - bigger cone = more bass', 'Connect to PAM8403 LOUT+ and LOUT-', 'Polarity just affects phase, not function'],
-      svg: `<svg viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:280px;display:block;margin:auto">
-  <ellipse cx="140" cy="90" rx="90" ry="90" fill="#1e1e2e"/>
-  <ellipse cx="140" cy="90" rx="80" ry="80" fill="none" stroke="#555" stroke-width="6"/>
-  <ellipse cx="140" cy="90" rx="66" ry="66" fill="#2a2a3a" stroke="#555" stroke-width="1"/>
-  <ellipse cx="140" cy="90" rx="22" ry="22" fill="#333" stroke="#555" stroke-width="1.5"/>
-  <rect x="108" y="172" width="16" height="22" rx="2" fill="#e8a020"/>
-  <text x="116" y="187" fill="#1a1a1a" font-size="9" font-family="monospace" text-anchor="middle" font-weight="bold">+</text>
-  <rect x="156" y="172" width="16" height="22" rx="2" fill="#555"/>
-  <text x="164" y="187" fill="#ccc" font-size="9" font-family="monospace" text-anchor="middle">-</text>
-</svg>`
-    },
-    'arduino-ide': {
-      category: 'Software',
-      title: 'Arduino IDE',
-      subtitle: 'Write, compile and upload sketches',
-      desc: 'The Arduino IDE is the official tool for writing code (called "sketches") and uploading them to Arduino-compatible boards. The ESP32 is supported via the Board Manager. You write C++ code, click Upload, and the IDE compiles it and flashes it to the board over USB.',
-      highlights: ['Download from arduino.cc', 'Add ESP32 support via Board Manager', 'Upload shortcut: Ctrl+U', 'Serial Monitor: Ctrl+Shift+M'],
-      svg: `<svg viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:320px;display:block;margin:auto">
-  <rect x="10" y="10" width="300" height="140" rx="8" fill="#1e1e2e" stroke="#444" stroke-width="1.5"/>
-  <rect x="10" y="10" width="300" height="28" rx="8" fill="#252535"/>
-  <rect x="10" y="28" width="300" height="10" fill="#252535"/>
-  <text x="160" y="27" fill="#888" font-size="9" font-family="monospace" text-anchor="middle">Arduino IDE</text>
-  <rect x="10" y="38" width="300" height="26" fill="#2a2a3a"/>
-  <rect x="48" y="43" width="32" height="16" rx="3" fill="#0066cc"/>
-  <text x="64" y="54" fill="#fff" font-size="8" font-family="monospace" text-anchor="middle">Upload</text>
-  <text x="22" y="100" fill="#cba6f7" font-size="8" font-family="monospace">#include "myclip.h"</text>
-  <text x="22" y="130" fill="#2ecc71" font-size="8" font-family="monospace">Done uploading.</text>
-</svg>`
-    }
-  };
-
-  function openGloss(termKey) {
-    const entry = glossary[termKey];
-    if (!entry) return;
-    document.getElementById('glossCategory').textContent = entry.category;
-    document.getElementById('glossTitle').textContent = entry.title;
-    document.getElementById('glossSubtitle').textContent = entry.subtitle;
-    document.getElementById('glossDesc').textContent = entry.desc;
-    document.getElementById('glossImage').innerHTML = entry.svg;
-    const list = document.getElementById('glossHighlightsList');
-    list.innerHTML = entry.highlights.map(h => `<li>${h}</li>`).join('');
-    document.getElementById('glossPanel').classList.add('open');
-    document.getElementById('glossOverlay').classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeGloss() {
-    document.getElementById('glossPanel').classList.remove('open');
-    document.getElementById('glossOverlay').classList.remove('open');
-    document.body.style.overflow = '';
-  }
-
-  document.getElementById('glossClose').addEventListener('click', closeGloss);
-
-  // Term hover to open, X to close
-  document.querySelectorAll('.term').forEach(el => {
-    el.addEventListener('mouseenter', () => openGloss(el.dataset.term));
-  });
-
-  // TOC active highlighting
   const sections = document.querySelectorAll('.section[id]');
   const tocLinks = document.querySelectorAll('.toc a');
   const observer = new IntersectionObserver(entries => {

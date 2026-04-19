@@ -1,0 +1,132 @@
+---
+import Base from './Base.astro';
+const { category, title, subtitle, highlights, backTo = '/projects/pam8403-esp32-audio', backLabel = 'Back to PAM8403 guide' } = Astro.props;
+---
+<Base title={title} description={subtitle}>
+  <div class="gloss-page">
+    <a href={backTo} class="back-link">&larr; {backLabel}</a>
+    <div class="gloss-card">
+      <div class="gloss-svg">
+        <slot name="svg" />
+      </div>
+      <div class="gloss-content">
+        <div class="category">{category}</div>
+        <h1>{title}</h1>
+        <p class="subtitle">{subtitle}</p>
+        <div class="desc">
+          <slot name="desc" />
+        </div>
+        {highlights && highlights.length > 0 && (
+          <div class="highlights">
+            <h2>Key details</h2>
+            <ul>
+              {highlights.map((h: string) => <li>{h}</li>)}
+            </ul>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .back-link {
+    display: inline-block;
+    color: var(--amber);
+    text-decoration: none;
+    font-size: 0.88rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+  }
+  .back-link:hover { text-decoration: underline; }
+
+  .gloss-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .gloss-svg {
+    background: #0f0f1a;
+    padding: 2rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+  }
+
+  .gloss-content {
+    padding: 1.75rem 2rem 2rem;
+  }
+
+  .category {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    background: var(--rainbow);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.3rem;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #1a1a2e;
+    line-height: 1.2;
+    margin-bottom: 0.25rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+    color: #999;
+    margin-bottom: 1.25rem;
+  }
+
+  .desc {
+    font-size: 0.95rem;
+    line-height: 1.8;
+    color: #333;
+    margin-bottom: 1.5rem;
+  }
+
+  .desc p + p { margin-top: 0.9rem; }
+
+  .highlights {
+    background: #f7f7f9;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+  }
+
+  .highlights h2 {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #999;
+    margin-bottom: 0.6rem;
+    font-weight: 700;
+  }
+
+  .highlights ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .highlights li {
+    font-size: 0.88rem;
+    padding: 0.28rem 0;
+    color: #444;
+    border-bottom: 1px solid #eee;
+  }
+  .highlights li:last-child { border-bottom: none; }
+  .highlights li::before { content: "-> "; color: var(--amber); font-weight: 700; }
+
+  @media (max-width: 600px) {
+    .gloss-content { padding: 1.25rem; }
+    h1 { font-size: 1.4rem; }
+  }
+</style>

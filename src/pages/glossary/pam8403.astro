@@ -1,0 +1,41 @@
+---
+import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
+---
+<GlossaryEntry
+  category="Amplifier IC"
+  title="PAM8403"
+  subtitle="3W stereo class-D audio amplifier"
+  highlights={[
+    'L - left channel audio input',
+    'G - ground reference for audio inputs',
+    'R - right channel (leave unconnected for mono)',
+    'LOUT+ / LOUT- - connect to your speaker',
+    'VCC - 5V supply',
+    'SD pin (if present) - tie HIGH to 3.3V',
+  ]}
+>
+  <svg slot="svg" viewBox="0 0 300 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:300px;display:block;margin:auto">
+    <rect x="90" y="50" width="120" height="120" rx="6" fill="#1e1e2e" stroke="#4a4a6a" stroke-width="2"/>
+    <rect x="94" y="54" width="112" height="112" rx="4" fill="#252535"/>
+    <text x="150" y="103" fill="#cdd6f4" font-size="12" font-family="monospace" text-anchor="middle" font-weight="bold">PAM8403</text>
+    <text x="150" y="120" fill="#666" font-size="8" font-family="monospace" text-anchor="middle">3W Class-D</text>
+    <line x1="50" y1="80" x2="90" y2="80" stroke="#e8a020" stroke-width="2"/>
+    <text x="38" y="84" fill="#e8a020" font-size="10" font-family="monospace" text-anchor="end" font-weight="bold">L</text>
+    <line x1="50" y1="110" x2="90" y2="110" stroke="#666" stroke-width="2"/>
+    <text x="38" y="114" fill="#888" font-size="10" font-family="monospace" text-anchor="end">G</text>
+    <line x1="50" y1="140" x2="90" y2="140" stroke="#7aa8d4" stroke-width="2"/>
+    <text x="38" y="144" fill="#7aa8d4" font-size="10" font-family="monospace" text-anchor="end">R</text>
+    <line x1="210" y1="75" x2="250" y2="75" stroke="#e8a020" stroke-width="2"/>
+    <text x="262" y="79" fill="#e8a020" font-size="9" font-family="monospace">LOUT+</text>
+    <line x1="210" y1="95" x2="250" y2="95" stroke="#e8a020" stroke-width="2"/>
+    <text x="262" y="99" fill="#c8841a" font-size="9" font-family="monospace">LOUT-</text>
+    <line x1="120" y1="20" x2="120" y2="50" stroke="#e05050" stroke-width="2"/>
+    <text x="120" y="10" fill="#e05050" font-size="9" font-family="monospace" text-anchor="middle">VCC</text>
+    <line x1="180" y1="170" x2="180" y2="200" stroke="#666" stroke-width="2"/>
+    <text x="180" y="216" fill="#888" font-size="9" font-family="monospace" text-anchor="middle">GND</text>
+  </svg>
+  <Fragment slot="desc">
+    <p>The PAM8403 is a compact audio amplifier that delivers up to 3W per channel from a 5V supply. It runs in class-D mode - switching rapidly to stay efficient.</p>
+    <p>Modules break out L, G, R audio inputs on one side and speaker output pins on the other. For mono use, connect only the L channel.</p>
+  </Fragment>
+</GlossaryEntry>

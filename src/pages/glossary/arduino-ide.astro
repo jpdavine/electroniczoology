@@ -1,0 +1,30 @@
+---
+import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
+---
+<GlossaryEntry
+  category="Software"
+  title="Arduino IDE"
+  subtitle="Write, compile and upload sketches"
+  highlights={[
+    'Download from arduino.cc',
+    'Add ESP32 support via Board Manager',
+    'Upload shortcut: Ctrl+U',
+    'Serial Monitor: Ctrl+Shift+M',
+  ]}
+>
+  <svg slot="svg" viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:320px;display:block;margin:auto">
+    <rect x="10" y="10" width="300" height="140" rx="8" fill="#1e1e2e" stroke="#444" stroke-width="1.5"/>
+    <rect x="10" y="10" width="300" height="28" rx="8" fill="#252535"/>
+    <rect x="10" y="28" width="300" height="10" fill="#252535"/>
+    <text x="160" y="27" fill="#888" font-size="9" font-family="monospace" text-anchor="middle">Arduino IDE</text>
+    <rect x="10" y="38" width="300" height="26" fill="#2a2a3a"/>
+    <rect x="48" y="43" width="32" height="16" rx="3" fill="#0066cc"/>
+    <text x="64" y="54" fill="#fff" font-size="8" font-family="monospace" text-anchor="middle">Upload</text>
+    <text x="22" y="100" fill="#cba6f7" font-size="8" font-family="monospace">#include "myclip.h"</text>
+    <text x="22" y="130" fill="#2ecc71" font-size="8" font-family="monospace">Done uploading.</text>
+  </svg>
+  <Fragment slot="desc">
+    <p>The Arduino IDE is the official tool for writing code (called "sketches") and uploading them to Arduino-compatible boards. The ESP32 is supported via the Board Manager.</p>
+    <p>You write C++ code, click Upload, and the IDE compiles it and flashes it to the board over USB.</p>
+  </Fragment>
+</GlossaryEntry>

@@ -1,0 +1,27 @@
+---
+import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
+---
+<GlossaryEntry
+  category="Common Gotcha"
+  title="USB Cable"
+  subtitle="Not all cables work for flashing"
+  highlights={[
+    'Charge-only cables: power only, no data - will not flash',
+    'Data cables: all 4 wires - required for flashing',
+    'ESP32 powers on either way - the LED is no proof',
+    'If port does not appear in IDE: swap cable first',
+  ]}
+>
+  <svg slot="svg" viewBox="0 0 300 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:300px;display:block;margin:auto">
+    <text x="75" y="18" fill="#e05050" font-size="10" font-family="monospace" text-anchor="middle" font-weight="bold">Charge Only</text>
+    <rect x="20" y="28" width="110" height="100" rx="8" fill="#1e1e2e" stroke="#e05050" stroke-width="1.5"/>
+    <text x="75" y="120" fill="#e05050" font-size="9" font-family="monospace" text-anchor="middle">Won't flash</text>
+    <text x="225" y="18" fill="#2ecc71" font-size="10" font-family="monospace" text-anchor="middle" font-weight="bold">Data Cable</text>
+    <rect x="170" y="28" width="110" height="100" rx="8" fill="#1e1e2e" stroke="#2ecc71" stroke-width="1.5"/>
+    <text x="225" y="120" fill="#2ecc71" font-size="9" font-family="monospace" text-anchor="middle">Flashes fine</text>
+  </svg>
+  <Fragment slot="desc">
+    <p>USB cables look identical from the outside but are not all the same inside. Charge-only cables contain just the power wires (VBUS and GND) - they will power your ESP32 but the computer will never see it, so you cannot upload a sketch.</p>
+    <p>Data cables contain all four wires including D+ and D- which carry the serial communication needed for flashing. If your ESP32 powers up but does not appear in the Arduino IDE port list, swap the cable first - it is the most common cause and takes 10 seconds to rule out.</p>
+  </Fragment>
+</GlossaryEntry>

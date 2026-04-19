@@ -1,0 +1,31 @@
+---
+import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
+---
+<GlossaryEntry
+  category="Electronic Component"
+  title="Decoupling Capacitor"
+  subtitle="100uF electrolytic - power supply"
+  highlights={[
+    'Value: 100uF electrolytic',
+    'Polarity matters - + leg to PAM8403 VCC',
+    '- leg to GND',
+    'Mount as close to the PAM8403 as possible',
+    'Smooths power-supply noise from audio bursts',
+  ]}
+>
+  <svg slot="svg" viewBox="0 0 240 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:180px;display:block;margin:auto">
+    <ellipse cx="120" cy="60" rx="52" ry="15" fill="#3a5a3a" stroke="#5a8a5a" stroke-width="1.5"/>
+    <rect x="68" y="60" width="104" height="110" fill="#3a5a3a" stroke="#5a8a5a" stroke-width="1.5"/>
+    <ellipse cx="120" cy="170" rx="52" ry="15" fill="#2e4e2e" stroke="#5a8a5a" stroke-width="1.5"/>
+    <text x="120" y="58" fill="#e8a020" font-size="18" font-family="monospace" text-anchor="middle" font-weight="bold">+</text>
+    <text x="120" y="94" fill="#ccc" font-size="9" font-family="monospace" text-anchor="middle">100uF</text>
+    <line x1="100" y1="170" x2="100" y2="230" stroke="#ccc" stroke-width="4" stroke-linecap="round"/>
+    <line x1="140" y1="170" x2="140" y2="220" stroke="#ccc" stroke-width="4" stroke-linecap="round"/>
+    <text x="100" y="248" fill="#e8a020" font-size="13" font-family="monospace" text-anchor="middle" font-weight="bold">+</text>
+    <text x="140" y="238" fill="#888" font-size="13" font-family="monospace" text-anchor="middle">-</text>
+  </svg>
+  <Fragment slot="desc">
+    <p>A decoupling capacitor sits across a power rail to absorb sudden current spikes.</p>
+    <p>When the PAM8403 plays a loud sound it draws a burst of current from the 5V line. Without this cap, that spike causes a tiny voltage drop which comes out as hiss or noise through the speaker. The cap provides instant local current, keeping the supply stable.</p>
+  </Fragment>
+</GlossaryEntry>

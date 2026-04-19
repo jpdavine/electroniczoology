@@ -1,0 +1,30 @@
+---
+import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
+---
+<GlossaryEntry
+  category="Electronic Component"
+  title="Coupling Capacitor"
+  subtitle="10uF electrolytic - signal path"
+  highlights={[
+    'Value: 10uF electrolytic',
+    'Polarity matters - + leg toward ESP32 GPIO25',
+    '- leg toward PAM8403 L input',
+    'Blocks DC, passes audio frequencies',
+  ]}
+>
+  <svg slot="svg" viewBox="0 0 240 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:180px;display:block;margin:auto">
+    <ellipse cx="120" cy="60" rx="44" ry="13" fill="#3a3a5a" stroke="#5a5a8a" stroke-width="1.5"/>
+    <rect x="76" y="60" width="88" height="110" fill="#3a3a5a" stroke="#5a5a8a" stroke-width="1.5"/>
+    <ellipse cx="120" cy="170" rx="44" ry="13" fill="#2e2e4e" stroke="#5a5a8a" stroke-width="1.5"/>
+    <text x="120" y="58" fill="#e8a020" font-size="18" font-family="monospace" text-anchor="middle" font-weight="bold">+</text>
+    <text x="120" y="94" fill="#ccc" font-size="9" font-family="monospace" text-anchor="middle">10uF</text>
+    <line x1="100" y1="170" x2="100" y2="230" stroke="#ccc" stroke-width="4" stroke-linecap="round"/>
+    <line x1="140" y1="170" x2="140" y2="220" stroke="#ccc" stroke-width="4" stroke-linecap="round"/>
+    <text x="100" y="248" fill="#e8a020" font-size="13" font-family="monospace" text-anchor="middle" font-weight="bold">+</text>
+    <text x="140" y="238" fill="#888" font-size="13" font-family="monospace" text-anchor="middle">-</text>
+  </svg>
+  <Fragment slot="desc">
+    <p>A coupling capacitor sits between two circuits to pass AC signals (audio) while blocking DC voltage.</p>
+    <p>The ESP32 DAC outputs 0-3.3V centred at ~1.65V DC. Without this cap, that DC offset enters the PAM8403 and causes a loud thump on power-on and distorts the audio. The cap strips the DC, leaving only the audio waveform.</p>
+  </Fragment>
+</GlossaryEntry>

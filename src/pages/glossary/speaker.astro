@@ -1,0 +1,30 @@
+---
+import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
+---
+<GlossaryEntry
+  category="Output Device"
+  title="4-8 Ohm Speaker"
+  subtitle="Passive speaker, any small size"
+  highlights={[
+    '4 ohm - louder, draws more current',
+    '8 ohm - safer for the amp, slightly quieter',
+    'Any physical size works - bigger cone = more bass',
+    'Connect to PAM8403 LOUT+ and LOUT-',
+    'Polarity just affects phase, not function',
+  ]}
+>
+  <svg slot="svg" viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:260px;display:block;margin:auto">
+    <ellipse cx="140" cy="90" rx="90" ry="90" fill="#1e1e2e"/>
+    <ellipse cx="140" cy="90" rx="80" ry="80" fill="none" stroke="#555" stroke-width="6"/>
+    <ellipse cx="140" cy="90" rx="66" ry="66" fill="#2a2a3a" stroke="#555" stroke-width="1"/>
+    <ellipse cx="140" cy="90" rx="22" ry="22" fill="#333" stroke="#555" stroke-width="1.5"/>
+    <rect x="108" y="172" width="16" height="22" rx="2" fill="#e8a020"/>
+    <text x="116" y="187" fill="#1a1a1a" font-size="9" font-family="monospace" text-anchor="middle" font-weight="bold">+</text>
+    <rect x="156" y="172" width="16" height="22" rx="2" fill="#555"/>
+    <text x="164" y="187" fill="#ccc" font-size="9" font-family="monospace" text-anchor="middle">-</text>
+  </svg>
+  <Fragment slot="desc">
+    <p>The PAM8403 can drive any speaker between 4 and 8 ohms impedance. Laptop speakers, small hobby speakers, and salvaged speakers all work.</p>
+    <p>Lower impedance (4 ohm) draws more current and plays louder; higher impedance (8 ohm) is easier on the amplifier. Connect the two wires to LOUT+ and LOUT-.</p>
+  </Fragment>
+</GlossaryEntry>
