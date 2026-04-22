@@ -1,0 +1,29 @@
+---
+import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
+---
+<GlossaryEntry
+  category="Display"
+  title="GC9A01"
+  subtitle="240x240 round IPS TFT display"
+  backTo="/guides/gc9a01-round-display-esp32"
+  backLabel="Back to GC9A01 guide"
+  highlights={[
+    'VCC - 3.3V or 5V (module has onboard regulator)',
+    'GND - ground',
+    'SCL - SPI clock, connect to GPIO 18',
+    'SDA - SPI data (MOSI), connect to GPIO 23',
+    'DC - data/command select, connect to GPIO 27',
+    'CS - chip select, connect to GPIO 5',
+    'RST - reset, connect to GPIO 4',
+  ]}
+>
+  <div slot="svg" style="display:flex;gap:1rem;flex-wrap:wrap;align-items:flex-start;">
+    <img src="/images/gc9a01/gc9a01-front.png" alt="GC9A01 round TFT display face" style="width:140px;border-radius:6px;" />
+    <img src="/images/gc9a01/gc9a01-back.png" alt="GC9A01 PCB back showing pin labels" style="width:140px;border-radius:6px;" />
+  </div>
+  <Fragment slot="desc">
+    <p>The GC9A01 is a 240x240 round IPS TFT display driven over SPI. It's write-only - no MISO needed. The round shape makes it a natural fit for instrument clusters, watch faces, and character displays.</p>
+    <p>Use the <strong>Arduino_GFX_Library</strong> by Moon On Our Nation. TFT_eSPI works but requires config file edits. Adafruit_GC9A01A is slower and less reliable on this display.</p>
+    <p>Some AliExpress AU depot stock has a known bad batch issue - garbled pixels and green lines that look like a software problem but aren't. If after many hours of exhausting debugging nothing works 😩 try a different supplier.</p>
+  </Fragment>
+</GlossaryEntry>

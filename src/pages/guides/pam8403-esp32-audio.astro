@@ -568,6 +568,7 @@ void loop() &#123;
   .code-wrap:hover .copy-btn { opacity: 1; }
   .copy-btn:hover { background: #45475a; }
   .copy-btn.copied { color: #a6e3a1; }
+  @media (hover: none) { .copy-btn { opacity: 1; } }
 
   .table-wrap { overflow-x: auto; margin: 1rem 0 1.5rem; }
   table {
@@ -658,14 +659,24 @@ void loop() &#123;
   document.querySelectorAll('.copy-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       const pre = btn.closest('.code-wrap').querySelector('pre');
-      navigator.clipboard.writeText(pre.innerText).then(() => {
+      const text = pre.innerText;
+      const done = () => {
         btn.textContent = 'Copied!';
         btn.classList.add('copied');
-        setTimeout(() => {
-          btn.textContent = 'Copy';
-          btn.classList.remove('copied');
-        }, 1500);
-      });
+        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+      };
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(done);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.cssText = 'position:fixed;opacity:0';
+        document.body.appendChild(ta);
+        ta.focus(); ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        done();
+      }
     });
   });
 
