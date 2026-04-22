@@ -71,6 +71,9 @@ import Base from '../layouts/Base.astro';
   }
   .badge .dot { width: 6px; height: 6px; border-radius: 50%; background: #a855f7; flex-shrink: 0; }
   .badge .dot.green { background: #2ecc71; }
+  .badge .dot.ochre { background: #a0562b; }
+  a.country-badge { text-decoration: none; transition: opacity 0.15s; }
+  a.country-badge:hover { opacity: 0.75; }
 
   .page-wrap {
     max-width: 780px;
@@ -192,6 +195,20 @@ import Base from '../layouts/Base.astro';
     .bio-grid { grid-template-columns: 1fr; }
     .hero { padding: 3.5rem 1.5rem 3rem; }
   }
+  .country-btn {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #7a3f1e;
+    background: #efe6d4;
+    border: 1px solid #a0562b;
+    border-radius: 4px;
+    padding: 0.1rem 0.45rem;
+    text-decoration: none;
+    vertical-align: middle;
+    transition: background 0.15s, color 0.15s;
+  }
+  .country-btn:hover { background: #a0562b; color: #fff; }
 </style>
 
 <section class="hero">
@@ -200,6 +217,7 @@ import Base from '../layouts/Base.astro';
   <p class="hero-sub">Studying, documenting, and occasionally arguing with the strange creatures that live in the electronic wilderness.</p>
   <div class="hero-badges">
     <span class="badge"><span class="dot"></span>Bellarine Peninsula, VIC</span>
+    <a href="/acknowledgement" class="badge country-badge"><span class="dot ochre"></span>Bellawiyn Country</a>
     <span class="badge"><span class="dot green"></span>Garage-based operation</span>
     <span class="badge"><span class="dot"></span>ESP32 &middot; Pi &middot; Salvage</span>
   </div>
@@ -214,7 +232,7 @@ import Base from '../layouts/Base.astro';
       We stand on the shoulders of giants when we build with knowledge gained from others' efforts. That doesn't make us giants. Be humble. Create with care. Open source is the way.
     </blockquote>
     <p>
-      I'm Josh, a maker, tinkerer, and self-described tech-ologist based on the Bellarine Peninsula. The garage out back is the lab. The workbench is permanently occupied. The floor has more project boxes on it than I'm prepared to admit.
+      I'm Josh, a maker, tinkerer, and self-described tech-ologist based on the Bellarine Peninsula (Bellawiyn Country). The garage out back is the lab. The workbench is permanently occupied. The floor has more project boxes on it than I'm prepared to admit.
     </p>
     <p>
       I've been pulling things apart since I was a kid, long before I had any idea how to put them back together. These days I mostly put them back together, usually into something they were never meant to be. Motors become controllers. Salvaged panels become displays. A toy train becomes a WiFi-enabled rolling experiment in embedded systems.
@@ -228,7 +246,7 @@ import Base from '../layouts/Base.astro';
     <div class="bio-grid">
       <div class="bio-card">
         <div class="bio-card-label">Based</div>
-        <p>Bellarine Peninsula, Victoria</p>
+        <p>Bellarine Peninsula (Bellawiyn Country), Victoria</p>
       </div>
       <div class="bio-card">
         <div class="bio-card-label">Habitat</div>

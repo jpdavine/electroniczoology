@@ -1,0 +1,337 @@
+---
+---
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Acknowledgement of Country — Electronic Zoology</title>
+<meta name="description" content="Electronic Zoology acknowledges the Wadawurrung People as the Traditional Custodians of the Bellarine Peninsula, on whose Country this work is made.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,500;1,8..60,400&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --paper:      #efe6d4;
+    --paper-deep: #e5d9c1;
+    --ink:        #1f1a14;
+    --ink-soft:   #4a3f32;
+    --ochre:      #a0562b;
+    --ochre-deep: #7a3f1e;
+    --sage:       #5a6b52;
+    --rule:       rgba(31, 26, 20, 0.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.7;
+    color: var(--ink);
+    background-color: var(--paper);
+    background-image:
+      radial-gradient(ellipse at top left, rgba(160, 86, 43, 0.06), transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(90, 107, 82, 0.08), transparent 50%);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.12  0 0 0 0 0.1  0 0 0 0 0.08  0 0 0 0.08 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    z-index: 1;
+  }
+
+  main {
+    position: relative;
+    z-index: 2;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 5rem 1.75rem 6rem;
+  }
+
+  .eyebrow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 4rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .eyebrow a {
+    color: var(--ink-soft);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .eyebrow a:hover { color: var(--ochre-deep); border-bottom-color: var(--ochre-deep); }
+
+  header h1 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 400;
+    font-variation-settings: "opsz" 144;
+    font-size: clamp(2.4rem, 6vw, 3.8rem);
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    margin-bottom: 0.5rem;
+  }
+
+  header h1 em {
+    font-style: italic;
+    color: var(--ochre-deep);
+  }
+
+  .subtitle {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.05rem;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-weight: 300;
+    margin-bottom: 3rem;
+  }
+
+  .acknowledgement {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 300;
+    font-variation-settings: "opsz" 144;
+    font-size: clamp(1.35rem, 3vw, 1.7rem);
+    line-height: 1.45;
+    color: var(--ink);
+    padding: 2.5rem 0;
+    margin: 2rem 0 3.5rem;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+  }
+
+  .acknowledgement::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 3rem;
+    height: 3px;
+    background: var(--ochre);
+  }
+
+  .acknowledgement p + p { margin-top: 1.25rem; }
+
+  .acknowledgement strong {
+    font-weight: 500;
+    color: var(--ochre-deep);
+  }
+
+  section {
+    margin-bottom: 3rem;
+  }
+
+  section h2 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 500;
+    font-size: 0.82rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 1.25rem;
+  }
+
+  section p + p { margin-top: 1rem; }
+
+  section p {
+    color: var(--ink);
+  }
+
+  .lang {
+    font-style: italic;
+    color: var(--ochre-deep);
+  }
+
+  .resources {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .resources li {
+    padding: 0.9rem 0;
+    border-bottom: 1px dagarage var(--rule);
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .resources li:last-child { border-bottom: none; }
+
+  .resources a {
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 500;
+    font-size: 1.05rem;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--ochre);
+    display: inline-block;
+    padding-bottom: 1px;
+    align-self: flex-start;
+    transition: color 0.2s, border-color 0.2s;
+  }
+  .resources a:hover { color: var(--ochre-deep); border-bottom-color: var(--ochre-deep); }
+
+  .resources small {
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    font-style: italic;
+  }
+
+  .refrain {
+    margin-top: 4rem;
+    text-align: center;
+    padding: 2.5rem 1rem;
+  }
+
+  .refrain p {
+    font-family: 'Fraunces', Georgia, serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 1.3rem;
+    color: var(--ochre-deep);
+    letter-spacing: 0.01em;
+  }
+
+  .refrain .dingbat {
+    display: block;
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 1.6rem;
+    color: var(--ochre);
+    margin-bottom: 1rem;
+    letter-spacing: 0.5em;
+    padding-left: 0.5em;
+  }
+
+  footer {
+    margin-top: 5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--rule);
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 0.75rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    text-align: center;
+  }
+
+  @media (max-width: 520px) {
+    main { padding: 3rem 1.25rem 4rem; }
+    .eyebrow { font-size: 0.7rem; margin-bottom: 2.5rem; }
+    .acknowledgement { padding: 2rem 0; margin: 1.5rem 0 2.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<main>
+
+  <nav class="eyebrow">
+    <a href="/">Electronic Zoology</a>
+    <span>The Garage &middot; Bellawiyn Country</span>
+  </nav>
+
+  <header>
+    <h1>Acknowledgement of <em>Country</em></h1>
+    <p class="subtitle">A note from the garage, on Wadawurrung land.</p>
+  </header>
+
+  <div class="acknowledgement">
+    <p>
+      Electronic Zoology is made on the lands of the
+      <strong>Wadawurrung People</strong>, the Traditional Custodians of the
+      Bellarine Peninsula, its waterways and its skies.
+    </p>
+    <p>
+      I acknowledge their Elders past and present, and pay my respects to all
+      Aboriginal and Torres Strait Islander peoples who read this. I acknowledge that sovereignty
+      was never ceded.
+    </p>
+  </div>
+
+  <section>
+    <h2>Where this is written</h2>
+    <p>
+      The garage sits on <span class="lang">Bellawiyn</span> &mdash; the
+      Wadawurrung name for the Bellarine Peninsula, meaning
+      <em>place of resting by the fire</em>. Wadawurrung Country stretches from
+      the coast at Aireys Inlet, around the Bellarine and up through Djilang
+      (Geelong) to Ballarat and the Great Dividing Range. It is one of the five
+      nations of the Kulin.
+    </p>
+    <p>
+      These lands, waters and skies have been cared for across thousands of
+      generations. The middens, songlines, scar trees and gathering places of
+      the Bellarine are not relics; they are living culture. Wadawurrung People
+      are still here, still caring for Country.
+    </p>
+  </section>
+
+  <section>
+    <h2>Why this matters to a maker</h2>
+    <p>
+      Everything built in this garage &mdash; the circuits, the prints, the
+      salvaged screens, the code &mdash; draws on the materials and quiet of
+      this place. The workbench sits on soil that has held story, law and
+      craft for tens of thousands of years before a soldering iron was ever
+      switched on here.
+    </p>
+    <p>
+      Acknowledging that is the smallest thing I can do. Listening, reading,
+      and supporting Wadawurrung-led work is the rest.
+    </p>
+  </section>
+
+  <section>
+    <h2>Further reading &amp; support</h2>
+    <ul class="resources">
+      <li>
+        <a href="https://www.wadawurrung.org.au/" target="_blank" rel="noopener">Wadawurrung Traditional Owners Aboriginal Corporation</a>
+        <small>The Registered Aboriginal Party for Wadawurrung Country.</small>
+      </li>
+      <li>
+        <a href="https://www.wadawurrung.org.au/country-plan" target="_blank" rel="noopener">Paleert Tjaara Dja — Wadawurrung Country Plan</a>
+        <small>Let&rsquo;s make Country good together, 2020&ndash;2030.</small>
+      </li>
+      <li>
+        <a href="https://aiatsis.gov.au/explore/map-indigenous-australia" target="_blank" rel="noopener">AIATSIS Map of Indigenous Australia</a>
+        <small>Find whose Country you&rsquo;re on, wherever you are.</small>
+      </li>
+    </ul>
+  </section>
+
+  <div class="refrain">
+    <span class="dingbat">&mdash; &mdash; &mdash;</span>
+    <p>Always was, always will be Aboriginal land.</p>
+  </div>
+
+  <footer>
+    Electronic Zoology &middot; The Tech-ologist &middot; St Leonards, Victoria (Bellawiyn Country)
+  </footer>
+
+</main>
+
+</body>
+</html>
