@@ -24,7 +24,7 @@ const { title, description = "Field notes from the garage — Electronic Zoology
       --rainbow: linear-gradient(135deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #c77dff);
     }
 
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; overflow-x: hidden; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -32,6 +32,7 @@ const { title, description = "Field notes from the garage — Electronic Zoology
       line-height: 1.7;
       color: var(--text);
       background: var(--light);
+      overflow-x: hidden;
     }
 
     header {

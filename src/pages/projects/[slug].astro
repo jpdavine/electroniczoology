@@ -96,8 +96,8 @@ const { Content } = project;
   }
 
   /* Markdown content styles */
-  .content { max-width: 720px; }
-  .content h2 {
+  .content { max-width: 720px; width: 100%; }
+  .content :global(h2) {
     font-size: 1.35rem;
     font-weight: 700;
     color: #1a1a2e;
@@ -106,16 +106,16 @@ const { Content } = project;
     border-bottom: 2px solid #a855f7;
     display: inline-block;
   }
-  .content h3 {
+  .content :global(h3) {
     font-size: 1.1rem;
     font-weight: 700;
     color: #333;
     margin: 1.75rem 0 0.5rem;
   }
-  .content p { color: #444; margin-bottom: 1rem; line-height: 1.75; }
-  .content ul, .content ol { padding-left: 1.4rem; margin-bottom: 1rem; }
-  .content li { margin-bottom: 0.3rem; color: #444; }
-  .content code {
+  .content :global(p) { color: #444; margin-bottom: 1rem; line-height: 1.75; }
+  .content :global(ul), .content :global(ol) { padding-left: 1.4rem; margin-bottom: 1rem; }
+  .content :global(li) { margin-bottom: 0.3rem; color: #444; }
+  .content :global(code) {
     font-family: "Fira Code", Consolas, monospace;
     background: #f0f0f0;
     padding: 0.15em 0.4em;
@@ -123,7 +123,7 @@ const { Content } = project;
     font-size: 0.875em;
     color: #c0392b;
   }
-  .content pre {
+  .content :global(pre) {
     background: #1e1e2e;
     color: #cdd6f4;
     border-radius: 6px;
@@ -133,16 +133,16 @@ const { Content } = project;
     font-size: 0.875rem;
     line-height: 1.6;
   }
-  .content pre code { background: none; padding: 0; color: inherit; }
-  .content a { color: #a855f7; }
-  .content blockquote {
+  .content :global(pre code) { background: none; padding: 0; color: inherit; }
+  .content :global(a) { color: #a855f7; }
+  .content :global(blockquote) {
     border-left: 4px solid #a855f7;
     padding: 0.5rem 1rem;
     margin: 1rem 0;
     background: #faf5ff;
     color: #555;
   }
-  .content img { max-width: 100%; border-radius: 6px; margin: 1rem 0; }
+  .content :global(img) { width: 300px; max-width: 100%; height: auto; border-radius: 6px; margin: 1rem 0; display: block; }
 
   .back-link {
     margin-top: 3rem;
