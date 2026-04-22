@@ -78,16 +78,41 @@ const { title, description = "Field notes from the garage — Electronic Zoology
       transition: color 0.15s;
     }
     header nav a:hover { color: var(--white); }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0; transform: scale(0.3) rotate(0deg); }
+      50%       { opacity: 1; transform: scale(1.2) rotate(40deg); }
+    }
+    .spark {
+      position: absolute;
+      font-size: 0.55rem;
+      color: #fff;
+      pointer-events: none;
+      opacity: 0;
+    }
+    .cookie-btn.sparkling .spark {
+      animation: twinkle 1.8s ease-in-out infinite;
+    }
+    .cookie-btn.sparkling {
+      animation: shimmer 3s ease infinite;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
     header nav a.cookie-btn {
+      position: relative;
       display: inline-block;
-      background: #FF813F;
+      background: linear-gradient(135deg, #c97b7b, #c9a84c, #5a9e6f, #4a7fc1, #9b6fc9, #c97b7b);
+      background-size: 300% 300%;
       color: #fff !important;
       font-weight: 700;
-      font-size: 0.78rem;
-      padding: 0.25rem 0.75rem;
+      font-size: 0.52rem;
+      padding: 0.08rem 0.3rem;
       border-radius: 6px;
       transform: rotate(-7deg);
       transition: transform 0.15s, opacity 0.15s;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
     }
     header nav a.cookie-btn:hover { opacity: 0.9; transform: rotate(0deg); }
     header nav a.active {
@@ -128,7 +153,28 @@ const { title, description = "Field notes from the garage — Electronic Zoology
 
 
     @media (max-width: 640px) {
-      header { padding: 0 1rem; }
+      header {
+        height: auto;
+        padding: 0.75rem 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+      }
+      header nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.25rem 0;
+      }
+      header nav a {
+        margin-left: 0;
+        margin-right: 1rem;
+        font-size: 0.85rem;
+      }
+      header nav a.cookie-btn {
+        font-size: 0.72rem;
+        padding: 0.3rem 0.7rem;
+        transform: rotate(-4deg);
+      }
       .page-wrap { padding: 2rem 1rem 4rem; }
     }
   </style>
@@ -142,7 +188,28 @@ const { title, description = "Field notes from the garage — Electronic Zoology
     <a href="/guides">Guides</a>
     <a href="/projects">Projects</a>
     <a href="/about">About</a>
-    <a href="https://buymeacoffee.com/yourawesome" target="_blank" rel="noopener" class="cookie-btn">🍪 <em>buy me a cookie</em></a>
+    <a href="https://buymeacoffee.com/yourawesome" target="_blank" rel="noopener" class="cookie-btn">
+  <span class="spark" style="top:-7px;left:2px;animation-delay:0s">✦</span>
+  <span class="spark" style="top:-8px;left:12%;animation-delay:0.1s">✧</span>
+  <span class="spark" style="top:-6px;left:25%;animation-delay:0.2s">✦</span>
+  <span class="spark" style="top:-8px;left:38%;animation-delay:0.3s">✧</span>
+  <span class="spark" style="top:-6px;left:52%;animation-delay:0.4s">✦</span>
+  <span class="spark" style="top:-8px;left:66%;animation-delay:0.5s">✧</span>
+  <span class="spark" style="top:-7px;left:80%;animation-delay:0.6s">✦</span>
+  <span class="spark" style="top:-6px;right:2px;animation-delay:0.7s">✧</span>
+  <span class="spark" style="bottom:-7px;left:2px;animation-delay:0.08s">✧</span>
+  <span class="spark" style="bottom:-8px;left:15%;animation-delay:0.18s">✦</span>
+  <span class="spark" style="bottom:-6px;left:30%;animation-delay:0.28s">✧</span>
+  <span class="spark" style="bottom:-8px;left:45%;animation-delay:0.38s">✦</span>
+  <span class="spark" style="bottom:-6px;left:60%;animation-delay:0.48s">✧</span>
+  <span class="spark" style="bottom:-8px;left:75%;animation-delay:0.58s">✦</span>
+  <span class="spark" style="bottom:-6px;right:2px;animation-delay:0.68s">✧</span>
+  <span class="spark" style="top:0px;left:-7px;animation-delay:0.15s">✦</span>
+  <span class="spark" style="top:40%;left:-8px;animation-delay:0.45s">✧</span>
+  <span class="spark" style="top:0px;right:-7px;animation-delay:0.25s">✦</span>
+  <span class="spark" style="top:40%;right:-8px;animation-delay:0.55s">✧</span>
+  🍪 <em>buy me a cookie</em>
+</a>
   </nav>
 </header>
 
@@ -153,5 +220,14 @@ const { title, description = "Field notes from the garage — Electronic Zoology
   <a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">Back to top &uarr;</a>
 </footer>
 
+<script>
+  const btn = document.querySelector('.cookie-btn');
+  let t;
+  window.addEventListener('scroll', () => {
+    btn.classList.add('sparkling');
+    clearTimeout(t);
+    t = setTimeout(() => btn.classList.remove('sparkling'), 1000);
+  }, { passive: true });
+</script>
 </body>
 </html>
