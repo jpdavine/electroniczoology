@@ -1,0 +1,134 @@
+---
+import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
+---
+<GlossaryEntry
+  category="Linux basics"
+  title="Saving a Script File"
+  subtitle="How to save a block of code as a runnable file"
+  backTo="/guides/gc9a01-custom-image"
+  backLabel="Back to custom image guide"
+  highlights={[
+    'A script is just a plain text file with code inside',
+    'The filename extension (.py) tells Linux what it is',
+    'Any text editor works - nano, gedit, VS Code, Kate',
+    'Save it somewhere you can find it - your home folder is fine',
+  ]}
+>
+  <svg slot="svg" viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:320px;display:block;margin:auto">
+    <rect x="10" y="10" width="300" height="140" rx="8" fill="#1e1e2e" stroke="#313244" stroke-width="1.5"/>
+    <rect x="10" y="10" width="300" height="24" rx="8" fill="#181825"/>
+    <rect x="10" y="24" width="300" height="10" fill="#181825"/>
+    <circle cx="28" cy="22" r="5" fill="#ff5f57"/>
+    <circle cx="44" cy="22" r="5" fill="#ffbd2e"/>
+    <circle cx="60" cy="22" r="5" fill="#28ca41"/>
+    <text x="160" y="25" fill="#6c7086" font-size="8" font-family="monospace" text-anchor="middle">terminal</text>
+    <text x="24" y="52" fill="#cba6f7" font-size="9" font-family="monospace">nano</text>
+    <text x="57" y="52" fill="#cdd6f4" font-size="9" font-family="monospace">image_to_rgb565.py</text>
+    <text x="24" y="70" fill="#6c7086" font-size="8" font-family="monospace"># paste your code here</text>
+    <text x="24" y="88" fill="#a6e3a1" font-size="8" font-family="monospace">Ctrl+O</text>
+    <text x="72" y="88" fill="#6c7086" font-size="8" font-family="monospace">to save</text>
+    <text x="24" y="104" fill="#a6e3a1" font-size="8" font-family="monospace">Enter</text>
+    <text x="66" y="104" fill="#6c7086" font-size="8" font-family="monospace">to confirm filename</text>
+    <text x="24" y="120" fill="#a6e3a1" font-size="8" font-family="monospace">Ctrl+X</text>
+    <text x="72" y="120" fill="#6c7086" font-size="8" font-family="monospace">to exit</text>
+  </svg>
+  <Fragment slot="desc">
+    <p>A script is just a plain text file. There is nothing special about it - the code you copy from this guide goes into a file, you give it a name ending in <code>.py</code>, and Python can then run it.</p>
+
+    <h2>Option 1 - nano (terminal, no install needed)</h2>
+    <p>Open a terminal and type:</p>
+    <div class="code-wrap">
+      <pre><code>nano image_to_rgb565.py</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>This opens a blank file in the terminal editor. Paste the script code in, then:</p>
+    <ul>
+      <li>Press <strong>Ctrl+O</strong> to save</li>
+      <li>Press <strong>Enter</strong> to confirm the filename</li>
+      <li>Press <strong>Ctrl+X</strong> to exit</li>
+    </ul>
+
+    <h2>Option 2 - any text editor (VS Code, Kate, gedit, etc.)</h2>
+    <p>Open your text editor, create a new file, paste the code in, and save it as <code>image_to_rgb565.py</code>. Make sure it saves as plain text - not a Word document or rich text file.</p>
+    <p>Save it somewhere easy to find - your home folder (<code>/home/yourname/</code>) or a project folder works well.</p>
+
+    <h2>Then run it</h2>
+    <p>Open a terminal, navigate to where you saved the file, and run it with Python:</p>
+    <div class="code-wrap">
+      <pre><code>python3 image_to_rgb565.py myface.png myface</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>If the terminal says <em>No such file or directory</em>, you are not in the right folder. Use <code>cd</code> to navigate there first - for example <code>cd ~/Documents</code> if that is where you saved it.</p>
+  </Fragment>
+</GlossaryEntry>
+
+<style>
+  pre {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    margin: 0.75rem 0 1rem;
+  }
+  pre code {
+    font-family: "Fira Code", "Cascadia Code", Consolas, monospace;
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+  code {
+    font-family: "Fira Code", "Cascadia Code", Consolas, monospace;
+    background: #f0f0f0;
+    padding: 0.15em 0.4em;
+    border-radius: 3px;
+    font-size: 0.875em;
+    color: #c0392b;
+  }
+  .code-wrap { position: relative; }
+  .copy-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: #313244;
+    color: #cdd6f4;
+    border: none;
+    border-radius: 4px;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.72rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .code-wrap:hover .copy-btn { opacity: 1; }
+  .copy-btn.copied { color: #a6e3a1; }
+  @media (hover: none) { .copy-btn { opacity: 1; } }
+</style>
+
+<script is:inline>
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pre = btn.closest('.code-wrap').querySelector('pre');
+      const text = pre.innerText;
+      const done = () => {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+      };
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(done);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.cssText = 'position:fixed;opacity:0';
+        document.body.appendChild(ta);
+        ta.focus(); ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        done();
+      }
+    });
+  });
+</script>

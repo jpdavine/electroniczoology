@@ -1,0 +1,604 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+
+<Base title="Display Custom Images on the GC9A01 Round TFT" description="How to convert any image to RGB565 and display it on a GC9A01 240x240 round IPS TFT display with an ESP32. Covers image prep, Python conversion script, and the full Arduino sketch." fullWidth={true}>
+
+<div class="pam-wrap">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <nav class="toc">
+      <h3>Contents</h3>
+      <ol>
+        <li><a href="#what-you-need">What You Need</a></li>
+        <li><a href="#how-it-works">How It Works</a></li>
+        <li><a href="#prepare-image">Prepare Your Image</a></li>
+        <li><a href="#convert">Convert to RGB565</a></li>
+        <li><a href="#sketch">The Sketch</a></li>
+        <li><a href="#troubleshooting">Troubleshooting</a></li>
+      </ol>
+    </nav>
+  </aside>
+
+  <!-- Main -->
+  <main>
+
+    <div class="hero">
+      <div class="category">Display &bull; ESP32</div>
+      <h1>Display Custom Images<br>on the GC9A01 Round TFT</h1>
+      <div class="meta">
+        <div class="meta-item"><strong>Display:</strong> GC9A01 - 240x240 round IPS TFT</div>
+        <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin)</div>
+        <div class="meta-item"><strong>Tools:</strong> Python + Pillow, Arduino IDE</div>
+      </div>
+      <div class="badge">&#10003; Confirmed Working</div>
+    </div>
+
+    <div class="terminal-note">
+      This guide assumes your GC9A01 is already wired and working. If not, start with the <a href="/guides/gc9a01-round-display-esp32" class="term-link">GC9A01 setup guide &rarr;</a>
+    </div>
+
+    <!-- What You Need -->
+    <div class="section" id="what-you-need">
+      <h2>What You Need</h2>
+      <div class="two-col">
+        <div class="card">
+          <h3>Hardware</h3>
+          <ul>
+            <li><a href="/glossary/esp32-display" class="term-link">ESP32 Dev Board (38-pin)</a></li>
+            <li><a href="/glossary/gc9a01" class="term-link">GC9A01 240x240 round IPS TFT module</a></li>
+            <li>Jumper wires</li>
+            <li>USB data cable for flashing</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Software</h3>
+          <ul>
+            <li>Arduino IDE with ESP32 board support</li>
+            <li><code>Arduino_GFX_Library</code> by Moon On Our Nation</li>
+            <li>Python 3 + Pillow - image converter</li>
+            <li>Any image editor (GIMP, Photoshop, etc.)</li>
+          </ul>
+          <p style="margin-top:1rem;font-size:0.85rem;color:#666;">Install on Arch Linux:</p>
+          <div class="code-wrap">
+            <pre><code>sudo pacman -S python python-pillow</code></pre>
+            <button class="copy-btn">Copy</button>
+          </div>
+          <p style="font-size:0.85rem;color:#666;">Other systems:</p>
+          <div class="code-wrap">
+            <pre><code>pip3 install Pillow</code></pre>
+            <button class="copy-btn">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- How It Works -->
+    <div class="section" id="how-it-works">
+      <h2>How It Works</h2>
+      <p>The GC9A01 speaks RGB565 - each pixel is a 16-bit number encoding red (5 bits), green (6 bits), and blue (5 bits). Standard image formats like PNG and JPEG can't be sent directly - they need to be decoded and converted first.</p>
+      <p>The process is: resize your image to 240x240, run a Python script to convert every pixel to its RGB565 value, and write the result out as a C header file. The sketch includes that header and blits the pixel array straight to the display in one call.</p>
+      <div class="callout callout-why">
+        <strong>Why not decode on the device?</strong>
+        Decoding JPEG or PNG on an ESP32 is possible but slow and complex. Pre-converting to raw RGB565 on your computer means the sketch is trivial - just a memcpy to the display. A 240x240 image is 115KB in flash, well within the ESP32's 4MB.
+      </div>
+    </div>
+
+    <!-- Prepare Your Image -->
+    <div class="section" id="prepare-image">
+      <h2>Prepare Your Image</h2>
+      <p>The converter will resize any image to 240x240 automatically, but you'll get better results doing it yourself first - it lets you control how it's cropped and centred.</p>
+
+      <h3>In GIMP</h3>
+      <ol>
+        <li>Open your image</li>
+        <li><strong>Image &rarr; Scale Image</strong> - scale so the shortest side is 240px</li>
+        <li><strong>Image &rarr; Canvas Size</strong> - set to 240x240 and centre the layer</li>
+        <li><strong>Image &rarr; Flatten Image</strong> - merges transparency to a solid background</li>
+        <li><strong>File &rarr; Export As</strong> - save as <code>.png</code></li>
+      </ol>
+
+      <div class="callout callout-tip">
+        <strong>Transparency</strong>
+        The display has no concept of transparent pixels - every pixel must have a colour. Flatten your image before exporting so transparent areas become a solid colour (black by default in GIMP, or set the background colour first).
+      </div>
+
+      <div class="callout callout-why">
+        <strong>Round display, square image</strong>
+        The GC9A01 panel is physically round but the pixel grid is 240x240 square. The display hardware clips the corners - anything outside the circle just isn't visible. You don't need to manually cut your image into a circle shape.
+      </div>
+    </div>
+
+    <!-- Convert to RGB565 -->
+    <div class="section" id="convert">
+      <h2>Convert to RGB565</h2>
+      <p>Save this script as <code>image_to_rgb565.py</code> anywhere on your computer, then run it once per image. <a href="/glossary/save-a-script-image" class="term-link">How to save a script &rarr;</a></p>
+
+      <div class="code-wrap">
+        <pre><code>{`#!/usr/bin/env python3
+"""
+Convert an image to an RGB565 C header for Arduino_GFX_Library.
+
+Usage:
+    python3 image_to_rgb565.py <image> <varname>
+
+Example:
+    python3 image_to_rgb565.py myface.png myface
+
+Outputs: myface.h in the same folder as the image.
+The image will be resized to 240x240 automatically.
+"""
+
+import sys
+from pathlib import Path
+from PIL import Image
+
+def convert(img_path, varname):
+    img = Image.open(img_path).convert("RGB")
+    img = img.resize((240, 240), Image.LANCZOS)
+    pixels = list(img.getdata())
+
+    out_path = Path(img_path).parent / f"{varname}.h"
+    with open(out_path, "w") as f:
+        f.write(f"// {Path(img_path).name} -> 240x240 RGB565\\n")
+        f.write(f"#pragma once\\n")
+        f.write(f"#include <pgmspace.h>\\n\\n")
+        f.write(f"const uint16_t {varname}[57600] PROGMEM = {{\\n  ")
+
+        for i, (r, g, b) in enumerate(pixels):
+            val = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
+            f.write(f"0x{val:04X}")
+            if i < len(pixels) - 1:
+                f.write(", ")
+            if (i + 1) % 12 == 0:
+                f.write("\\n  ")
+
+        f.write("\\n};\\n")
+
+    print(f"Done -> {out_path}  (240x240, {240*240*2} bytes)")
+
+if __name__ == "__main__":
+    if len(sys.argv) != 3:
+        print("Usage: python3 image_to_rgb565.py <image> <varname>")
+        sys.exit(1)
+    convert(sys.argv[1], sys.argv[2])`}</code></pre>
+        <button class="copy-btn">Copy</button>
+      </div>
+
+      <h3>Run it</h3>
+      <div class="code-wrap">
+        <pre><code>python3 image_to_rgb565.py myface.png myface</code></pre>
+        <button class="copy-btn">Copy</button>
+      </div>
+
+      <p>This produces <code>myface.h</code> in the same folder as the image. Move it into your Arduino sketch folder alongside the <code>.ino</code> file.</p>
+
+      <ul class="flag-list">
+        <li><code>myface.png</code> - your source image (PNG, JPG, WEBP all work)</li>
+        <li><code>myface</code> - the variable name used in the sketch - no spaces, no special characters</li>
+      </ul>
+
+      <div class="callout callout-tip">
+        <strong>Multiple images</strong>
+        Run the script once per image with a different varname each time. Each produces its own <code>.h</code> file. Include them all in the sketch and cycle through them.
+      </div>
+    </div>
+
+    <!-- Sketch -->
+    <div class="section" id="sketch">
+      <h2>The Sketch</h2>
+      <p>Place <code>myface.h</code> in the same folder as the sketch before opening Arduino IDE. The sketch includes it and draws the image on boot.</p>
+      <div class="code-wrap">
+        <pre><code>{`/*
+ * We stand on the shoulders of giants when we build
+ * with knowledge gained from others' efforts.
+ * That doesn't make us giants. Be humble.
+ * Create with care. Open source is the way.
+ *
+ * GC9A01 Custom Image Display
+ * ---------------------------
+ * Displays a custom RGB565 image on a GC9A01 240x240
+ * round IPS TFT display via SPI using Arduino_GFX_Library.
+ * Image is pre-converted from PNG using image_to_rgb565.py.
+ *
+ * Board:   ESP32 Dev Board (38-pin)
+ * Library: Arduino_GFX_Library by Moon On Our Nation
+ *
+ * Wiring:
+ *   VCC -> 3.3V or 5V   GND -> GND
+ *   SCL -> GPIO 18       SDA -> GPIO 23
+ *   DC  -> GPIO 27       CS  -> GPIO 5
+ *   RST -> GPIO 4
+ *
+ * Open source - MIT Licence
+ * Full guide:
+ * https://electroniczoology.com/guides/gc9a01-custom-image
+ *
+ * Electronic Zoology - field notes from the garage
+ */
+
+#include <Arduino_GFX_Library.h>
+#include "myface.h"   // generated by image_to_rgb565.py
+
+#define TFT_DC  27
+#define TFT_CS   5
+#define TFT_RST  4
+
+Arduino_DataBus *bus = new Arduino_HWSPI(TFT_DC, TFT_CS);
+Arduino_GFX *gfx = new Arduino_GC9A01(bus, TFT_RST, 0, true);
+
+void setup() {
+  Serial.begin(115200);
+  gfx->begin();
+  gfx->fillScreen(0x0000);
+  gfx->draw16bitRGBBitmap(0, 0, (uint16_t*)myface, 240, 240);
+}
+
+void loop() {}`}</code></pre>
+        <button class="copy-btn">Copy</button>
+      </div>
+
+      <div class="callout callout-tip">
+        <strong>Cycling multiple images</strong>
+        Include each header, put the variable names in an array, and call <code>draw16bitRGBBitmap</code> in <code>loop()</code> with a timer to advance the index.
+      </div>
+    </div>
+
+    <!-- Troubleshooting -->
+    <div class="section" id="troubleshooting">
+      <h2>Troubleshooting</h2>
+
+      <div class="trouble-item">
+        <h3>Wrong colours - image looks like a negative or has a red/blue swap</h3>
+        <ul>
+          <li>RGB565 byte order matters - try swapping the bytes in the converter</li>
+          <li>In <code>image_to_rgb565.py</code>, change the val line to: <code>val = ((val &amp; 0xFF) &lt;&lt; 8) | ((val &gt;&gt; 8) &amp; 0xFF)</code></li>
+          <li>This byte-swaps each pixel to big-endian order which some display configs expect</li>
+        </ul>
+      </div>
+
+      <div class="trouble-item">
+        <h3>Compile error - array too large / out of memory</h3>
+        <ul>
+          <li>Make sure <code>PROGMEM</code> is in the header - without it the 115KB array goes into RAM and overflows</li>
+          <li>Check the generated <code>.h</code> file contains <code>PROGMEM</code> after the array declaration</li>
+        </ul>
+      </div>
+
+      <div class="trouble-item">
+        <h3>Image draws but is shifted, tiled, or has garbage at edges</h3>
+        <ul>
+          <li>The image must be exactly 240x240 - check with <code>python3 -c "from PIL import Image; print(Image.open('myface.png').size)"</code></li>
+          <li>Rerun the converter after confirming the source image dimensions</li>
+        </ul>
+      </div>
+
+      <div class="trouble-item">
+        <h3>Transparent areas showing as black or wrong colour</h3>
+        <ul>
+          <li>Flatten the image in GIMP before exporting - <strong>Image &rarr; Flatten Image</strong></li>
+          <li>Set your desired background colour before flattening</li>
+          <li>The converter uses <code>.convert("RGB")</code> which drops the alpha channel - transparent pixels become black unless you flatten first</li>
+        </ul>
+      </div>
+
+      <div class="trouble-item">
+        <h3>Display is blank after flashing</h3>
+        <ul>
+          <li>Check the <code>#include "myface.h"</code> filename matches exactly - Arduino IDE is case sensitive on Linux</li>
+          <li>Confirm the <code>.h</code> file is in the same folder as the <code>.ino</code> file</li>
+          <li>Open Serial Monitor - if nothing appears, the sketch may have crashed on boot</li>
+        </ul>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<style>
+  .pam-wrap {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 76px;
+  }
+  .toc {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+  }
+  .toc h3 {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #888;
+    margin-bottom: 0.75rem;
+  }
+  .toc ol {
+    list-style: none;
+    counter-reset: toc;
+    padding: 0;
+    margin: 0;
+  }
+  .toc ol li {
+    counter-increment: toc;
+    margin-bottom: 0.4rem;
+  }
+  .toc ol li::before {
+    content: counter(toc) ". ";
+    color: var(--amber);
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+  .toc a {
+    color: #444;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.15s;
+  }
+  .toc a:hover { color: var(--amber); }
+  .toc a.active { color: var(--amber); font-weight: 600; }
+
+  main {
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    padding: 2.5rem 3rem;
+    min-width: 0;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #fff;
+    border-radius: 8px;
+    padding: 2rem 2.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .hero .category {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    background: var(--rainbow);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+  }
+  .hero h1 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    color: #fff;
+  }
+  .hero .meta {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.25rem;
+  }
+  .hero .meta-item { font-size: 0.85rem; color: #aaa; }
+  .hero .meta-item strong { color: #fff; }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #2ecc71;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.35rem 0.9rem;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
+
+  .terminal-note {
+    background: #f0f4ff;
+    border-left: 4px solid #4a6cf7;
+    border-radius: 0 6px 6px 0;
+    padding: 0.65rem 1rem;
+    font-size: 0.88rem;
+    color: #444;
+    margin-bottom: 2rem;
+  }
+
+  .section { margin-bottom: 3rem; }
+  .section h2 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    border-bottom: 3px solid var(--amber);
+    padding-bottom: 0.4rem;
+    margin-bottom: 1.25rem;
+    display: inline-block;
+  }
+  .section h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #333;
+    margin: 1.5rem 0 0.75rem;
+  }
+
+  main p { color: #444; line-height: 1.75; margin-bottom: 0.75rem; }
+  main ul, main ol { padding-left: 1.4rem; margin-bottom: 1rem; }
+  main li { margin-bottom: 0.3rem; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .card {
+    background: #fafafa;
+    border: 1px solid #e8e8e8;
+    border-radius: 6px;
+    padding: 1.25rem 1.5rem;
+  }
+  .card h3 {
+    margin-top: 0;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #888;
+    margin-bottom: 0.75rem;
+  }
+  .card ul { margin-bottom: 0; }
+
+  pre {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    border-radius: 6px;
+    padding: 1.25rem 1.5rem;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    margin: 0.75rem 0 1.25rem;
+    position: relative;
+  }
+  pre code {
+    font-family: "Fira Code", "Cascadia Code", Consolas, monospace;
+    background: none;
+    padding: 0;
+    color: inherit;
+    font-size: inherit;
+    border-radius: 0;
+  }
+  main code {
+    font-family: "Fira Code", "Cascadia Code", Consolas, monospace;
+    background: #f0f0f0;
+    padding: 0.15em 0.4em;
+    border-radius: 3px;
+    font-size: 0.875em;
+    color: #c0392b;
+  }
+
+  .code-wrap { position: relative; }
+  .copy-btn {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    background: #313244;
+    color: #cdd6f4;
+    border: none;
+    border-radius: 4px;
+    padding: 0.25rem 0.6rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .code-wrap:hover .copy-btn { opacity: 1; }
+  .copy-btn:hover { background: #45475a; }
+  .copy-btn.copied { color: #a6e3a1; }
+  @media (hover: none) { .copy-btn { opacity: 1; } }
+
+  .callout {
+    border-radius: 6px;
+    padding: 0.9rem 1.1rem;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+  }
+  .callout-why {
+    background: #f5f0ff;
+    border-left: 4px solid var(--amber);
+  }
+  .callout-tip {
+    background: #f0fff4;
+    border-left: 4px solid #2ecc71;
+  }
+  .callout strong { display: block; margin-bottom: 0.3rem; }
+
+  .flag-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.75rem 0 1rem;
+  }
+  .flag-list li {
+    padding: 0.3rem 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.9rem;
+  }
+  .flag-list li:last-child { border-bottom: none; }
+  .flag-list code { color: #4a6cf7; background: #f0f4ff; }
+
+  .trouble-item {
+    background: #fafafa;
+    border: 1px solid #e8e8e8;
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .trouble-item h3 { margin: 0 0 0.5rem; font-size: 0.95rem; color: #c47a1e; }
+  .trouble-item ul { margin: 0; }
+
+  .term-link {
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1.5px dashed var(--amber);
+    border-radius: 2px;
+  }
+  .term-link:hover { background: #f5f0ff; }
+
+  @media (max-width: 800px) {
+    .pam-wrap { grid-template-columns: 1fr; }
+    .sidebar { position: static; }
+    main { padding: 1.5rem; }
+    .two-col { grid-template-columns: 1fr; }
+    .hero { padding: 1.5rem; }
+    .hero h1 { font-size: 1.4rem; }
+  }
+</style>
+
+<script is:inline>
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pre = btn.closest('.code-wrap').querySelector('pre');
+      const text = pre.innerText;
+      const done = () => {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+      };
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(done);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.cssText = 'position:fixed;opacity:0';
+        document.body.appendChild(ta);
+        ta.focus(); ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        done();
+      }
+    });
+  });
+
+  const sections = document.querySelectorAll('.section[id]');
+  const tocLinks = document.querySelectorAll('.toc a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const active = document.querySelector(`.toc a[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</Base>
