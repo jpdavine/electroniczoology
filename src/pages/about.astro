@@ -21,6 +21,8 @@ import Base from '../layouts/Base.astro';
       My tools of choice are microcontrollers, my preferred language is C++ (Arduino flavour), and my preferred debugging method is staring at something until it confesses. I run Arch Linux, work from a home garage, and have a wife and son who remain admirably tolerant of the whole operation.
     </p>
 
+    <p><a href="/origin" class="story-link">Read the full origin story →</a></p>
+
     <div class="bio-grid">
       <div class="bio-card">
         <div class="bio-card-label">Based</div>
@@ -116,6 +118,15 @@ import Base from '../layouts/Base.astro';
     margin-bottom: 0.4rem;
   }
   .bio-card p { font-size: 0.88rem; color: #555; margin: 0; }
+
+  .story-link {
+    color: #a855f7;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: opacity 0.15s;
+  }
+  .story-link:hover { opacity: 0.75; }
 
   .contact-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
   .contact-link {

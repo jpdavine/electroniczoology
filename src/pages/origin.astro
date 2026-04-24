@@ -1,0 +1,198 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base
+  title="How I got here"
+  description="Two years from 'what's a microcontroller' to running Arch Linux on three salvaged MacBooks. The origin story."
+  fullWidth={true}
+>
+
+<style>
+  .hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+    color: #fff;
+    padding: 5rem 2rem 4rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 50%, rgba(199,125,255,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(77,150,255,0.06) 0%, transparent 40%);
+    pointer-events: none;
+  }
+  .hero-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #c77dff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+  }
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 1rem;
+  }
+  .hero-dek {
+    font-size: 1.05rem;
+    color: #aaa;
+    max-width: 540px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  .page-wrap {
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 5rem;
+  }
+
+  .section {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 2.5rem 3rem;
+    margin-bottom: 2rem;
+  }
+
+  .section-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, #ff6b6b, #ffd93d, #6bcb77, #4d96ff, #c77dff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.6rem;
+  }
+
+  .section h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1a1a2e;
+    margin-bottom: 1.25rem;
+    line-height: 1.2;
+  }
+
+  .section p {
+    color: #444;
+    margin-bottom: 1rem;
+    font-size: 0.97rem;
+  }
+  .section p:last-child { margin-bottom: 0; }
+  .section em { font-style: italic; }
+
+  .pullquote {
+    border-left: 4px solid #a855f7;
+    margin: 0 0 1.5rem;
+    padding: 0.9rem 1.25rem;
+    background: #faf8ff;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.97rem;
+    font-style: italic;
+    color: #444;
+    line-height: 1.75;
+  }
+
+  @media (max-width: 640px) {
+    .hero { padding: 3.5rem 1.5rem 3rem; }
+    .section { padding: 1.75rem 1.5rem; }
+    .page-wrap { padding: 2rem 1rem 4rem; }
+  }
+</style>
+
+<section class="hero">
+  <div class="hero-label">Origin Story</div>
+  <h1>How I got here</h1>
+  <p class="hero-dek">Two years from "what's a microcontroller" to running Arch Linux on three salvaged MacBooks.</p>
+</section>
+
+<main class="page-wrap">
+
+  <div class="section">
+    <div class="section-label">The beginning</div>
+    <h2>Starting from nothing</h2>
+    <p>Two years ago I ordered an Arduino starter pack. My concept of electronics was from the 80s. What's a microcontroller?</p>
+    <p>Worth saying up front: I was not a computer person. If something went wrong on my phone, my partner fixed it. And not the hard stuff. Settings menus. Wi-Fi passwords. The things most people take for granted.</p>
+    <blockquote class="pullquote">The one with the furthest to go, will go far.</blockquote>
+    <p>And I had a long way to go.</p>
+    <p>So when I say 12 hours to get an LED blinking, it wasn't because the Arduino IDE is hard. It was because I had no road map. The IDE, Windows itself, the file system, what a driver even was.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">The first wall</div>
+    <h2>12 hours in</h2>
+    <p>The old secondhand laptop we used as a TV became the dev machine. Windows 7, well out of support by then. Driver issues mostly. I couldn't get Windows to talk to a board that was specifically designed to be talked to. I needed help. I started using AI.</p>
+    <p>I worked through the whole starter book using AI as IT support and tutor. When I asked the AI how to make the laptop faster it recommended Linux.</p>
+    <p>It was free, open source, it had to be a scam. I wasn't having it.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">An unexpected turn</div>
+    <h2>An accidental PC</h2>
+    <p>After the starter book was done I went looking for what's next. I wanted something with WiFi. Saw the ESP-01 at 2am and added it to the cart.</p>
+    <p>It had no USB port, no onboard regulator, and used 3.3V logic. I would need a bench power supply to do anything with it. I read that you could build one from an old ATX PSU. So I asked on the local Freecycle page and got a few PCs looking for a working PSU.</p>
+    <p>In the process I built my first PC from dead machines. It was an upgrade from my Win 7 laptop. I installed the most Windows like Linux, Mint Cinnamon. Keeping the laptop as a backup in case Mint was too hard. this was the rabbit hole.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">The conversion</div>
+    <h2>Straight up faster</h2>
+    <p>First thing I noticed was that it was faster. From boot times to opening programs.</p>
+    <p>I was a two-finger typist then. I wanted nothing to do with the terminal. Mint let me avoid it, but that only lasted a few weeks. Mint had packages I wasn't going to use, so I started cutting them out until I broke dependencies. then things got real.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Going deeper</div>
+    <h2>Six distros</h2>
+    <p>What followed was about three months and six distributions, each one a little leaner than the last. I wasn't hopping for novelty. without realising it i was getting closer and closer to the code and the hardware. A system where nothing was on it that I hadn't put there myself. Each step took about two weeks, enough time to feel safe with less mouse and more terminal.</p>
+    <p>I landed for a while on Debian 12 with Openbox. By that point I was getting familiar with bash scripts and config files. After you need to roll back a GRUB config a few times, the panic of a black screen and a white blinking cursor top-left eases. I wasn't comfortable, but I knew how to get myself out of trouble.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">The hardware obsession</div>
+    <h2>In search of upgrades</h2>
+    <p>Around the same time I got serious about Freecycle. I was learning fast. What's in a PC, how the parts fit together, how to diagnose faults. I wasn't really repairing. I was swapping broken parts for working ones, and constantly upgrading to better and faster laptops and desktops. All of them were broken in some way, or just so full of dust the fans choked and the system crashed.</p>
+    <p>My ethos was upcycle. Without it this obsession could get very expensive very fast. And there are things you let yourself do when the hardware is free. Pull a laptop apart not knowing if you can get it back together. Try a fix that might brick it. Risk things you wouldn't risk on a machine you'd paid for. That's where the learning happens.</p>
+    <p>Somewhere between forty and seventy laptops and twenty-plus desktops came through the shed over three months. I wasn't hoarding. I was triaging. Keep the best four or five, send the rest to proper e-waste recycling so they didn't end up in landfill.</p>
+    <p>What I was learning in the process was that Linux boots from a USB stick and runs on almost anything with a pulse. That's when Linux stopped being a weird OS and became a viable option for old hardware. This was the answer to corporate greed.</p>
+    <p>No need to register your email or account. It's your system, not something that belongs to someone else and they're letting you use it. I had landed and it felt good.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">The find</div>
+    <h2>The MacBook</h2>
+    <p>At the local e-waste drop-off I saw a MacBook Pro in the pile. First Mac I'd ever held. I quietly grabbed it. First thing I noticed when I opened it up was the quality. This thing was built to last.</p>
+    <p>Hard drive was corrupt, so I replaced it. Installed macOS to see what the fuss was about, then wiped it and put Debian 12 on.</p>
+    <p>Debian booted to the GUI in six seconds. On a machine pulled out of an e-waste bin.</p>
+    <p>I have a fleet of Macs now. Honestly, the only laptop worth owning.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">The final move</div>
+    <h2>Why Arch</h2>
+    <p>Debian 12 was perfect. It shipped with almost nothing and I could install just what I needed. But the fast boot started to creep. 250ms slower each reboot. Took some time to notice. I tried every config edit I could find. Weeks editing and compiling ACPI tables. Nothing worked, because the problem wasn't in the config. It was in the kernel. An ACPI issue that had been fixed upstream but hadn't made it into Debian yet, and wouldn't for a long time.</p>
+    <p>Debian holds kernels still for years. Then I found out about Linux "streams". Other branches of the same tree with different kernels. I tried Arch.</p>
+    <p>Arch updates its kernel regularly. It ships whatever the current stable kernel is. I installed Arch and had a stable working system. It's been Arch ever since.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Where it stands</div>
+    <h2>Where that left me</h2>
+    <p>So where am I now. Upcycling whenever possible. Playing with microcontrollers. Building websites. About to try for my first real Play Store app.</p>
+    <p>The last two years have been a mad ride. I've been flying solo and kinda want some company. So join me. I can't guarantee your safety, or mine. But I can tell you, you will not be bored.</p>
+  </div>
+
+</main>
+
+</Base>

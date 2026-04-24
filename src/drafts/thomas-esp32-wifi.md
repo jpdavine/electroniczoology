@@ -1,8 +1,8 @@
 ---
 slug: thomas-esp32-wifi
 title: Thomas the Tank Engine — WiFi-Enabled Rolling Experiment
-description: Gutting a toy Thomas the Tank Engine and turning it into a WiFi-controlled embedded systems platform with an ESP32-C3. Because why not.
-date: 2026-04-17
+description: Gutting a Thomas the Tank Engine toy, stuffing in a LiPo, WiFi, and a round TFT, and losing a week to a bad batch of displays.
+date: 2026-04-20
 category: ESP32
 tags: [ESP32-C3, WiFi, Arduino, Motor Control]
 youtube:
@@ -16,23 +16,27 @@ parts:
     qty: 1
     price: "e-waste"
     notes: The donor vehicle
-  - name: Small DC motors (salvaged)
-    qty: 2
+  - name: Small DC motor (salvaged)
+    qty: 1
     price: "-"
     notes: From the original toy or salvage
   - name: Motor driver module (DRV8833 or similar)
     qty: 1
     price: "$4"
     link: ""
-  - name: LiPo battery (small, 3.7V)
+  - name: LiPo battery (3.7V, upcycled laptop cell)
     qty: 1
-    price: "$8"
+    price: "e-waste"
     link: ""
   - name: LiPo charging module (TP4056)
     qty: 1
     price: "$2"
     link: ""
-  - name: Jumper wires + heatshrink
+  - name: Aluminium offcut
+    qty: 1
+    price: "e-waste"
+    notes: Bonded to ESP32-C3 to manage heat from WiFi + motor load
+  - name: Jumper wires
     qty: 1
     price: "$3"
     link: ""
@@ -40,9 +44,21 @@ parts:
 
 ## The idea
 
-Every maker gets to a point where they look at a toy train and think "this should have WiFi." Thomas the Tank Engine — specifically the old chunky plastic kind you find at op shops and garage sales — turns out to be a surprisingly good enclosure for a small ESP32-C3 build.
+Every Thomas toy that comes out of the box is the same: one speed, no reverse, and two AA batteries that are flat in an afternoon. That's fine when you're three. Less fine when you're trying to run a test lap from the couch at 10pm after the monster of Sodor has gone to sleep.
 
-The goal: pull out whatever electronics are inside, fit an ESP32-C3, wire up motor control, and drive it over WiFi from a phone browser. No app. No custom firmware tool. Just a web page served from the chip itself.
+The plan was simple, swap the batteries for a LiPo and add WiFi control from a phone browser. No app, no pairing dance, just connect and go. But once you're pulling the shell apart, it's hard not to keep going. Needed an animated display small enough to fit the build and big enough to still look cool.
+
+Started with a spare SSD1306 OLED from the parts bin. Ended up ordering a colour TFT for the price of a coffee, a GC9A01, round, exactly the right shape for Thomas's face. Designed the shell around it. Three hours in TinkerCAD, a 7 hour 3D print, and a quick test paint. But I couldn't get the displays to work.
+
+![3D printed Thomas the Tank Engine shell in teal PLA with round cutout for GC9A01 display](/images/thomas/thomas-shell-teal.jpeg)
+*Shell fresh off the Ender. Nose hole sized to the GC9A01 footprint. Still needs the stripes and the number 1 painted up properly.*
+
+Five screens, all from the AliExpress Australian depot, all dead the same way. Garbled pixels, green lines on red, the kind of output that looks like software until you've ruled out software three times over. Twelve hours across TFT_eSPI, Adafruit_GC9A01A, and Arduino_GFX before it was clear the code was fine and the hardware was cooked. Went back and checked the reviews. Only Australian buyers had the same problem. A whole bad batch, quietly sitting in the local warehouse. Ordered three more from three different suppliers. Just to be sure it wasn't me.
+
+![Defective GC9A01 round TFT display showing vertical blue lines instead of correct output, held in hand](/images/thomas/gc9a01-dud-lines.jpeg)
+*One of the five. Wired correctly, powered correctly, code confirmed on three libraries. Just a dead panel pretending to be alive.*
+
+New screens work. Thomas has a face. Also there's now a diesel being built on the side because he's got a square face and I have a spare rectangular display, but that's another project. Well. Kinda.
 
 ## What's inside a Thomas
 

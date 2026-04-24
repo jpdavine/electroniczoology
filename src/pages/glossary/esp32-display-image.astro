@@ -5,13 +5,16 @@ import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
   category="Microcontroller"
   title="ESP32 Dev Board"
   subtitle="38-pin development board"
-  backTo="/guides/pam8403-esp32-audio"
-  backLabel="Back to PAM8403 guide"
+  backTo="/guides/gc9a01-custom-image"
+  backLabel="Back to custom image guide"
   highlights={[
-    'GPIO25 - DAC1, audio output (PAM8403 guide)',
-    'GPIO26 - DAC2 (unused in PAM8403 guide)',
-    'VIN - 5V input, powers the PAM8403',
-    'GND - common ground for all components',
+    'GPIO 18 - SPI clock (SCL)',
+    'GPIO 23 - SPI data MOSI (SDA)',
+    'GPIO 27 - Data/Command select (DC)',
+    'GPIO 5  - Chip select (CS)',
+    'GPIO 4  - Reset (RST)',
+    '3.3V    - Display power (never 5V)',
+    'GND     - Common ground',
   ]}
 >
   <img slot="svg" src="/components/esp32-dev-board.png" alt="ESP32 WROOM-32 38-pin dev board" style="max-width:280px;border-radius:6px;"/>
@@ -23,6 +26,6 @@ import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
       ESP32-DevKitC V4 user guide &rarr;
     </a>
     <p>The ESP32 is a dual-core 240MHz microcontroller with built-in WiFi and Bluetooth. The 38-pin dev board breaks all GPIO pins out on two rows of headers.</p>
-    <p>It includes two 8-bit DAC outputs on GPIO25 and GPIO26 that produce a true analogue voltage - used in the PAM8403 guide to drive audio into the amplifier.</p>
+    <p>For SPI displays like the GC9A01, the ESP32 uses its hardware SPI peripheral on GPIO 18 (SCLK) and GPIO 23 (MOSI). DC, CS, and RST are standard GPIO and can be reassigned if needed.</p>
   </Fragment>
 </GlossaryEntry>
