@@ -189,6 +189,8 @@ import Base from '../layouts/Base.astro';
   }
   .contact-link.secondary:hover { border-color: #a855f7; color: #a855f7; }
   .contact-link svg { width: 16px; height: 16px; flex-shrink: 0; }
+  .origin-link { color: #a855f7; text-decoration: none; font-weight: 600; font-size: 0.95rem; transition: opacity 0.15s; }
+  .origin-link:hover { opacity: 0.75; }
 
   @media (max-width: 640px) {
     .section { padding: 1.75rem 1.5rem; }
@@ -243,6 +245,7 @@ import Base from '../layouts/Base.astro';
     <p>
       My tools of choice are microcontrollers, my preferred language is C++ (Arduino flavour), and my preferred debugging method is staring at something until it confesses. I run Arch Linux, work from a home garage, and have a wife and son who remain admirably tolerant of the whole operation.
     </p>
+    <p><a href="/origin" class="origin-link">Read the full origin story &rarr;</a></p>
     <div class="bio-grid">
       <div class="bio-card">
         <div class="bio-card-label">Based</div>
