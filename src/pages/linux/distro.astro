@@ -1,0 +1,123 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+
+<Base title="What's a distro?" description="A distribution is the kernel plus a particular bundle of software around it. Why there are dozens, what makes them different, how to pick.">
+
+<div class="editorial">
+
+  <header class="hero">
+    <div class="kicker">Going Deeper</div>
+    <h1>What's a distro?</h1>
+  </header>
+
+  <section>
+    <p>If the kernel is the engine, a distribution is the whole vehicle. Body, wheels, seats, dashboard, paint job. Different teams build different vehicles around the same engine, and that's why there are dozens of Linuxes that all share the same code at the bottom.</p>
+
+    <p>Distribution gets shortened to <em>distro</em>. Same word, less syllables.</p>
+  </section>
+
+  <section>
+    <h2>What goes in the bundle</h2>
+    <p>Roughly four things, all stacked on the kernel:</p>
+
+    <p><strong>The userland.</strong> The basic command-line tools, the file manager, the shell, the package manager. The plumbing that turns a kernel into a usable computer.</p>
+
+    <p><strong>A desktop environment.</strong> The visual layer. The taskbar, the menu, the windows, the file browser. GNOME, KDE, Cinnamon, Xfce, others. This is what you see and what makes one distro look different from another.</p>
+
+    <p><strong>A package manager.</strong> The tool that installs, updates and removes software. Different distros use different ones. <code>apt</code> on Debian and Ubuntu, <code>pacman</code> on Arch, <code>dnf</code> on Fedora.</p>
+
+    <p><strong>A release model.</strong> When new versions of software arrive on your system, and how often. Some distros hold software still for years and only update for security. Some ship the latest of everything as soon as it's available. This is one of the biggest differences between distros, and the reason ACPI bugs took weeks to fix on one and minutes on another.</p>
+  </section>
+
+  <section>
+    <h2>Why so many</h2>
+    <p>Because nobody owns Linux. Anyone with the time and the inclination can take the kernel, pick their favourite combination of the four things above, and ship it. Some distros are built for beginners. Some for servers. Some for absolute minimalism. Some for specific languages, regions, or industries. Some are made by one person. Some are made by foundations with thousands of contributors.</p>
+
+    <p>It sounds like chaos but it isn't really. Most distros are descended from one of three or four parent projects. Debian, Red Hat, Arch, Slackware. Mint comes from Ubuntu, which comes from Debian. Fedora comes from Red Hat. Manjaro comes from Arch. Knowing the parent tells you most of what you need to know about the child.</p>
+  </section>
+
+  <section>
+    <h2>The big families</h2>
+    <p><strong>Debian and its descendants.</strong> Debian itself is one of the oldest, biggest, most stable distros. Ubuntu was built on Debian to be friendlier to beginners. Mint was built on Ubuntu to be friendlier still. If you start with Mint, you're benefiting from thirty years of work upstream.</p>
+
+    <p><strong>Red Hat and its descendants.</strong> Red Hat is the big commercial Linux company. Their free version was Fedora, which is now its own thing. CentOS and Rocky Linux are server-focused offshoots. Common in business environments.</p>
+
+    <p><strong>Arch and its descendants.</strong> Arch is rolling-release and minimal. You install the bare bones and add what you want. Manjaro is Arch with a friendlier installer. EndeavourOS is somewhere in between. Not for first-timers.</p>
+
+    <p><strong>The independents.</strong> Slackware, Gentoo, NixOS, Void. Each does something philosophically different. Niche, advanced, rewarding if you have a reason.</p>
+  </section>
+
+  <section>
+    <h2>Which one for you</h2>
+    <p>For most people coming from Windows or macOS, the answer is Linux Mint Cinnamon. It's built on Ubuntu, which is built on Debian, so it has a deep, well-tested foundation. The Cinnamon desktop looks and behaves like Windows. Software installs with a click. Updates are predictable. It will run on hardware Windows has given up on. The community is large and friendly, which means searching for an answer almost always works.</p>
+
+    <p>Mint is the right place to start. Some people stay there. Some find it's the doorway to wanting more. I lasted about two weeks before I started cutting bloat. Where you land is yours to find out.</p>
+  </section>
+
+  <a href="/linux" class="footer-link">← Back to the Linux primer</a>
+
+</div>
+
+</Base>
+
+<style>
+  .editorial {
+    max-width: 680px;
+  }
+
+  .hero {
+    margin-bottom: 3rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .kicker {
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.9rem;
+    font-weight: 600;
+  }
+
+  h1 {
+    font-weight: 500;
+    font-size: clamp(2.1rem, 5vw, 3rem);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    font-weight: 500;
+    font-size: 1.55rem;
+    letter-spacing: -0.01em;
+    margin: 2.75rem 0 1rem;
+    color: var(--amber);
+  }
+
+  section { margin-bottom: 0.5rem; }
+
+  p { margin-bottom: 1.1rem; }
+
+  a { color: var(--amber); }
+  a:hover { color: var(--text); }
+
+  code {
+    font-family: ui-monospace, monospace;
+    font-size: 0.9em;
+    background: rgba(168, 85, 247, 0.08);
+    padding: 0.08em 0.35em;
+    border-radius: 3px;
+  }
+
+  .footer-link {
+    display: inline-block;
+    margin-top: 3rem;
+    font-size: 0.9rem;
+    text-decoration: none;
+    border-bottom: 1px solid var(--amber);
+    padding-bottom: 1px;
+  }
+</style>

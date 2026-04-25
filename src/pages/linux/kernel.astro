@@ -1,0 +1,111 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+
+<Base title="What's a kernel?" description="The kernel is the part of an operating system that talks to the hardware. A short explanation of what it does and why it matters.">
+
+<div class="editorial">
+
+  <header class="hero">
+    <div class="kicker">Going Deeper</div>
+    <h1>What's a kernel?</h1>
+  </header>
+
+  <section>
+    <h2>The job</h2>
+    <p>A computer is two things really. There's the hardware. CPU, memory, drives, screen, keyboard, network card, USB ports. And there's everything you actually do with the computer. Browse, type, watch, code, play. Those two worlds don't speak the same language. The hardware speaks in voltages and registers and addresses. Your software speaks in files and windows and clicks.</p>
+
+    <p>The kernel is the translator. It sits between the two and makes them talk to each other. When you open a file, the kernel turns that into the right sequence of reads from the right block on the right drive. When you click a button, the kernel turns the click into a signal the right program can hear. None of your other software talks to the hardware directly. Everything goes through the kernel.</p>
+  </section>
+
+  <section>
+    <h2>What's actually in there</h2>
+    <p>A handful of jobs, all running constantly:</p>
+
+    <p><strong>Process management.</strong> Your computer is running dozens of programs at once. The kernel decides who gets the CPU, for how long, and whose turn is next. Switches between them so fast it looks like they're all running together.</p>
+
+    <p><strong>Memory management.</strong> Each program thinks it has the whole machine to itself. The kernel makes that illusion work, hands out memory, takes it back, swaps things in and out of RAM as needed.</p>
+
+    <p><strong>Drivers.</strong> Every piece of hardware needs code that knows how to talk to it. WiFi card, graphics card, webcam, mouse. Those drivers live in the kernel or get loaded by it.</p>
+
+    <p><strong>Filesystems.</strong> Drives don't really store files. They store blocks. The kernel maintains the illusion of files, folders, and a tree you can navigate.</p>
+
+    <p><strong>Networking.</strong> Packets in and out of the network card, sorted into the right conversations for the right programs.</p>
+
+    <p>You never see any of this. That's the point. The kernel does all of it underneath while you get on with what you opened the computer for.</p>
+  </section>
+
+  <section>
+    <h2>Why it matters for Linux</h2>
+    <p>The Linux kernel is the same kernel across every distribution. Mint, Ubuntu, Arch, Fedora, all of them are running the same code at the bottom. The differences between distros are everything <em>around</em> the kernel: which programs come pre-installed, how the desktop looks, how updates work, what tools are included.</p>
+
+    <p>This matters because it means a driver written for Linux works on every distro. A piece of hardware that's supported on Ubuntu is supported on Arch. A bug fixed in the kernel reaches everyone. The split between "the kernel" and "everything else" is the architectural decision that makes the whole Linux ecosystem possible.</p>
+
+    <p>It's also why "Linux" is technically only the name of the kernel. What most people call Linux is more accurately a Linux <em>distribution</em>, the kernel plus a particular bundle of software around it. Strict purists insist on calling it GNU/Linux to acknowledge the GNU project's contribution to the userland tools. Most people don't bother. For day-to-day use, "Linux" is fine.</p>
+  </section>
+
+  <section>
+    <h2>One kernel, many shapes</h2>
+    <p>The same Linux kernel runs on a phone, a fridge, a car dashboard, an Amazon server, a satellite, a Raspberry Pi, and your laptop. It scales from devices with kilobytes of memory to supercomputers with petabytes. That's because the kernel is modular. Pieces can be swapped in and out depending on what the machine needs.</p>
+
+    <p>Which is also why "Linux is everywhere." The kernel has been adopted by almost every part of the computing world that isn't owned by a single vendor. When you read that 96% of web servers run Linux, that doesn't mean they're all running Ubuntu. It means they're all running <em>the kernel</em>, in different distros, on different hardware, doing different jobs. One codebase underneath all of it.</p>
+  </section>
+
+  <a href="/linux" class="footer-link">← Back to the Linux primer</a>
+
+</div>
+
+</Base>
+
+<style>
+  .editorial {
+    max-width: 680px;
+  }
+
+  .hero {
+    margin-bottom: 3rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .kicker {
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.9rem;
+    font-weight: 600;
+  }
+
+  h1 {
+    font-weight: 500;
+    font-size: clamp(2.1rem, 5vw, 3rem);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    font-weight: 500;
+    font-size: 1.55rem;
+    letter-spacing: -0.01em;
+    margin: 2.75rem 0 1rem;
+    color: var(--amber);
+  }
+
+  section { margin-bottom: 0.5rem; }
+
+  p { margin-bottom: 1.1rem; }
+
+  a { color: var(--amber); }
+  a:hover { color: var(--text); }
+
+  .footer-link {
+    display: inline-block;
+    margin-top: 3rem;
+    font-size: 0.9rem;
+    text-decoration: none;
+    border-bottom: 1px solid var(--amber);
+    padding-bottom: 1px;
+  }
+</style>

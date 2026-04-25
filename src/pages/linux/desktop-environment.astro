@@ -1,0 +1,112 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+
+<Base title="What's a desktop environment?" description="The desktop environment is the visual layer of your operating system. Taskbar, windows, menus, icons. The big ones, what each is good for, and how to choose.">
+
+<div class="editorial">
+
+  <header class="hero">
+    <div class="kicker">Going Deeper</div>
+    <h1>What's a desktop environment?</h1>
+  </header>
+
+  <section>
+    <p>On Windows or macOS, the look of the operating system isn't really a choice. Microsoft and Apple decide what the taskbar is, where the menu lives, what the windows look like, and that's what you get. You can change a wallpaper. You can't change the philosophy of the interface.</p>
+
+    <p>Linux works differently. The visual layer is its own swappable piece, called a <em>desktop environment</em>, or DE. The kernel doesn't care which one you run. The userland doesn't care. You can install one, install another, log out, log back in with a different one, and your files and programs are exactly where you left them. Only the look and feel changes.</p>
+
+    <p>Most distros come with a default DE. Mint comes with Cinnamon. Ubuntu with GNOME. Fedora with GNOME. KDE Neon with KDE. The default is usually a good fit for the distro's intended audience, but it's not the only choice.</p>
+  </section>
+
+  <section>
+    <h2>The big ones</h2>
+    <p><strong>Cinnamon.</strong> Mint's default. Looks and behaves like Windows: taskbar at the bottom, start menu in the corner, system tray on the right. Designed to be familiar to anyone coming from Windows. Lightweight enough for old hardware. The right answer for almost every first-time Linux user.</p>
+
+    <p><strong>GNOME.</strong> Ubuntu's default. Modern, minimal, opinionated. The interface is more like a tablet or a Mac than a Windows machine. Activities overview in the corner, full-screen app launcher, no traditional taskbar by default. Polished. Some people love it, some find it constraining. Heavier on resources than Cinnamon or Xfce.</p>
+
+    <p><strong>KDE Plasma.</strong> The shape-shifter. Looks like Windows out of the box, but every part of it can be reconfigured. Want a Mac-style dock? Done. Want a tiling layout? There's a setting. Highly polished, full of features. Can feel overwhelming if you don't want to fiddle.</p>
+
+    <p><strong>Xfce.</strong> The lightweight workhorse. Traditional layout, modest on resources, doesn't get in the way. Less flashy than the others. Excellent on old hardware where Cinnamon starts to feel heavy.</p>
+
+    <p><strong>MATE.</strong> A continuation of GNOME 2, the older traditional interface that GNOME left behind when it went minimal. For people who liked the old ways. Lightweight, stable, predictable.</p>
+
+    <p><strong>LXQt.</strong> Even lighter than Xfce. For very old hardware or very minimal preferences. Less polished, but it'll run on almost anything.</p>
+  </section>
+
+  <section>
+    <h2>Tiling window managers</h2>
+    <p>A different category, worth knowing about. A tiling window manager isn't a full desktop environment. It's just the part that arranges windows, plus whatever else you decide to add. Configured through a text file.</p>
+
+    <p>i3, Sway, Hyprland, Awesome, dwm. Each one arranges your windows automatically into non-overlapping tiles. You move between them with keyboard shortcuts. By default there's no taskbar, no system tray, no menu, but you can add any of those if you want them. I run i3 with a custom status bar at the bottom showing CPU, memory, WiFi, battery, fan speed, and a few shortcuts. Built piece by piece. Nothing on it I didn't choose.</p>
+
+    <p>For some people this is heaven and they never go back. For most people it's a step too far. If you've ever wanted a computer where every part of the interface is something you put there on purpose, this is what that looks like.</p>
+  </section>
+
+  <section>
+    <h2>Which one for you</h2>
+    <p>If you're just starting, the answer is whatever your distro comes with. Mint Cinnamon is a great first DE. It looks like Windows, behaves like Windows, runs well on modest hardware. You can poke at others later.</p>
+
+    <p>The good news is that swapping desktop environments doesn't mean reinstalling Linux. You can install a second DE alongside the first and pick which one to use at the login screen. If you want to try GNOME for an afternoon while keeping Cinnamon as your main, you can. Worst case you uninstall it and you're back where you started.</p>
+
+    <p>The visual layer being swappable is one of the things that makes Linux Linux. Don't feel locked in.</p>
+  </section>
+
+  <a href="/linux" class="footer-link">← Back to the Linux primer</a>
+
+</div>
+
+</Base>
+
+<style>
+  .editorial {
+    max-width: 680px;
+  }
+
+  .hero {
+    margin-bottom: 3rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .kicker {
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.9rem;
+    font-weight: 600;
+  }
+
+  h1 {
+    font-weight: 500;
+    font-size: clamp(2.1rem, 5vw, 3rem);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    font-weight: 500;
+    font-size: 1.55rem;
+    letter-spacing: -0.01em;
+    margin: 2.75rem 0 1rem;
+    color: var(--amber);
+  }
+
+  section { margin-bottom: 0.5rem; }
+
+  p { margin-bottom: 1.1rem; }
+
+  a { color: var(--amber); }
+  a:hover { color: var(--text); }
+
+  .footer-link {
+    display: inline-block;
+    margin-top: 3rem;
+    font-size: 0.9rem;
+    text-decoration: none;
+    border-bottom: 1px solid var(--amber);
+    padding-bottom: 1px;
+  }
+</style>

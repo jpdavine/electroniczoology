@@ -1,0 +1,144 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+
+<Base title="Linux, a starting point" description="What Linux actually is, how it differs from Windows and Mac, why you might want to try it, and where to start.">
+
+<div class="editorial">
+
+  <header class="hero">
+    <div class="kicker">Starting Point</div>
+    <h1>Linux</h1>
+  </header>
+
+  <section>
+    <h2>What Linux actually is</h2>
+    <p>Linux isn't one thing. At its core is the <a href="/linux/kernel">kernel</a>, the bit of an operating system that talks to the hardware. Around it, development teams add the rest: the desktop, the file manager, the package tools, all the software that lets you actually use the machine. Different teams make different choices about what to bundle. Each bundle is called a <a href="/linux/distro"><em>distribution</em></a>, or distro. Ubuntu, Mint, Debian, Fedora, Arch. Those are all Linux. Same kernel underneath, different operating systems on top.</p>
+
+    <p>This is a big mental shift coming from Windows or macOS. There, the operating system is a product. One company makes it, ships it, sells it. On Linux there's no company. There's one kernel underneath all of them, and there are dozens of groups putting it together into something you can install. Which means there's no single Linux experience. There's a Mint experience, an Ubuntu experience, an Arch experience. Pick a distro, that's what Linux looks like for you.</p>
+
+    <p>The bit that usually surprises people: you don't pay for any of it. The operating system costs nothing, the software costs nothing, and the source code is open for anyone to read or change. That's how it's been built for thirty years by people who want to use it themselves and are willing to share.</p>
+  </section>
+
+  <section>
+    <h2>How it's different</h2>
+    <p>Windows and macOS are products. Someone sells them to you, and a lot of what the operating system does is in service of that company. Telemetry, ads in the start menu, "recommended" apps, a login to the company's cloud, an assistant that wants your attention. The line between what's serving you and what's serving the company is hard to see.</p>
+
+    <p>Linux has no company. Nobody is trying to monetise your operating system. There's no account to register, no telemetry you can't turn off, no ads, no upsell. You install it and it just runs.</p>
+
+    <p>So who's paying for it? A mix. Thousands of volunteers who use Linux themselves and contribute code in their own time. Major tech companies, Red Hat, IBM, Google, Intel, who pay full-time kernel developers because Linux runs their servers. Foundations that pool money from member companies. None of them are paying to sell Linux to you. They're paying to use it themselves. We get it as a byproduct.</p>
+
+    <p>If that surprises you, here's the bigger surprise. Almost the entire internet runs on Linux. 96% of the top million web servers run it. Every supercomputer in the world's top 500 runs it. Android phones run a Linux kernel under the hood, which means the operating system on most of the phones on earth is Linux. Smart TVs, traffic light controllers, in-car infotainment, point-of-sale terminals, ATMs, planes, satellites. You've been using Linux all day. You just didn't know it had a name.</p>
+
+    <p>The practical differences you'll notice first:</p>
+
+    <p><strong>It's lean.</strong> A fresh install of most Linux distros uses a fraction of the disk and RAM that Windows does. On a five-year-old laptop that was starting to feel slow, Linux will often feel genuinely fast.</p>
+
+    <p><strong>It runs on old hardware.</strong> Windows 11 has a list of CPUs it will install on. Machines older than that list are officially dead, even if they work perfectly. Linux doesn't care. Most distros will run on anything from roughly the last fifteen years, and lighter distros go further back than that.</p>
+
+    <p><strong>You control updates.</strong> Your machine won't reboot itself during a presentation. Updates happen when you run them.</p>
+
+    <p><strong>You install software from a repository.</strong> Instead of hunting installers on websites, you pull software from a curated list maintained by your distro. It's closer to an app store than to the Windows download culture. Safer, too. Done through a tool called a <a href="/linux/package-manager">package manager</a>.</p>
+
+    <p><strong>Almost everything is a config file.</strong> Settings live in readable text files. You can back them up, share them, version-control them, compare them across machines. Nothing is hidden in an opaque registry.</p>
+
+    <p>The thing that's <em>not</em> different: for most day-to-day use, it's a <a href="/linux/desktop-environment">desktop</a> with a web browser, an email client, a file manager, and the programs you use. Firefox is Firefox, Chrome is Chrome, VS Code is VS Code. If your life is in the browser, the transition is close to invisible.</p>
+  </section>
+
+  <section>
+    <h2>Why you might try it</h2>
+    <p>A few honest reasons. Pick whichever ones actually apply to you.</p>
+
+    <p><strong>You have an old laptop that's getting slow.</strong> This is the best first reason. Linux on hardware Windows has given up on is often genuinely faster than it was new. A machine that was on the way to landfill becomes useful again.</p>
+
+    <p><strong>You want to stop paying for software you don't need.</strong> Office suite, photo editor, video editor, code editor, password manager, backup tool, all of it, free. Not "free trial." Free.</p>
+
+    <p><strong>You care about privacy.</strong> The default Linux install does not phone home. It does not build a profile. It does not sync your activity to a company's servers. What it does is up to you.</p>
+
+    <p><strong>You want to understand how computers actually work.</strong> Linux rewards curiosity. The machine is legible. You can read how it's put together, change it, break it, fix it. If you're the kind of person who likes to open things, Linux is the operating system that doesn't glue itself shut.</p>
+
+    <p><strong>You're tired of being sold to.</strong> No ads in the file manager. No "suggested content" in the start menu. No account required. The operating system works for you.</p>
+
+    <p>The honest cost: you have to be willing to learn a bit. Not a lot, and not all at once. But Linux isn't designed to hide itself from you the way Windows and macOS are. That's its strength and its cost in one. If you meet it halfway, it rewards you. If you want to never have to think about your operating system, stay on what you're using.</p>
+  </section>
+
+  <section>
+    <h2>Where to actually start</h2>
+    <p>You don't need to research this for a week. Most distros do most things well. Here's the shortest path:</p>
+
+    <p><strong>1. Pick Linux Mint Cinnamon.</strong> It looks and behaves like Windows. It's built on Ubuntu which is built on Debian, so it's on a mature base. It'll do everything a beginner needs. Some people stay on Mint for years. Some find it's the doorway to wanting more. Either is fine.</p>
+
+    <p><strong>2. Download the ISO and write it to a USB stick.</strong> A tool called <a href="https://etcher.balena.io/" target="_blank" rel="noopener">Balena Etcher</a> does this on any operating system. An 8GB stick is enough. This is non-destructive. You're just preparing a bootable drive.</p>
+
+    <p><strong>3. Try it as a live session first.</strong> Boot from the USB stick. Mint will start up and run entirely in memory, without touching your hard drive. Click around. Open a browser. Play some music. If the WiFi works and the screen looks right, the install will too. This is the single most reassuring step, and most people skip it.</p>
+
+    <p><strong>4. Install it on a machine you can afford to lose.</strong> An old laptop is ideal. Keep your main machine on whatever it's running for now. Having a backup means you don't need Linux to work perfectly on day one. If something breaks, you've still got a working computer in the other room while you figure it out.</p>
+
+    <p><strong>5. Give it a month.</strong> The first week is new and awkward. The second week you stop noticing. By the fourth week you'll have forgotten it's different. If you're still fighting it at that point, it's probably not for you. But most people aren't.</p>
+
+    <p>A note on distros to avoid as a first step: Arch is not a beginner distro. Anyone who tells you to start there is wrong, even if they mean well. Start with Mint. You can always install Arch later, and you'll appreciate it more.</p>
+
+    <p>When you get stuck, and you will, the answer to almost every question is a web search away. Linux has thirty years of forum posts answering nearly every possible problem. Between that and an AI assistant, you'll find what you need.</p>
+
+    <p>One more thing. At some point, usually when you're trying to fix something, someone will tell you to type a command into <a href="/linux/terminal">a terminal</a>. Don't panic. There's a page on what that is and why it isn't scary.</p>
+  </section>
+
+</div>
+
+</Base>
+
+<style>
+  .editorial {
+    max-width: 680px;
+  }
+
+  .hero {
+    margin-bottom: 3rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .kicker {
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.9rem;
+    font-weight: 600;
+  }
+
+  h1 {
+    font-weight: 500;
+    font-size: clamp(2.1rem, 5vw, 3rem);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    font-weight: 500;
+    font-size: 1.55rem;
+    letter-spacing: -0.01em;
+    margin: 2.75rem 0 1rem;
+    color: var(--amber);
+  }
+
+  section { margin-bottom: 0.5rem; }
+
+  p { margin-bottom: 1.1rem; }
+
+  a { color: var(--amber); }
+  a:hover { color: var(--text); }
+
+  code {
+    font-family: ui-monospace, monospace;
+    font-size: 0.9em;
+    background: rgba(168, 85, 247, 0.08);
+    padding: 0.08em 0.35em;
+    border-radius: 3px;
+  }
+
+  @media (max-width: 520px) {
+    .editorial { padding-top: 0.5rem; }
+  }
+</style>

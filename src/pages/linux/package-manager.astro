@@ -1,0 +1,127 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+
+<Base title="What's a package manager?" description="A package manager installs, updates and removes software for you. The big ones, what they do, and why it's better than hunting installers on websites.">
+
+<div class="editorial">
+
+  <header class="hero">
+    <div class="kicker">Going Deeper</div>
+    <h1>What's a package manager?</h1>
+  </header>
+
+  <section>
+    <p>On Windows, installing a program usually means going to a website, downloading an installer, double-clicking it, watching it ask for permissions, ticking through screens, sometimes catching it trying to install three other things you didn't want. Updating it means doing that again later. Removing it means hunting in the control panel and hoping the uninstaller is honest.</p>
+
+    <p>Linux works differently. There's a single tool that knows about every piece of software you might want to install. Type one command, the software gets pulled from a trusted source and installed. Type another command, everything on your machine gets updated at once. Type one more, it's gone cleanly. That tool is the package manager.</p>
+  </section>
+
+  <section>
+    <h2>How it works</h2>
+    <p>The distro maintains a <em>repository</em>, which is just a curated catalogue of software, hosted on servers run by the project. Tens of thousands of packages, all built and tested to work with that distro, all kept up to date by maintainers. Your package manager talks to the repository, fetches what you ask for, checks it's signed by the right key, and installs it.</p>
+
+    <p>It also tracks <em>dependencies</em>. Most software needs other software to run. A photo editor might depend on a particular image library. A game might depend on a particular sound system. The package manager works out what's needed, fetches it all in one go, and remembers what was installed for what. When you remove the photo editor later, the package manager can also remove the bits that were only there to support it.</p>
+
+    <p>The result is a system that stays clean. No leftover folders. No orphaned registry entries. No DLL hell. Software comes in clean and goes out clean.</p>
+  </section>
+
+  <section>
+    <h2>The big ones</h2>
+    <p>Different distros use different package managers. They all do the same job, just with different commands.</p>
+
+    <p><strong>apt.</strong> Debian, Ubuntu, Mint. The most common. <code>sudo apt install firefox</code> installs Firefox. <code>sudo apt update &amp;&amp; sudo apt upgrade</code> updates everything on the system. Mature, reliable, used by huge numbers of people, which means almost every problem you might hit has been solved on a forum somewhere.</p>
+
+    <p><strong>pacman.</strong> Arch and its derivatives. Faster, more terse. <code>sudo pacman -S firefox</code> installs Firefox. <code>sudo pacman -Syu</code> updates everything. The flags are cryptic at first but you remember them quickly.</p>
+
+    <p><strong>dnf.</strong> Fedora, Red Hat, Rocky. <code>sudo dnf install firefox</code>. Similar feel to apt.</p>
+
+    <p>If you start with Mint, you'll be using apt. You'll also have a graphical software centre that wraps apt in a clickable interface for the times you don't want to type anything.</p>
+  </section>
+
+  <section>
+    <h2>Why it's better</h2>
+    <p>Three reasons that matter day to day:</p>
+
+    <p><strong>It's safer.</strong> Because the package comes from your distro's repository, you know it's been built and signed by people who maintain that distro. You're not downloading a random installer from a random website hoping it's the real thing. The supply chain is short and verifiable.</p>
+
+    <p><strong>It updates everything at once.</strong> One command updates your browser, your media player, your image viewer, your office suite, your kernel, all at the same time. No app sitting in a corner asking to be updated. No mystery about what's current and what isn't.</p>
+
+    <p><strong>It cleans up after itself.</strong> Programs leave when you tell them to leave. The system stays the size it should be. After three years on the same install, you don't have a hard drive full of orphaned stuff you can't find or remove.</p>
+  </section>
+
+  <section>
+    <h2>The exceptions</h2>
+    <p>Two things to know.</p>
+
+    <p>First, not every piece of software is in your distro's repository. Some commercial apps, some niche tools, some things that move faster than the repository can keep up with. For those, Linux has alternative formats. Flatpak, Snap, and AppImage are three different ways of distributing software that works across distros, sandboxed from the rest of the system. They each have trade-offs, but they fill the gap when the official repository doesn't have what you need.</p>
+
+    <p>Second, on Arch specifically there's the <em>AUR</em>, the Arch User Repository. A community-maintained collection of build scripts for almost any piece of software that exists. If something isn't in the official Arch repository, it's almost certainly in the AUR. It's one of the reasons people stay on Arch once they get there.</p>
+  </section>
+
+  <a href="/linux" class="footer-link">← Back to the Linux primer</a>
+
+</div>
+
+</Base>
+
+<style>
+  .editorial {
+    max-width: 680px;
+  }
+
+  .hero {
+    margin-bottom: 3rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .kicker {
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.9rem;
+    font-weight: 600;
+  }
+
+  h1 {
+    font-weight: 500;
+    font-size: clamp(2.1rem, 5vw, 3rem);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    font-weight: 500;
+    font-size: 1.55rem;
+    letter-spacing: -0.01em;
+    margin: 2.75rem 0 1rem;
+    color: var(--amber);
+  }
+
+  section { margin-bottom: 0.5rem; }
+
+  p { margin-bottom: 1.1rem; }
+
+  a { color: var(--amber); }
+  a:hover { color: var(--text); }
+
+  code {
+    font-family: ui-monospace, monospace;
+    font-size: 0.9em;
+    background: rgba(168, 85, 247, 0.08);
+    padding: 0.08em 0.35em;
+    border-radius: 3px;
+  }
+
+  .footer-link {
+    display: inline-block;
+    margin-top: 3rem;
+    font-size: 0.9rem;
+    text-decoration: none;
+    border-bottom: 1px solid var(--amber);
+    padding-bottom: 1px;
+  }
+</style>

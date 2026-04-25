@@ -1,0 +1,116 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+
+<Base title="The terminal" description="What the terminal actually is, why the fear of it is misplaced, and where to go when you're ready to learn it.">
+
+<div class="editorial">
+
+  <header class="hero">
+    <div class="kicker">Going Deeper</div>
+    <h1>The terminal</h1>
+  </header>
+
+  <section>
+    <h2>What it is</h2>
+    <p>The terminal is the oldest interface a computer has. Text in, text out. You type a command, the computer runs it, you see the result. That's the whole thing.</p>
+
+    <p>Every graphical thing you do on Linux is the terminal underneath, just with a button drawn over the top of it. When you click <em>install</em> in your software centre, the software centre is running a terminal command for you. The terminal is the layer where the work actually happens. The graphical interface is a wrapper.</p>
+
+    <p>It looks intimidating because it's bare. No icons, no colour, no animations. Just a prompt waiting. But bare is also why it's fast and why it's powerful. Anything the computer can do, you can ask it to do directly, in plain text, without clicking through screens.</p>
+  </section>
+
+  <section>
+    <h2>Why the fear is misplaced</h2>
+    <p>The fear of the terminal usually breaks down into three things. Worth naming them, because once you see them you'll notice they're not the threats they look like.</p>
+
+    <p><strong>"I'll break the computer."</strong> Almost certainly not. Anything that could really break things needs your password first. As long as you read what you're about to run, and don't paste commands you don't understand, the worst you'll usually do is type something that doesn't work.</p>
+
+    <p><strong>"I won't know what to do if something goes wrong."</strong> Linux error messages are usually readable. Copy the error into a search engine and someone has hit it before. Most problems were solved on a forum a decade ago.</p>
+
+    <p><strong>"It's too much to remember."</strong> Nobody remembers everything. People who've used Linux for thirty years still look up commands. The terminal has a built-in manual for every command, and the internet has the rest. Knowing how to ask is the skill, not memorising.</p>
+
+    <p>The terminal isn't a test. It's a tool. The first time you fix something that would have taken twenty clicks by typing one line, the fear leaves and doesn't come back.</p>
+  </section>
+
+  <section>
+    <h2>Where to start when you're ready</h2>
+    <p>This site isn't going to teach you the terminal. There are people who do that better. A few honest pointers:</p>
+
+    <p><strong>Don't try to learn it cold.</strong> Wait until you have a real problem to solve. The first time you actually need to type something, you'll learn faster than any tutorial would teach you.</p>
+
+    <p><strong>Start with the manual.</strong> Open a terminal, type <code>man ls</code>, press Enter. That's the manual page for the <code>ls</code> command. Press <code>q</code> to leave. Every command on the system has one. Learning to read manual pages is more useful than memorising commands.</p>
+
+    <p><strong>The Linux Mint forums and the Arch Wiki are gold.</strong> Mint forums are warm and beginner-friendly. The Arch Wiki is technically excellent and applies to far more than just Arch. Both should be in your bookmarks before you need them.</p>
+
+    <p><strong>An AI assistant works well here.</strong> Ask it to explain a command before you run it, or to write a command for what you're trying to do. It's an enormous shortcut for someone learning the terminal in 2026.</p>
+
+    <p>Beyond that, you'll find your own way. The terminal rewards curiosity and patience, and not much else.</p>
+  </section>
+
+  <a href="/linux" class="footer-link">← Back to the Linux primer</a>
+
+</div>
+
+</Base>
+
+<style>
+  .editorial {
+    max-width: 680px;
+  }
+
+  .hero {
+    margin-bottom: 3rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .kicker {
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.9rem;
+    font-weight: 600;
+  }
+
+  h1 {
+    font-weight: 500;
+    font-size: clamp(2.1rem, 5vw, 3rem);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    font-weight: 500;
+    font-size: 1.55rem;
+    letter-spacing: -0.01em;
+    margin: 2.75rem 0 1rem;
+    color: var(--amber);
+  }
+
+  section { margin-bottom: 0.5rem; }
+
+  p { margin-bottom: 1.1rem; }
+
+  a { color: var(--amber); }
+  a:hover { color: var(--text); }
+
+  code {
+    font-family: ui-monospace, monospace;
+    font-size: 0.9em;
+    background: rgba(168, 85, 247, 0.08);
+    padding: 0.08em 0.35em;
+    border-radius: 3px;
+  }
+
+  .footer-link {
+    display: inline-block;
+    margin-top: 3rem;
+    font-size: 0.9rem;
+    text-decoration: none;
+    border-bottom: 1px solid var(--amber);
+    padding-bottom: 1px;
+  }
+</style>

@@ -1,0 +1,120 @@
+---
+import Base from '../../layouts/Base.astro';
+---
+
+<Base title="AI and Linux" description="AI assistants have changed what learning Linux looks like. How to use one well, and the limits worth knowing about.">
+
+<div class="editorial">
+
+  <header class="hero">
+    <div class="kicker">Going Deeper</div>
+    <h1>AI and Linux</h1>
+  </header>
+
+  <section>
+    <p>Learning Linux used to be hard for a specific reason. You had to know enough Linux to ask the right question, find the right forum, read the right answer, and adapt it to your situation. There was a competence floor before any of the help started helping.</p>
+
+    <p>That floor is mostly gone. You can describe a problem in plain English to an AI assistant, get a working command back, ask it to explain what each part does, and learn from there. The thing that used to take a week of forum-reading takes ten minutes.</p>
+
+    <p>AI can help you understand the question you're asking, then help you find the answer. Often the first half is the harder one.</p>
+  </section>
+
+  <section>
+    <h2>How to use one well</h2>
+    <p>A few habits worth picking up early.</p>
+
+    <p><strong>Tell it which distro you're on.</strong> "I'm on Mint" or "I'm on Arch" at the start of the conversation. Linux commands vary across distros, and an AI that doesn't know yours will sometimes give you advice for the wrong one.</p>
+
+    <p><strong>Ask before you run.</strong> Before pasting any command into your terminal, ask the AI to explain what it does. Read the explanation. If anything sounds off, ask again. <code>sudo</code> commands especially.</p>
+
+    <p><strong>Treat it like a knowledgeable friend, not an oracle.</strong> A friend can be wrong. A friend doesn't always know your machine. A friend's advice is a good starting point, not a final answer.</p>
+
+    <p><strong>Use it to learn, not to skip learning.</strong> The point isn't to never understand. It's to get past the first wall faster. After it gives you a command, ask why. After it explains, try a small variation yourself. The understanding catches up surprisingly fast.</p>
+  </section>
+
+  <section>
+    <h2>Where it gets things wrong</h2>
+    <p>AI assistants are confidently wrong sometimes. The failure modes worth watching for:</p>
+
+    <p><strong>Outdated information.</strong> The AI may have learned commands and package names that have since changed. If something doesn't work, that's worth checking before you assume you typed it wrong.</p>
+
+    <p><strong>Wrong distro advice.</strong> If you didn't tell it which distro you're on, it'll often default to Ubuntu, which means <code>apt</code> commands on a system that uses <code>pacman</code>.</p>
+
+    <p><strong>Hallucinated commands.</strong> Occasionally an AI will invent a command or a flag that doesn't exist. The terminal will tell you if you try to run it. Search the command before running anything that smells fictional.</p>
+
+    <p><strong>Confidently dangerous.</strong> Rarer, but it happens. An AI can suggest a command that would break your system if run as written. This is why you read the explanation before you run anything with <code>sudo</code> in it. The terminal is fast and unforgiving in equal measure.</p>
+  </section>
+
+  <section>
+    <h2>The honest version</h2>
+    <p>Two years ago I didn't know what a microcontroller was. AI was central to how I got from there to running Arch. It's been my IT support, my tutor, and a coding partner. I'm not subtle about that being a good thing.</p>
+
+    <p>If you're starting Linux now, you have access to something I didn't quite have at the start, and certainly didn't trust at the start. Use it. Just always remember it's the most educated simpleton you'll ever meet.</p>
+  </section>
+
+  <a href="/linux" class="footer-link">← Back to the Linux primer</a>
+
+</div>
+
+</Base>
+
+<style>
+  .editorial {
+    max-width: 680px;
+  }
+
+  .hero {
+    margin-bottom: 3rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .kicker {
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.9rem;
+    font-weight: 600;
+  }
+
+  h1 {
+    font-weight: 500;
+    font-size: clamp(2.1rem, 5vw, 3rem);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    font-weight: 500;
+    font-size: 1.55rem;
+    letter-spacing: -0.01em;
+    margin: 2.75rem 0 1rem;
+    color: var(--amber);
+  }
+
+  section { margin-bottom: 0.5rem; }
+
+  p { margin-bottom: 1.1rem; }
+
+  a { color: var(--amber); }
+  a:hover { color: var(--text); }
+
+  code {
+    font-family: ui-monospace, monospace;
+    font-size: 0.9em;
+    background: rgba(168, 85, 247, 0.08);
+    padding: 0.08em 0.35em;
+    border-radius: 3px;
+  }
+
+  .footer-link {
+    display: inline-block;
+    margin-top: 3rem;
+    font-size: 0.9rem;
+    text-decoration: none;
+    border-bottom: 1px solid var(--amber);
+    padding-bottom: 1px;
+  }
+</style>
