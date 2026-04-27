@@ -135,7 +135,7 @@ import Base from '../../layouts/Base.astro';
 
       <p><strong>What the flags mean:</strong></p>
       <ul class="flag-list">
-        <li><code>-i /path/to/source.wav</code> - input file (replace with your actual path)</li>
+        <li><code>-i /path/to/source.wav</code> - your input file. <code>/path/to/source.wav</code> is a placeholder - replace it with the actual location of your file on disk (e.g. <code>~/Downloads/mysound.mp3</code> or <code>/home/j/Videos/clip.mp4</code>). Not sure of the path? Drag the file into a terminal window and the full path will be pasted in automatically.</li>
         <li><code>-ss 00:00:05</code> - start cutting at 5 seconds</li>
         <li><code>-to 00:00:08</code> - stop cutting at 8 seconds (3-second clip)</li>
         <li><code>/tmp/myclip.wav</code> - output path. <code>/tmp</code> is a temporary folder Linux provides - files survive until reboot</li>
@@ -237,7 +237,7 @@ print(f"Done: &#123;len(pcm)&#125; bytes -> &#123;output_file&#125;")</code></pr
         <pre><code>python3 wav_to_header.py /tmp/myclip_8bit.wav myclip.h myclip</code></pre>
         <button class="copy-btn">Copy</button>
       </div>
-      <p>Place <code>myclip.h</code> in your sketch folder - the same directory as your <code>.ino</code> file.</p>
+      <p>Place <code>myclip.h</code> in your <a href="/glossary/sketch-folder" class="term-link">sketch folder</a> - the same directory as your <code>.ino</code> file.</p>
     </div>
 
     <!-- Sketch -->
