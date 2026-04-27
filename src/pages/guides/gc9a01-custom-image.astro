@@ -32,7 +32,7 @@ import Base from '../../layouts/Base.astro';
         <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin)</div>
         <div class="meta-item"><strong>Tools:</strong> Python + Pillow, Arduino IDE</div>
       </div>
-      <div class="badge">&#10003; Confirmed Working</div>
+      <div class="badge badge-untested">&#9888; Untested</div>
     </div>
 
     <div class="terminal-note">
@@ -403,6 +403,7 @@ void loop() {}`}</code></pre>
     border-radius: 20px;
     letter-spacing: 0.5px;
   }
+  .badge-untested { background: #e67e22; }
 
   .terminal-note {
     background: #f0f4ff;
