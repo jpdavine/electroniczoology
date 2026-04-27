@@ -8,6 +8,7 @@ const guides = [
     description: 'Playing audio clips from an ESP32 dev board through a PAM8403 amplifier and a speaker. Covers wiring, audio prep, WAV-to-header conversion, and the full Arduino sketch.',
     category: 'Audio',
     date: '2026-04-16',
+    status: 'confirmed',
     tags: ['ESP32', 'PAM8403', 'Audio', 'Arduino'],
   },
   {
@@ -16,6 +17,7 @@ const guides = [
     description: 'Wiring and driving a GC9A01 240x240 round IPS TFT display with an ESP32 Dev Board over SPI. Covers library setup, wiring, and a confirmed working test sketch.',
     category: 'Display',
     date: '2026-04-22',
+    status: 'confirmed',
     tags: ['ESP32', 'GC9A01', 'TFT', 'SPI', 'Arduino'],
   },
   {
@@ -24,6 +26,7 @@ const guides = [
     description: 'Convert any image to RGB565 and display it on a GC9A01 240x240 round IPS TFT with an ESP32. Covers image prep in GIMP, the Python conversion script, and the full Arduino sketch.',
     category: 'Display',
     date: '2026-04-22',
+    status: 'untested',
     tags: ['ESP32', 'GC9A01', 'RGB565', 'Images', 'Python', 'Arduino'],
   },
 ];
@@ -31,9 +34,9 @@ const guides = [
 <Base title="Guides">
 
   <div class="page-header">
-    <div class="section-label">Confirmed Working</div>
+    <div class="section-label">Field Notes</div>
     <h1>The Guides</h1>
-    <p>Step-by-step guides built on real hardware, tested, and verified. If it's here, it works.</p>
+    <p>Step-by-step guides built on real hardware in the garage. Confirmed working means tested and verified. Untested means the code is written but not yet run on hardware.</p>
   </div>
 
   <div class="guide-list">
@@ -41,7 +44,9 @@ const guides = [
       <a class="guide-row" href={`/guides/${g.slug}`}>
         <div class="row-meta">
           <span class="row-category">{g.category}</span>
-          <span class="row-badge">&#10003; Confirmed Working</span>
+          <span class={`row-badge ${g.status === 'untested' ? 'row-badge-untested' : ''}`}>
+            {g.status === 'untested' ? '⚠ Untested' : '✓ Confirmed Working'}
+          </span>
           <span class="row-date">{new Date(g.date).toLocaleDateString('en-AU', { year: 'numeric', month: 'short' })}</span>
         </div>
         <h2>{g.title}</h2>
@@ -118,6 +123,7 @@ const guides = [
     border-radius: 20px;
     letter-spacing: 0.5px;
   }
+  .row-badge-untested { background: #e67e22; }
   .row-date { font-size: 0.8rem; color: #888; }
 
   .guide-row h2 {
