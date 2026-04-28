@@ -46,10 +46,10 @@ import Base from '../../layouts/Base.astro';
         <div class="card">
           <h3>Hardware</h3>
           <ul>
-            <li><a href="/glossary/esp32-display-image" class="term-link">ESP32 Dev Board (38-pin)</a></li>
-            <li><a href="/glossary/gc9a01-image" class="term-link">GC9A01 240x240 round IPS TFT module</a></li>
+            <li><a id="esp32-display-image" href="/glossary/esp32-display-image" class="term-link">ESP32 Dev Board (38-pin)</a></li>
+            <li><a id="gc9a01-image" href="/glossary/gc9a01-image" class="term-link">GC9A01 240x240 round IPS TFT module</a></li>
             <li>Jumper wires</li>
-            <li><a href="/glossary/usb-cable-image" class="term-link">USB data cable for flashing</a></li>
+            <li><a id="usb-cable-image" href="/glossary/usb-cable-image" class="term-link">USB data cable for flashing</a></li>
           </ul>
         </div>
         <div class="card">
@@ -113,7 +113,7 @@ import Base from '../../layouts/Base.astro';
     <!-- Convert to RGB565 -->
     <div class="section" id="convert">
       <h2>Convert to RGB565</h2>
-      <p>Save this script as <code>image_to_rgb565.py</code> anywhere on your computer, then run it once per image. <a href="/glossary/save-a-script-image" class="term-link">How to save a script &rarr;</a></p>
+      <p>Save this script as <code>image_to_rgb565.py</code> anywhere on your computer, then run it once per image. <a id="save-a-script-image" href="/glossary/save-a-script-image" class="term-link">How to save a script &rarr;</a></p>
 
       <div class="code-wrap">
         <pre><code>{`#!/usr/bin/env python3
@@ -600,6 +600,19 @@ void loop() {}`}</code></pre>
     });
   }, { rootMargin: '-20% 0px -70% 0px' });
   sections.forEach(s => observer.observe(s));
+
+  window.addEventListener('load', () => {
+    const id = window.location.hash.slice(1);
+    if (!id) return;
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ block: 'center' });
+  });
+  window.addEventListener('hashchange', () => {
+    const id = window.location.hash.slice(1);
+    if (!id) return;
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ block: 'center' });
+  });
 </script>
 
 </Base>

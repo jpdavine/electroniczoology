@@ -19,7 +19,7 @@ const mdProjects = Object.values(modules).sort((a: any, b: any) => new Date(b.fr
 
   <div class="project-list">
     {mdProjects.map((p: any) => (
-      <a class="project-row" href={`/projects/${p.frontmatter.slug}`}>
+      <a id={p.frontmatter.slug} class="project-row" href={`/projects/${p.frontmatter.slug}`}>
         <div class="row-meta">
           <span class="row-category">{p.frontmatter.category ?? 'Build'}</span>
           <span class="row-status">In progress</span>
@@ -35,6 +35,21 @@ const mdProjects = Object.values(modules).sort((a: any, b: any) => new Date(b.fr
       </a>
     ))}
   </div>
+
+<script>
+  window.addEventListener('load', () => {
+    const id = window.location.hash.slice(1);
+    if (!id) return;
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ block: 'center' });
+  });
+  window.addEventListener('hashchange', () => {
+    const id = window.location.hash.slice(1);
+    if (!id) return;
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ block: 'center' });
+  });
+</script>
 
 </Base>
 

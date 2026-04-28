@@ -42,10 +42,10 @@ import Base from '../../layouts/Base.astro';
         <div class="card">
           <h3>Parts</h3>
           <ul>
-            <li><a href="/glossary/esp32-display" class="term-link">ESP32 Dev Board (38-pin)</a></li>
-            <li><a href="/glossary/gc9a01" class="term-link">GC9A01 240x240 round IPS TFT module</a></li>
+            <li><a id="esp32-display" href="/glossary/esp32-display" class="term-link">ESP32 Dev Board (38-pin)</a></li>
+            <li><a id="gc9a01" href="/glossary/gc9a01" class="term-link">GC9A01 240x240 round IPS TFT module</a></li>
             <li>Jumper wires</li>
-            <li><a href="/glossary/usb-cable-round" class="term-link">USB data cable for flashing</a></li>
+            <li><a id="usb-cable-round" href="/glossary/usb-cable-round" class="term-link">USB data cable for flashing</a></li>
           </ul>
         </div>
         <div class="card">
@@ -518,6 +518,19 @@ void loop() {
     });
   }, { rootMargin: '-20% 0px -70% 0px' });
   sections.forEach(s => observer.observe(s));
+
+  window.addEventListener('load', () => {
+    const id = window.location.hash.slice(1);
+    if (!id) return;
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ block: 'center' });
+  });
+  window.addEventListener('hashchange', () => {
+    const id = window.location.hash.slice(1);
+    if (!id) return;
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ block: 'center' });
+  });
 </script>
 
 </Base>

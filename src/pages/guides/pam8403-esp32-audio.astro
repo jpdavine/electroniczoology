@@ -48,19 +48,19 @@ import Base from '../../layouts/Base.astro';
         <div class="card">
           <h3>Parts</h3>
           <ul>
-            <li><a href="/glossary/esp32" class="term-link">ESP32 Dev Board (38-pin)</a></li>
-            <li><a href="/glossary/pam8403" class="term-link">PAM8403 amplifier module</a></li>
-            <li><a href="/glossary/speaker" class="term-link">4-8&#8486; speaker</a></li>
-            <li><a href="/glossary/cap-coupling" class="term-link">10&#xB5;F electrolytic capacitor</a> <em>(coupling cap)</em></li>
-            <li><a href="/glossary/cap-decoupling" class="term-link">100&#xB5;F electrolytic capacitor</a> <em>(decoupling cap)</em></li>
+            <li><a id="esp32" href="/glossary/esp32" class="term-link">ESP32 Dev Board (38-pin)</a></li>
+            <li><a id="pam8403" href="/glossary/pam8403" class="term-link">PAM8403 amplifier module</a></li>
+            <li><a id="speaker" href="/glossary/speaker" class="term-link">4-8&#8486; speaker</a></li>
+            <li><a id="cap-coupling" href="/glossary/cap-coupling" class="term-link">10&#xB5;F electrolytic capacitor</a> <em>(coupling cap)</em></li>
+            <li><a id="cap-decoupling" href="/glossary/cap-decoupling" class="term-link">100&#xB5;F electrolytic capacitor</a> <em>(decoupling cap)</em></li>
             <li>Jumper wires</li>
-            <li><a href="/glossary/usb-cable" class="term-link">USB cable for flashing</a></li>
+            <li><a id="usb-cable" href="/glossary/usb-cable" class="term-link">USB cable for flashing</a></li>
           </ul>
         </div>
         <div class="card">
           <h3>Software</h3>
           <ul>
-            <li><a href="/glossary/arduino-ide" class="term-link">Arduino IDE</a> with ESP32 board support</li>
+            <li><a id="arduino-ide" href="/glossary/arduino-ide" class="term-link">Arduino IDE</a> with ESP32 board support</li>
             <li><code>espeak-ng</code> - generate voice clips</li>
             <li><code>ffmpeg</code> - convert audio files</li>
             <li>Python 3 - WAV to C header</li>
@@ -77,7 +77,7 @@ import Base from '../../layouts/Base.astro';
     <!-- How It Works -->
     <div class="section" id="how-it-works">
       <h2>How It Works</h2>
-      <p>The ESP32 has two built-in <a href="/glossary/dac" class="term-link">DAC pins</a> (GPIO25 and GPIO26) that output a true analogue voltage (0-3.3V). We use one of these to output audio samples, which the <a href="/glossary/pam8403" class="term-link">PAM8403</a> amplifies to drive the speaker.</p>
+      <p>The ESP32 has two built-in <a id="dac" href="/glossary/dac" class="term-link">DAC pins</a> (GPIO25 and GPIO26) that output a true analogue voltage (0-3.3V). We use one of these to output audio samples, which the <a href="/glossary/pam8403" class="term-link">PAM8403</a> amplifies to drive the speaker.</p>
       <p style="margin-top:0.75rem;">The audio data is stored as a C byte array compiled directly into the sketch - no SD card or filesystem needed for short clips.</p>
     </div>
 
@@ -195,7 +195,7 @@ import Base from '../../layouts/Base.astro';
     <!-- WAV to Header -->
     <div class="section" id="wav-to-header">
       <h2>Convert WAV to C Header</h2>
-      <p>Save the script below as <code>wav_to_header.py</code>, then execute it to convert your audio into a header file for the sketch. <a href="/glossary/save-a-script" class="term-link">How to save a script &rarr;</a></p>
+      <p>Save the script below as <code>wav_to_header.py</code>, then execute it to convert your audio into a header file for the sketch. <a id="save-a-script" href="/glossary/save-a-script" class="term-link">How to save a script &rarr;</a></p>
 
       <div class="code-wrap">
         <pre><code>import sys
@@ -237,7 +237,7 @@ print(f"Done: &#123;len(pcm)&#125; bytes -> &#123;output_file&#125;")</code></pr
         <pre><code>python3 wav_to_header.py /tmp/myclip_8bit.wav myclip.h myclip</code></pre>
         <button class="copy-btn">Copy</button>
       </div>
-      <p>Place <code>myclip.h</code> in your <a href="/glossary/sketch-folder" class="term-link">sketch folder</a> - the same directory as your <code>.ino</code> file.</p>
+      <p>Place <code>myclip.h</code> in your <a id="sketch-folder" href="/glossary/sketch-folder" class="term-link">sketch folder</a> - the same directory as your <code>.ino</code> file.</p>
     </div>
 
     <!-- Sketch -->
@@ -295,7 +295,7 @@ void loop() &#123;
       </div>
 
       <div class="callout callout-why">
-        <strong><a href="/glossary/progmem" class="term-link">PROGMEM</a></strong>
+        <strong><a id="progmem" href="/glossary/progmem" class="term-link">PROGMEM</a></strong>
         Stores the audio data in flash instead of RAM. Without it, a large audio array would overflow the ESP32's 320KB RAM. <code>pgm_read_byte()</code> reads it back one byte at a time during playback.
       </div>
       <div class="callout callout-tip">
@@ -690,4 +690,17 @@ void loop() &#123;
     });
   }, { rootMargin: '-20% 0px -70% 0px' });
   sections.forEach(s => observer.observe(s));
+
+  window.addEventListener('load', () => {
+    const id = window.location.hash.slice(1);
+    if (!id) return;
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ block: 'center' });
+  });
+  window.addEventListener('hashchange', () => {
+    const id = window.location.hash.slice(1);
+    if (!id) return;
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ block: 'center' });
+  });
 </script>
