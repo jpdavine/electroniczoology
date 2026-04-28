@@ -73,7 +73,7 @@ import Base from '../../layouts/Base.astro';
     <!-- Sketch -->
     <div class="section" id="sketch">
       <h2>The Sketch</h2>
-      <p>Include each header at the top and add the variable names to the <code>images[]</code> array. Update <code>NUM_IMAGES</code> to match how many you have. The swap interval is set in milliseconds - 5000 = 5 seconds.</p>
+      <p>All your edits are in one block at the top - add your <code>#include</code> lines, update the <code>images[]</code> array and <code>NUM_IMAGES</code> to match. Everything below that block stays untouched. Swap interval is in milliseconds - 5000 = 5 seconds.</p>
       <div class="code-wrap">
         <pre><code>{`/*
  * We stand on the shoulders of giants when we build
@@ -107,22 +107,23 @@ import Base from '../../layouts/Base.astro';
 
 #include <Arduino_GFX_Library.h>
 
-// <- add your .h files here, one per image
+// ---- your images - edit here ----
 #include "face1.h"
 #include "face2.h"
 #include "face3.h"
 
+const uint16_t* images[] = { face1, face2, face3 };
+#define NUM_IMAGES 3
+// ----------------------------------
+
+#define SWAP_MS 5000        // swap interval in milliseconds
+
 #define TFT_DC  27
 #define TFT_CS   5
 #define TFT_RST  4
-#define NUM_IMAGES 3        // <- update to match number of images
-#define SWAP_MS    5000     // <- swap interval in milliseconds
 
 Arduino_DataBus *bus = new Arduino_HWSPI(TFT_DC, TFT_CS);
 Arduino_GFX *gfx = new Arduino_GC9A01(bus, TFT_RST, 0, true);
-
-// <- add your variable names here to match the .h files
-const uint16_t* images[NUM_IMAGES] = { face1, face2, face3 };
 uint8_t idx = 0;
 unsigned long lastSwap = 0;
 

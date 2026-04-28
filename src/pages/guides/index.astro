@@ -22,11 +22,20 @@ const guides = [
   },
   {
     slug: 'gc9a01-custom-image',
-    title: 'Display Custom Images on the GC9A01 Round TFT',
+    title: 'Display a Custom Image on the GC9A01 Round TFT',
     description: 'Convert any image to RGB565 and display it on a GC9A01 240x240 round IPS TFT with an ESP32. Covers image prep in GIMP, the Python conversion script, and the full Arduino sketch.',
     category: 'Display',
-    date: '2026-04-22',
-    status: 'untested',
+    date: '2026-04-28',
+    status: 'confirmed',
+    tags: ['ESP32', 'GC9A01', 'RGB565', 'Images', 'Python', 'Arduino'],
+  },
+  {
+    slug: 'gc9a01-multiple-images',
+    title: 'Cycling Multiple Images on the GC9A01 Round TFT',
+    description: 'Batch convert a folder of images to RGB565 and cycle through them on a GC9A01 round display. Covers batch conversion, flash memory limits, partition scheme, and the full cycling sketch.',
+    category: 'Display',
+    date: '2026-04-28',
+    status: 'wip',
     tags: ['ESP32', 'GC9A01', 'RGB565', 'Images', 'Python', 'Arduino'],
   },
 ];
@@ -44,8 +53,8 @@ const guides = [
       <a class="guide-row" href={`/guides/${g.slug}`}>
         <div class="row-meta">
           <span class="row-category">{g.category}</span>
-          <span class={`row-badge ${g.status === 'untested' ? 'row-badge-untested' : ''}`}>
-            {g.status === 'untested' ? '⚠ Untested' : '✓ Confirmed Working'}
+          <span class={`row-badge ${g.status === 'untested' ? 'row-badge-untested' : g.status === 'wip' ? 'row-badge-wip' : ''}`}>
+            {g.status === 'untested' ? '⚠ Untested' : g.status === 'wip' ? '⚙ Under Construction' : '✓ Confirmed Working'}
           </span>
           <span class="row-date">{new Date(g.date).toLocaleDateString('en-AU', { year: 'numeric', month: 'short' })}</span>
         </div>
@@ -124,6 +133,7 @@ const guides = [
     letter-spacing: 0.5px;
   }
   .row-badge-untested { background: #e67e22; }
+  .row-badge-wip { background: #6b7280; }
   .row-date { font-size: 0.8rem; color: #888; }
 
   .guide-row h2 {
