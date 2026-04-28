@@ -20,6 +20,7 @@ const guides = [
     status: 'confirmed',
     series: 'GC9A01 Display Series',
     step: 1,
+    stepDesc: 'Getting it working — wiring and first display',
     tags: ['ESP32', 'GC9A01', 'TFT', 'SPI', 'Arduino'],
   },
   {
@@ -31,6 +32,7 @@ const guides = [
     status: 'confirmed',
     series: 'GC9A01 Display Series',
     step: 2,
+    stepDesc: 'Your first image — converting and displaying custom art',
     tags: ['ESP32', 'GC9A01', 'RGB565', 'Images', 'Python', 'Arduino'],
   },
   {
@@ -42,6 +44,7 @@ const guides = [
     status: 'confirmed',
     series: 'GC9A01 Display Series',
     step: 3,
+    stepDesc: 'Cycling images — batch conversion and memory management',
     tags: ['ESP32', 'GC9A01', 'RGB565', 'Images', 'Python', 'Arduino'],
   },
 ];
@@ -67,7 +70,7 @@ const guides = [
             <a class={`guide-row ${g.series ? 'guide-row-series' : ''}`} href={`/guides/${g.slug}`}>
               <div class="row-meta">
                 <span class="row-category">{g.category}</span>
-                {g.step && <span class="row-step">Step {g.step}</span>}
+                {g.step && <span class="row-step">Step {g.step} — {g.stepDesc}</span>}
                 <span class={`row-badge ${g.status === 'untested' ? 'row-badge-untested' : g.status === 'wip' ? 'row-badge-wip' : ''}`}>
                   {g.status === 'untested' ? '⚠ Untested' : g.status === 'wip' ? '⚙ Under Construction' : '✓ Confirmed Working'}
                 </span>
