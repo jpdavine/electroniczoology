@@ -1,0 +1,31 @@
+---
+import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
+---
+<GlossaryEntry
+  category="Microcontroller"
+  title="ESP32 Dev Board"
+  subtitle="38-pin development board"
+  backTo="/guides/gc9a01-multiple-images#esp32-multi"
+  backLabel="Back to multiple images guide"
+  highlights={[
+    'GPIO 18 - SPI clock (SCL)',
+    'GPIO 23 - SPI data MOSI (SDA)',
+    'GPIO 27 - Data/Command select (DC)',
+    'GPIO 5  - Chip select (CS)',
+    'GPIO 4  - Reset (RST)',
+    '3.3V    - Display power (never 5V)',
+    'GND     - Common ground',
+  ]}
+>
+  <img slot="svg" src="/components/esp32-dev-board.png" alt="ESP32 WROOM-32 38-pin dev board" style="max-width:280px;border-radius:6px;"/>
+  <Fragment slot="desc">
+    <p style="font-size:0.7rem;color:#999;margin-bottom:0.1rem;">Official Espressif documentation:</p>
+    <a href="https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/esp32-devkitc/user_guide.html"
+       target="_blank" rel="noopener"
+       style="display:inline-block;margin-bottom:1rem;font-size:0.95rem;color:#7a8ab0;text-decoration:none;">
+      ESP32-DevKitC V4 user guide &rarr;
+    </a>
+    <p>The ESP32 is a dual-core 240MHz microcontroller with built-in WiFi and Bluetooth. The 38-pin dev board breaks all GPIO pins out on two rows of headers.</p>
+    <p>For SPI displays like the GC9A01, the ESP32 uses its hardware SPI peripheral on GPIO 18 (SCLK) and GPIO 23 (MOSI). DC, CS, and RST are standard GPIO and can be reassigned if needed.</p>
+  </Fragment>
+</GlossaryEntry>
