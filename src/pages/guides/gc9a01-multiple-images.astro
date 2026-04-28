@@ -11,6 +11,7 @@ import Base from '../../layouts/Base.astro';
     <nav class="toc">
       <h3>Contents</h3>
       <ol>
+        <li><a href="#what-you-need">What You Need</a></li>
         <li><a href="#batch">Batch Convert</a></li>
         <li><a href="#flash">Flash Memory</a></li>
         <li><a href="#sketch">The Sketch</a></li>
@@ -30,11 +31,35 @@ import Base from '../../layouts/Base.astro';
         <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin)</div>
         <div class="meta-item"><strong>Tools:</strong> Python + Pillow, Arduino IDE</div>
       </div>
-      <div class="badge badge-wip">&#9999; Under Construction</div>
+      <div class="badge badge-confirmed">&#10003; Confirmed Working</div>
     </div>
 
-    <div class="terminal-note" style="background:#fff8e1;border-color:#f59e0b;">
-      &#9888; This guide is not yet complete - check back soon. In the meantime start with the <a href="/guides/gc9a01-custom-image" class="term-link">single image guide &rarr;</a>
+    <!-- What You Need -->
+    <div class="section" id="what-you-need">
+      <h2>What You Need</h2>
+      <div class="two-col">
+        <div class="card">
+          <h3>Hardware</h3>
+          <ul>
+            <li>ESP32 Dev Board (38-pin)</li>
+            <li>GC9A01 240x240 round IPS TFT module</li>
+            <li>Jumper wires</li>
+            <li>USB data cable for flashing</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Software & Files</h3>
+          <ul>
+            <li>Arduino IDE with ESP32 board support</li>
+            <li><code>Arduino_GFX_Library</code> by Moon On Our Nation</li>
+            <li>Python 3 + Pillow - image converter</li>
+            <li>Multiple PNG images prepared and converted to <code>.h</code> files</li>
+          </ul>
+        </div>
+      </div>
+      <div class="terminal-note" style="margin-bottom:0;">
+        Not set up yet? Start with the <a href="/guides/gc9a01-custom-image" class="term-link">single image guide &rarr;</a> - it covers wiring, the library, and the conversion script.
+      </div>
     </div>
 
     <!-- Batch Convert -->
@@ -73,7 +98,7 @@ import Base from '../../layouts/Base.astro';
     <!-- Sketch -->
     <div class="section" id="sketch">
       <h2>The Sketch</h2>
-      <p>All your edits are in one block at the top - add your <code>#include</code> lines, update the <code>images[]</code> array and <code>NUM_IMAGES</code> to match. Everything below that block stays untouched. Swap interval is in milliseconds - 5000 = 5 seconds.</p>
+      <p>All your edits are in one block at the top - add your <code>#include</code> lines and update the <code>images[]</code> array. <code>NUM_IMAGES</code> counts itself automatically. Everything below that block stays untouched. Swap interval is in milliseconds - 5000 = 5 seconds.</p>
       <div class="code-wrap">
         <pre><code>{`/*
  * We stand on the shoulders of giants when we build
@@ -113,7 +138,7 @@ import Base from '../../layouts/Base.astro';
 #include "face3.h"
 
 const uint16_t* images[] = { face1, face2, face3 };
-#define NUM_IMAGES 3
+#define NUM_IMAGES (sizeof(images) / sizeof(images[0]))  // auto-counts
 // ----------------------------------
 
 #define SWAP_MS 5000        // swap interval in milliseconds
@@ -328,6 +353,28 @@ void loop() {
   main p { color: #444; line-height: 1.75; margin-bottom: 0.75rem; }
   main ul, main ol { padding-left: 1.4rem; margin-bottom: 1rem; }
   main li { margin-bottom: 0.3rem; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .card {
+    background: #fafafa;
+    border: 1px solid #e8e8e8;
+    border-radius: 6px;
+    padding: 1.25rem 1.5rem;
+  }
+  .card h3 {
+    margin-top: 0;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #888;
+    margin-bottom: 0.75rem;
+  }
+  .card ul { margin-bottom: 0; }
 
   pre {
     background: #1e1e2e;
