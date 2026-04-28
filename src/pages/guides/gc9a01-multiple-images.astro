@@ -1,104 +1,95 @@
 ---
-import Base from '../../layouts/Base.astro';
+import GuideLayout from '../../layouts/GuideLayout.astro';
 ---
+<GuideLayout
+  title="Cycling Multiple Images on the GC9A01 Round TFT"
+  description="How to convert and cycle through multiple custom images on a GC9A01 240x240 round IPS TFT display with an ESP32. Covers batch conversion, flash memory limits, and the full cycling sketch."
+  toc={[
+    {href: '#what-you-need', label: 'What You Need'},
+    {href: '#batch', label: 'Batch Convert'},
+    {href: '#flash', label: 'Flash Memory'},
+    {href: '#sketch', label: 'The Sketch'},
+    {href: '#troubleshooting', label: 'Troubleshooting'},
+  ]}
+>
 
-<Base title="Cycling Multiple Images on the GC9A01 Round TFT" description="How to convert and cycle through multiple custom images on a GC9A01 240x240 round IPS TFT display with an ESP32. Covers batch conversion, flash memory limits, and the full cycling sketch." fullWidth={true}>
-
-<div class="pam-wrap">
-
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <nav class="toc">
-      <h3>Contents</h3>
-      <ol>
-        <li><a href="#what-you-need">What You Need</a></li>
-        <li><a href="#batch">Batch Convert</a></li>
-        <li><a href="#flash">Flash Memory</a></li>
-        <li><a href="#sketch">The Sketch</a></li>
-        <li><a href="#troubleshooting">Troubleshooting</a></li>
-      </ol>
-    </nav>
-  </aside>
-
-  <!-- Main -->
-  <main>
-
-    <div class="hero">
-      <div class="category">Display &bull; ESP32</div>
-      <h1>Cycling Multiple Images<br>on the GC9A01 Round TFT</h1>
-      <div class="meta">
-        <div class="meta-item"><strong>Display:</strong> GC9A01 - 240x240 round IPS TFT</div>
-        <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin)</div>
-        <div class="meta-item"><strong>Tools:</strong> Python + Pillow, Arduino IDE</div>
-      </div>
-      <div class="series-step">GC9A01 Display Series &mdash; Step 3 of 3 &mdash; Cycling images</div>
-      <div class="badge badge-confirmed">&#10003; Confirmed Working</div>
+  <div class="hero">
+    <div class="category">Display &bull; ESP32</div>
+    <h1>Cycling Multiple Images<br>on the GC9A01 Round TFT</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Display:</strong> GC9A01 - 240x240 round IPS TFT</div>
+      <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin)</div>
+      <div class="meta-item"><strong>Tools:</strong> Python + Pillow, Arduino IDE</div>
     </div>
+    <div class="series-step">GC9A01 Display Series &mdash; Step 3 of 3 &mdash; Cycling images</div>
+    <div class="badge badge-confirmed">&#10003; Confirmed Working</div>
+  </div>
 
-    <!-- What You Need -->
-    <div class="section" id="what-you-need">
-      <h2>What You Need</h2>
-      <div class="two-col">
-        <div class="card">
-          <h3>Hardware</h3>
-          <ul>
-            <li><a id="esp32-multi" href="/glossary/esp32-multi" class="term-link">ESP32 Dev Board (38-pin)</a></li>
-            <li><a id="gc9a01-multi" href="/glossary/gc9a01-multi" class="term-link">GC9A01 240x240 round IPS TFT module</a></li>
-            <li>Jumper wires</li>
-            <li><a id="usb-cable-multi" href="/glossary/usb-cable-multi" class="term-link">USB data cable for flashing</a></li>
-          </ul>
-        </div>
-        <div class="card">
-          <h3>Software & Files</h3>
-          <ul>
-            <li>Arduino IDE with ESP32 board support</li>
-            <li><code>Arduino_GFX_Library</code> by Moon On Our Nation</li>
-            <li>Python 3 + Pillow - image converter</li>
-            <li>Multiple PNG images prepared and converted to <code>.h</code> files</li>
-          </ul>
-        </div>
+  <div class="terminal-note">
+    This guide continues from the <a href="/guides/gc9a01-custom-image" class="term-link">single image guide &rarr;</a> - make sure your display is working with one image before starting here.
+  </div>
+
+  <!-- What You Need -->
+  <div class="section" id="what-you-need">
+    <h2>What You Need</h2>
+    <div class="two-col">
+      <div class="card">
+        <h3>Hardware</h3>
+        <ul>
+          <li><a id="esp32-multi" href="/glossary/esp32-multi" class="term-link">ESP32 Dev Board (38-pin)</a></li>
+          <li><a id="gc9a01-multi" href="/glossary/gc9a01-multi" class="term-link">GC9A01 240x240 round IPS TFT module</a></li>
+          <li>Jumper wires</li>
+          <li><a id="usb-cable-multi" href="/glossary/usb-cable-multi" class="term-link">USB data cable for flashing</a></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Software & Files</h3>
+        <ul>
+          <li>Arduino IDE with ESP32 board support</li>
+          <li><code>Arduino_GFX_Library</code> by Moon On Our Nation</li>
+          <li>Python 3 + Pillow - image converter</li>
+          <li>Multiple PNG images prepared and converted to <code>.h</code> files</li>
+        </ul>
       </div>
     </div>
+  </div>
 
-    <!-- Batch Convert -->
-    <div class="section" id="batch">
-      <h2>Batch Convert</h2>
-      <p>If all your images are in one folder, convert them all at once with a shell loop. Each <code>.h</code> file is named after its source image automatically.</p>
-
-      <div class="code-wrap">
-        <pre><code>for f in ~/Downloads/myimages/*.png; do name=$(basename "$f" .png); python3 ~/image_to_rgb565.py "$f" "$name"; done</code></pre>
-        <button class="copy-btn">Copy</button>
-      </div>
-      <p class="cmd-annotate">Replace <code>~/Downloads/myimages/</code> with the path to your images folder.</p>
-      <p>The <code>.h</code> files land in the same folder as your images. Move them all into your Arduino sketch folder alongside the <code>.ino</code> file.</p>
+  <!-- Batch Convert -->
+  <div class="section" id="batch">
+    <h2>Batch Convert</h2>
+    <p>If all your images are in one folder, convert them all at once with a shell loop. Each <code>.h</code> file is named after its source image automatically.</p>
+    <div class="code-wrap">
+      <pre><code>for f in ~/Downloads/myimages/*.png; do name=$(basename "$f" .png); python3 ~/image_to_rgb565.py "$f" "$name"; done</code></pre>
+      <button class="copy-btn">Copy</button>
     </div>
+    <p class="cmd-annotate">Replace <code>~/Downloads/myimages/</code> with the path to your images folder.</p>
+    <p>The <code>.h</code> files land in the same folder as your images. Move them all into your Arduino sketch folder alongside the <code>.ino</code> file.</p>
+  </div>
 
-    <!-- Flash Memory -->
-    <div class="section" id="flash">
-      <h2>Flash Memory</h2>
-      <p>Each 240x240 image takes <strong>115KB</strong> of flash. The ESP32 default partition gives the app 1MB total - shared with the compiled sketch and libraries. With multiple images you will likely hit that limit.</p>
-
-      <div class="callout callout-why">
-        <strong>Change the partition scheme</strong>
-        <p>In Arduino IDE go to <strong>Tools &rarr; Partition Scheme &rarr; Huge APP (3MB No OTA / 1MB SPIFFS)</strong> before compiling. That gives the app 3MB, comfortably fitting around 25 images.</p>
-      </div>
-
-      <table class="mem-table">
-        <thead><tr><th>Images</th><th>Flash used</th><th>Partition needed</th></tr></thead>
-        <tbody>
-          <tr><td>1-4</td><td>up to ~460KB</td><td>Default (1MB) - ok</td></tr>
-          <tr><td>5+</td><td>500KB+</td><td>Huge APP (3MB)</td></tr>
-          <tr><td>~25</td><td>~2.9MB</td><td>Huge APP (3MB) - limit</td></tr>
-        </tbody>
-      </table>
+  <!-- Flash Memory -->
+  <div class="section" id="flash">
+    <h2>Flash Memory</h2>
+    <p>Each 240x240 image takes <strong>115KB</strong> of flash. The ESP32 default partition gives the app 1MB total - shared with the compiled sketch and libraries. With multiple images you will likely hit that limit.</p>
+    <div class="callout callout-why">
+      <strong>Change the partition scheme</strong>
+      <p>In Arduino IDE go to <strong>Tools &rarr; Partition Scheme &rarr; Huge APP (3MB No OTA / 1MB SPIFFS)</strong> before compiling. That gives the app 3MB, comfortably fitting around 25 images.</p>
     </div>
+    <table class="mem-table">
+      <thead><tr><th>Images</th><th>Flash used</th><th>Partition needed</th></tr></thead>
+      <tbody>
+        <tr><td>1-4</td><td>up to ~460KB</td><td>Default (1MB) - ok</td></tr>
+        <tr><td>5+</td><td>500KB+</td><td>Huge APP (3MB)</td></tr>
+        <tr><td>~25</td><td>~2.9MB</td><td>Huge APP (3MB) - limit</td></tr>
+      </tbody>
+    </table>
+  </div>
 
-    <!-- Sketch -->
-    <div class="section" id="sketch">
-      <h2>The Sketch</h2>
-      <p>All your edits are in one block at the top - add your <code>#include</code> lines and update the <code>images[]</code> array. <code>NUM_IMAGES</code> counts itself automatically. Everything below that block stays untouched. Swap interval is in milliseconds - 5000 = 5 seconds.</p>
-      <div class="code-wrap">
-        <pre><code>{`/*
+  <!-- Sketch -->
+  <div class="section" id="sketch">
+    <h2>The Sketch</h2>
+    <p>All your edits are in one block at the top - add your <code>#include</code> lines and update the <code>images[]</code> array. <code>NUM_IMAGES</code> counts itself automatically. Everything below that block stays untouched. Swap interval is in milliseconds - 5000 = 5 seconds.</p>
+    <div class="code-wrap">
+      <pre><code>{`/*
  * We stand on the shoulders of giants when we build
  * with knowledge gained from others' efforts.
  * That doesn't make us giants. Be humble.
@@ -165,287 +156,53 @@ void loop() {
     gfx->draw16bitRGBBitmap(0, 0, (uint16_t*)images[idx], 240, 240);
   }
 }`}</code></pre>
-        <button class="copy-btn">Copy</button>
-      </div>
+      <button class="copy-btn">Copy</button>
     </div>
+  </div>
 
-    <!-- Troubleshooting -->
-    <div class="section" id="troubleshooting">
-      <h2>Troubleshooting</h2>
-
-      <div class="trouble-item">
-        <h3>Compile error - sketch too large / not enough flash</h3>
-        <ul>
-          <li>Go to <strong>Tools &rarr; Partition Scheme &rarr; Huge APP (3MB No OTA / 1MB SPIFFS)</strong> and recompile</li>
-          <li>Each image is 115KB - check how many you have included and whether it exceeds the partition size</li>
-        </ul>
-      </div>
-
-      <div class="trouble-item">
-        <h3>Only the first image shows - display stops cycling</h3>
-        <ul>
-          <li>Check <code>NUM_IMAGES</code> matches the number of entries in your <code>images[]</code> array</li>
-          <li>Check <code>SWAP_MS</code> - if set very high it may just look like it's not cycling</li>
-          <li>Open Serial Monitor - a crash on draw will stop the loop silently</li>
-        </ul>
-      </div>
-
-      <div class="trouble-item">
-        <h3>Wrong colours on one or more images</h3>
-        <ul>
-          <li>Rerun the converter on that image and replace the <code>.h</code> file</li>
-          <li>Make sure each image was exported as RGB (not RGBA) - flatten in GIMP before converting</li>
-        </ul>
-      </div>
-
-      <div class="trouble-item">
-        <h3>Compile error - variable already defined</h3>
-        <ul>
-          <li>Each <code>.h</code> file must have a unique variable name - check all your headers don't share a name</li>
-          <li>Rename by rerunning the converter with a different varname argument</li>
-        </ul>
-      </div>
-
+  <!-- Troubleshooting -->
+  <div class="section" id="troubleshooting">
+    <h2>Troubleshooting</h2>
+    <div class="trouble-item">
+      <h3>Compile error - sketch too large / not enough flash</h3>
+      <ul>
+        <li>Go to <strong>Tools &rarr; Partition Scheme &rarr; Huge APP (3MB No OTA / 1MB SPIFFS)</strong> and recompile</li>
+        <li>Each image is 115KB - check how many you have included and whether it exceeds the partition size</li>
+      </ul>
     </div>
+    <div class="trouble-item">
+      <h3>Only the first image shows - display stops cycling</h3>
+      <ul>
+        <li>Check <code>NUM_IMAGES</code> matches the number of entries in your <code>images[]</code> array</li>
+        <li>Check <code>SWAP_MS</code> - if set very high it may just look like it's not cycling</li>
+        <li>Open Serial Monitor - a crash on draw will stop the loop silently</li>
+      </ul>
+    </div>
+    <div class="trouble-item">
+      <h3>Wrong colours on one or more images</h3>
+      <ul>
+        <li>Rerun the converter on that image and replace the <code>.h</code> file</li>
+        <li>Make sure each image was exported as RGB (not RGBA) - flatten in GIMP before converting</li>
+      </ul>
+    </div>
+    <div class="trouble-item">
+      <h3>Compile error - variable already defined</h3>
+      <ul>
+        <li>Each <code>.h</code> file must have a unique variable name - check all your headers don't share a name</li>
+        <li>Rename by rerunning the converter with a different varname argument</li>
+      </ul>
+    </div>
+  </div>
 
-  </main>
-</div>
+</GuideLayout>
 
 <style>
-  .pam-wrap {
-    max-width: 1140px;
-    margin: 0 auto;
-    padding: 2rem 1.5rem;
-    display: grid;
-    grid-template-columns: 240px 1fr;
-    gap: 2rem;
-    align-items: start;
-  }
-
-  .sidebar {
-    position: sticky;
-    top: 76px;
-  }
-  .toc {
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 1.25rem 1.5rem;
-  }
-  .toc h3 {
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #888;
-    margin-bottom: 0.75rem;
-  }
-  .toc ol {
-    list-style: none;
-    counter-reset: toc;
-    padding: 0;
-    margin: 0;
-  }
-  .toc ol li {
-    counter-increment: toc;
-    margin-bottom: 0.4rem;
-  }
-  .toc ol li::before {
-    content: counter(toc) ". ";
-    color: var(--amber);
-    font-weight: 700;
-    font-size: 0.85rem;
-  }
-  .toc a {
-    color: #444;
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: color 0.15s;
-  }
-  .toc a:hover { color: var(--amber); }
-  .toc a.active { color: var(--amber); font-weight: 600; }
-
-  main {
-    background: #fff;
-    border-radius: 8px;
-    border: 1px solid #e0e0e0;
-    padding: 2.5rem 3rem;
-    min-width: 0;
-  }
-
-  .hero {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    color: #fff;
-    border-radius: 8px;
-    padding: 2rem 2.5rem;
-    margin-bottom: 2.5rem;
-  }
-  .hero .category {
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    background: var(--rainbow);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 0.5rem;
-  }
-  .hero h1 {
-    font-size: 1.8rem;
-    font-weight: 800;
-    line-height: 1.2;
-    margin-bottom: 1rem;
-    color: #fff;
-  }
-  .hero .meta {
-    display: flex;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-    margin-bottom: 1.25rem;
-  }
-  .hero .meta-item { font-size: 0.85rem; color: #aaa; }
-  .hero .meta-item strong { color: #fff; }
-  .series-step {
-    font-size: 0.78rem;
-    color: rgba(255,255,255,0.6);
-    margin-bottom: 0.5rem;
-    letter-spacing: 0.5px;
-  }
-  .badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    background: #2ecc71;
-    color: #fff;
-    font-size: 0.85rem;
-    font-weight: 700;
-    padding: 0.35rem 0.9rem;
-    border-radius: 20px;
-    letter-spacing: 0.5px;
-  }
-  .badge-untested { background: #e67e22; }
-  .badge-wip { background: #6b7280; }
-
-  .terminal-note {
-    background: #f0f4ff;
-    border-left: 4px solid #4a6cf7;
-    border-radius: 0 6px 6px 0;
-    padding: 0.65rem 1rem;
-    font-size: 0.88rem;
-    color: #444;
-    margin-bottom: 2rem;
-  }
-
-  .section { margin-bottom: 3rem; }
-  .section h2 {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: #1a1a2e;
-    border-bottom: 3px solid var(--amber);
-    padding-bottom: 0.4rem;
-    margin-bottom: 1.25rem;
-    display: inline-block;
-  }
-  .section h3 {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: #333;
-    margin: 1.5rem 0 0.75rem;
-  }
-
-  main p { color: #444; line-height: 1.75; margin-bottom: 0.75rem; }
-  main ul, main ol { padding-left: 1.4rem; margin-bottom: 1rem; }
-  main li { margin-bottom: 0.3rem; }
-
-  .two-col {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-  .card {
-    background: #fafafa;
-    border: 1px solid #e8e8e8;
-    border-radius: 6px;
-    padding: 1.25rem 1.5rem;
-  }
-  .card h3 {
-    margin-top: 0;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #888;
-    margin-bottom: 0.75rem;
-  }
-  .card ul { margin-bottom: 0; }
-
-  pre {
-    background: #1e1e2e;
-    color: #cdd6f4;
-    border-radius: 6px;
-    padding: 1.25rem 1.5rem;
-    overflow-x: auto;
-    font-size: 0.875rem;
-    line-height: 1.6;
-    margin: 0.75rem 0 1.25rem;
-    position: relative;
-  }
-  pre code {
-    font-family: "Fira Code", "Cascadia Code", Consolas, monospace;
-    background: none;
-    padding: 0;
-    color: inherit;
-    font-size: inherit;
-    border-radius: 0;
-  }
-  main code {
-    font-family: "Fira Code", "Cascadia Code", Consolas, monospace;
-    background: #f0f0f0;
-    padding: 0.15em 0.4em;
-    border-radius: 3px;
-    font-size: 0.875em;
-    color: #c0392b;
-  }
   .cmd-annotate {
     font-size: 0.88rem;
     color: #555;
     margin-top: -0.75rem;
     margin-bottom: 1rem;
   }
-
-  .code-wrap { position: relative; }
-  .copy-btn {
-    position: absolute;
-    top: 0.6rem;
-    right: 0.6rem;
-    background: #313244;
-    color: #cdd6f4;
-    border: none;
-    border-radius: 4px;
-    padding: 0.25rem 0.6rem;
-    font-size: 0.75rem;
-    cursor: pointer;
-    opacity: 0;
-    transition: opacity 0.15s;
-  }
-  .code-wrap:hover .copy-btn { opacity: 1; }
-  .copy-btn:hover { background: #45475a; }
-  .copy-btn.copied { color: #a6e3a1; }
-  @media (hover: none) { .copy-btn { opacity: 1; } }
-
-  .callout {
-    border-radius: 6px;
-    padding: 0.9rem 1.1rem;
-    margin: 1rem 0;
-    font-size: 0.9rem;
-  }
-  .callout-why {
-    background: #f5f0ff;
-    border-left: 4px solid var(--amber);
-  }
-  .callout strong { display: block; margin-bottom: 0.3rem; }
-
   .mem-table {
     width: 100%;
     border-collapse: collapse;
@@ -466,84 +223,4 @@ void loop() {
     color: #444;
   }
   .mem-table tr:last-child td { border-bottom: none; }
-
-  .trouble-item {
-    background: #fafafa;
-    border: 1px solid #e8e8e8;
-    border-radius: 6px;
-    padding: 1rem 1.25rem;
-    margin-bottom: 1rem;
-  }
-  .trouble-item h3 { margin: 0 0 0.5rem; font-size: 0.95rem; color: #c47a1e; }
-  .trouble-item ul { margin: 0; }
-
-  .term-link {
-    color: var(--amber);
-    text-decoration: none;
-    border-bottom: 1.5px dashed var(--amber);
-    border-radius: 2px;
-  }
-  .term-link:hover { background: #f5f0ff; }
-
-  @media (max-width: 800px) {
-    .pam-wrap { grid-template-columns: 1fr; }
-    .sidebar { position: static; }
-    main { padding: 1.5rem; }
-    .hero { padding: 1.5rem; }
-    .hero h1 { font-size: 1.4rem; }
-  }
 </style>
-
-<script is:inline>
-  document.querySelectorAll('.copy-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const pre = btn.closest('.code-wrap').querySelector('pre');
-      const text = pre.innerText;
-      const done = () => {
-        btn.textContent = 'Copied!';
-        btn.classList.add('copied');
-        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
-      };
-      if (navigator.clipboard) {
-        navigator.clipboard.writeText(text).then(done);
-      } else {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        ta.style.cssText = 'position:fixed;opacity:0';
-        document.body.appendChild(ta);
-        ta.focus(); ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-        done();
-      }
-    });
-  });
-
-  const sections = document.querySelectorAll('.section[id]');
-  const tocLinks = document.querySelectorAll('.toc a');
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        tocLinks.forEach(a => a.classList.remove('active'));
-        const active = document.querySelector(`.toc a[href="#${entry.target.id}"]`);
-        if (active) active.classList.add('active');
-      }
-    });
-  }, { rootMargin: '-20% 0px -70% 0px' });
-  sections.forEach(s => observer.observe(s));
-
-  window.addEventListener('load', () => {
-    const id = window.location.hash.slice(1);
-    if (!id) return;
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ block: 'center' });
-  });
-  window.addEventListener('hashchange', () => {
-    const id = window.location.hash.slice(1);
-    if (!id) return;
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ block: 'center' });
-  });
-</script>
-
-</Base>
