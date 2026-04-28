@@ -18,6 +18,8 @@ const guides = [
     category: 'Display',
     date: '2026-04-22',
     status: 'confirmed',
+    series: 'GC9A01 Display Series',
+    step: 1,
     tags: ['ESP32', 'GC9A01', 'TFT', 'SPI', 'Arduino'],
   },
   {
@@ -27,6 +29,8 @@ const guides = [
     category: 'Display',
     date: '2026-04-28',
     status: 'confirmed',
+    series: 'GC9A01 Display Series',
+    step: 2,
     tags: ['ESP32', 'GC9A01', 'RGB565', 'Images', 'Python', 'Arduino'],
   },
   {
@@ -36,6 +40,8 @@ const guides = [
     category: 'Display',
     date: '2026-04-28',
     status: 'confirmed',
+    series: 'GC9A01 Display Series',
+    step: 3,
     tags: ['ESP32', 'GC9A01', 'RGB565', 'Images', 'Python', 'Arduino'],
   },
 ];
@@ -49,24 +55,36 @@ const guides = [
   </div>
 
   <div class="guide-list">
-    {guides.map((g) => (
-      <a class="guide-row" href={`/guides/${g.slug}`}>
-        <div class="row-meta">
-          <span class="row-category">{g.category}</span>
-          <span class={`row-badge ${g.status === 'untested' ? 'row-badge-untested' : g.status === 'wip' ? 'row-badge-wip' : ''}`}>
-            {g.status === 'untested' ? '⚠ Untested' : g.status === 'wip' ? '⚙ Under Construction' : '✓ Confirmed Working'}
-          </span>
-          <span class="row-date">{new Date(g.date).toLocaleDateString('en-AU', { year: 'numeric', month: 'short' })}</span>
-        </div>
-        <h2>{g.title}</h2>
-        <p>{g.description}</p>
-        {g.tags && (
-          <div class="tags">
-            {g.tags.map((t) => <span class="tag">{t}</span>)}
-          </div>
-        )}
-      </a>
-    ))}
+    {(() => {
+      let lastSeries = null;
+      return guides.map((g) => {
+        const seriesHeader = g.series && g.series !== lastSeries
+          ? (lastSeries = g.series, <div class="series-label">{g.series}</div>)
+          : (lastSeries = g.series || null, null);
+        return (
+          <>
+            {seriesHeader}
+            <a class={`guide-row ${g.series ? 'guide-row-series' : ''}`} href={`/guides/${g.slug}`}>
+              <div class="row-meta">
+                <span class="row-category">{g.category}</span>
+                {g.step && <span class="row-step">Step {g.step}</span>}
+                <span class={`row-badge ${g.status === 'untested' ? 'row-badge-untested' : g.status === 'wip' ? 'row-badge-wip' : ''}`}>
+                  {g.status === 'untested' ? '⚠ Untested' : g.status === 'wip' ? '⚙ Under Construction' : '✓ Confirmed Working'}
+                </span>
+                <span class="row-date">{new Date(g.date).toLocaleDateString('en-AU', { year: 'numeric', month: 'short' })}</span>
+              </div>
+              <h2>{g.title}</h2>
+              <p>{g.description}</p>
+              {g.tags && (
+                <div class="tags">
+                  {g.tags.map((t) => <span class="tag">{t}</span>)}
+                </div>
+              )}
+            </a>
+          </>
+        );
+      });
+    })()}
   </div>
 
 </Base>
@@ -134,6 +152,29 @@ const guides = [
   }
   .row-badge-untested { background: #e67e22; }
   .row-badge-wip { background: #6b7280; }
+
+  .series-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #a855f7;
+    padding: 0.5rem 0 0.25rem;
+    margin-top: 0.5rem;
+  }
+  .guide-row-series {
+    border-left: 3px solid #a855f7;
+    padding-left: calc(2rem - 3px);
+  }
+  .row-step {
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: #f3e8ff;
+    color: #a855f7;
+    padding: 0.1rem 0.55rem;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+  }
   .row-date { font-size: 0.8rem; color: #888; }
 
   .guide-row h2 {
