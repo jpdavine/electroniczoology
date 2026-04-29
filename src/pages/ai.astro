@@ -1,0 +1,168 @@
+---
+import Base from '../layouts/Base.astro';
+---
+<Base title="AI" description="Where did the blacksmith go? A maker's honest account of AI, tools, and what actually changed.">
+
+<div class="editorial">
+
+  <header class="hero">
+    <div class="kicker">Artificial Intelligence</div>
+    <h1>Where did the <em>blacksmith</em> go?</h1>
+    <p class="hero-sub">Not a think piece. Not a prediction. Just an honest account of what I can see, told from a garage.</p>
+  </header>
+
+  <section>
+    <div class="section-label">The hook</div>
+    <h2>The blacksmith</h2>
+    <p>There used to be a blacksmith on every building site. Not decorative, essential. They made the nails, sharpened the tools, fabricated the ironwork. If they stopped, the site stopped.</p>
+    <p>Then machines made nails faster and cheaper than any human hands ever could, and the site blacksmith was gone. Not replaced by a better blacksmith. Just gone.</p>
+    <p>That's not a tragedy. Buildings didn't get worse. The work got done by different means.</p>
+    <p>This is a page about AI. But it starts with the blacksmith because the blacksmith is the point.</p>
+  </section>
+
+  <section>
+    <div class="section-label">What always happens</div>
+    <h2>Trades don't die. They transform.</h2>
+    <p>A blacksmith shod horses on every street in every town. Essential trade, skilled work, years to master. The car didn't replace the blacksmith with a better blacksmith. The whole category dissolved. Blacksmiths still exist, artisans now, practitioners of a craft kept alive by people who love it for what it is.</p>
+    <p>I work in the trade, qualified carpenter. Met blokes who only used hand tools and could pitch a roof in their head like it was the sixties. Met others who couldn't hang a door that didn't come prehung, but could set up a theodolite and shoot grades across a site in twenty minutes. Both carpenters, just working at different ends of the same trade. The industry needed both. The building didn't care which end of the spectrum you were at, it cared whether the thing got done right.</p>
+    <p>Every trade that got compressed by a new tool thought the tool was the threat. The tool was never the threat. The threat was always the gap closing between the idea and the thing.</p>
+  </section>
+
+  <section>
+    <div class="section-label">Pattern recognition</div>
+    <h2>Born in 1975</h2>
+    <p>I've watched every format war play out from the beginning. Betamax. VHS. DVD. The video shop. Blu-ray. The torrent era. Streaming. I owned most of them.</p>
+    <p>Betamax was the better format and it still lost. The torrents proved that when friction drops low enough people will take the free version every time. Streaming proved that when legal is cheap and easy enough, people come back.</p>
+    <p>Every time, the thing that won wasn't the best technology. It was the lowest friction path to the content.</p>
+    <p>I'm not guessing about AI. I'm pattern matching. I've seen what happens when the friction drops. I've watched this same shape play out countless times. I know how it ends.</p>
+  </section>
+
+  <section>
+    <div class="section-label">How I'm wired</div>
+    <h2>I see in patterns. Always have.</h2>
+    <p>ADHD and autism. It's not a disclaimer, it's the explanation. The pattern recognition isn't something I do, it's something I can't turn off. I see what a thing <em>almost</em> is. The gap between what's implemented and what's already there waiting. A system does X and I immediately see XY, because Y is there, just behind a wall someone forgot to add a door into.</p>
+    <p>That's why locked systems always frustrated me more than they frustrated other people. It wasn't the inconvenience. It was the visibility. I could see the capability sitting right there on the other side of a permission wall, and the wall was the only thing between me and it.</p>
+    <p>For a long time I saw technology as the proverbial devil. I could see where it was headed and I put my head in the sand. I'm not going to pretend otherwise. Now I see it as a solution to a lot of problems. But that's a bigger conversation than this page is for. This page is about making toys.</p>
+    <div class="pull-quote">Neurodivergent brains don't build civilisation. They break them open so they can evolve.</div>
+  </section>
+
+  <section>
+    <div class="section-label">No permission wall</div>
+    <h2>Why I use Linux and microcontrollers</h2>
+    <p>A microcontroller is just physics and your imagination. There's no corporation standing between you and the hardware deciding what you're allowed to do with it. The pin either goes high or it doesn't. You own the whole stack from the idea to the electron.</p>
+    <p>Linux is the same deal. The configs are readable. The source is there. Nothing is hidden behind a decision someone made about what you should need, can do or can't do. If the capability exists, you can reach it.</p>
+    <p>Proprietary operating systems are someone else's judgement about the boundary of what you're permitted to do with hardware you own. For a brain that sees what a thing could be, that's not a minor inconvenience. It's a fundamental incompatibility.</p>
+  </section>
+
+  <section>
+    <div class="section-label">A concrete example</div>
+    <h2>The laptop fans</h2>
+    <p>My laptop was overheating. The manufacturer's thermal management reacts to temperature, the fans kick in when the CPU gets hot. Sounds reasonable, it's not. It's wrong.</p>
+    <p>By the time the temperature sensor is reading high, the damage is already happening. Temperature is the result. CPU load is the cause. Why wait for the symptom when the cause is visible in real time?</p>
+    <p>So I set the fans to react to CPU load first, then hand off to temperature after thirty seconds once it's had time to actually reflect reality. Fast reaction during the critical window. Accurate signal once the system has caught up.</p>
+    <p>Before: pushing close to throttle temperature, fans always playing catch-up. After: peaks well under that, fans cool ahead of the heat, full CPU output the whole time. Same hardware. Just measuring the right variable.</p>
+    <p>I understood the solution completely. I couldn't have written the config to implement it without spending a very long time learning things I had no other use for. AI in the terminal wrote it in a minute.</p>
+    <p>That's the whole thing right there.</p>
+  </section>
+
+  <section>
+    <div class="section-label">What actually changed</div>
+    <h2>I don't look at code anymore</h2>
+    <p>There was a time when I'd ask AI to add something to a code, and if it didn't work I'd sit with two windows open side by side hunting for the change, then ask what it did and why, because that was the only way to debug it.</p>
+    <p>That era is over. Now if something doesn't work I describe what it's doing wrong and what I need it to do instead. The fix comes back. Nine times out of ten the problem wasn't the code at all - it was a hardware assumption AI made that didn't match what was actually in my hand. I catch that because I know the hardware. AI fixes the code.</p>
+    <p>I went from copy-pasting between windows on a phone to running AI directly in the terminal watching live output in real time. The progression happened fast enough that looking back even a couple of years feels like archaeology.</p>
+    <div class="pull-quote">I think we are fast approaching a time where all the human code that has been written is all the human code that will ever be written.</div>
+    <p>That's not a prediction. It's a description of a direction I can already see from here.</p>
+  </section>
+
+  <section>
+    <div class="section-label">The actual relationship</div>
+    <h2>AI is a tool. It does nothing on its own.</h2>
+    <p>A hammer doesn't build a house. It's inert without someone who knows what the house requires. AI is the same - the most capable tool that's ever been put in a builder's hand, but a tool with no one holding it builds nothing.</p>
+    <p>You still need to know what you're building and why. You need to know when the output is wrong. You need to know which layer the problem is actually in: code, hardware, or the question you asked. That's not nothing. That's everything. The rest was always just the means.</p>
+    <p>The people who'll struggle aren't the ones who can't code. They're the ones who never had anything they actually wanted to build.</p>
+    <p>The future is AI as the coder and human as the inspiration. The person who knows <em>what to build and why</em> becomes the scarce resource. Which is a more honest description of where value always came from: the idea, the domain knowledge, the judgement. The craft of writing code was always just the means of expressing it.</p>
+  </section>
+
+  <section>
+    <div class="section-label">The grace note</div>
+    <h2>The blacksmiths still exist</h2>
+    <p>There are still farriers. Still people who work with hand tools and know things about timber that no laser level will ever tell you. Still people who write code because they love code, who find beauty in an elegant algorithm the way a craftsman finds beauty in a perfectly balanced joint.</p>
+    <p>Coding won't disappear. It'll become what it always deserved to be - a craft practiced by people who love it for what it is, not an obligatory barrier between an idea and its implementation.</p>
+    <p>There will always be someone holding the history of a thing, who sees the beauty in it and keeps it alive. That's not a consolation prize. That's an honourable destination.</p>
+  </section>
+
+</div>
+
+</Base>
+
+<style>
+  .editorial { max-width: 680px; }
+
+  .hero {
+    margin-bottom: 3rem;
+    padding-bottom: 2.5rem;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+  }
+
+  .kicker {
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 0.9rem;
+    font-weight: 600;
+  }
+
+  .hero-sub {
+    color: #555;
+    font-size: 1rem;
+    margin-top: 0.75rem;
+  }
+
+  h1 {
+    font-weight: 500;
+    font-size: clamp(2.1rem, 5vw, 3rem);
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    margin-bottom: 0.5rem;
+  }
+  h1 em { font-style: italic; }
+
+  h2 {
+    font-weight: 500;
+    font-size: 1.55rem;
+    letter-spacing: -0.01em;
+    margin: 0.5rem 0 1rem;
+    color: var(--amber);
+  }
+
+  section { margin-bottom: 2.5rem; }
+
+  p { margin-bottom: 1.1rem; }
+
+  .section-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+    margin-top: 2.5rem;
+  }
+
+  .pull-quote {
+    border-left: 3px solid;
+    border-image: var(--rainbow) 1;
+    margin: 2rem 0;
+    padding: 0.75rem 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--dark);
+    line-height: 1.5;
+  }
+
+  @media (max-width: 520px) {
+    .editorial { padding-top: 0.5rem; }
+  }
+</style>
