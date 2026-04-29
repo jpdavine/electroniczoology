@@ -90,6 +90,17 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
         </ol>
       </div>
     </div>
+    <div class="screenshot-row">
+      <figure class="screenshot-wrap">
+        <img src="/images/manageLibraries.png" alt="Arduino IDE Tools menu with Manage Libraries highlighted" />
+        <figcaption>Tools &rarr; Manage Libraries in Arduino IDE</figcaption>
+      </figure>
+      <figure class="screenshot-wrap">
+        <img src="/images/installTftEspi.png" alt="Library Manager showing TFT_eSPI by Bodmer with Install button" />
+        <figcaption>Search TFT_eSPI - find the one by Bodmer and click Install</figcaption>
+      </figure>
+    </div>
+
     <div class="callout callout-why">
       <strong>Why "by Bodmer"?</strong>
       There are other libraries with similar names in the Library Manager. You want the one authored by Bodmer - it is the most widely used, actively maintained, and supports the widest range of displays. The author name appears in small text under the library title in the search results.
@@ -432,13 +443,26 @@ void printProcessorName(void) {
   tr:nth-child(even) td { background: #fafafa; }
   tr:last-child td { border-bottom: none; }
 
+  .screenshot-row {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1rem 0 1.5rem;
+  }
   .screenshot-wrap {
-    margin: 0.75rem 0 0;
     border: 1px solid #e0e0e0;
     border-radius: 6px;
     overflow: hidden;
+    margin: 0;
   }
   .screenshot-wrap img { width: 100%; display: block; }
+  .screenshot-wrap figcaption {
+    font-size: 0.8rem;
+    color: #666;
+    padding: 0.4rem 0.75rem;
+    background: #fafafa;
+    border-top: 1px solid #e0e0e0;
+  }
 
   .install-steps {
     padding-left: 1.2rem;
