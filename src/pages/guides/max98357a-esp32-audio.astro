@@ -38,7 +38,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <div class="card">
         <h3>Parts</h3>
         <ul>
-          <li><a id="what-you-need" href="/glossary/esp32-i2s" class="term-link">ESP32 Dev Board (38-pin)</a></li>
+          <li><a href="/glossary/esp32-i2s" class="term-link">ESP32 Dev Board (38-pin)</a></li>
           <li><a href="/glossary/max98357a" class="term-link">MAX98357A I2S amplifier module</a></li>
           <li><a href="/glossary/speaker-i2s" class="term-link">4-8&#8486; speaker</a></li>
           <li>Jumper wires</li>
@@ -94,7 +94,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
         </tbody>
       </table>
     </div>
-    <p>Connect your speaker to the two output terminals on the MAX98357A module. Polarity only affects phase in a mono setup - either orientation will produce sound.</p>
+    <p>Connect your speaker to the two output terminals on the MAX98357A module. Polarity only affects phase in a mono setup - either orientation will produce sound. Use a speaker rated 1W or above - the MAX98357A delivers up to 3.2W into 4&#8486; at 5V, and a 0.5W speaker will distort badly at full gain.</p>
     <div class="callout callout-why">
       <strong>Why not GPIO25 and GPIO26?</strong>
       Those are the ESP32's built-in DAC pins. They work for I2S but reserving them for DAC keeps your options open - if you ever want to add an analogue audio output to a different project on the same board, the DAC pins are still free. GPIO27, GPIO14, and GPIO13 are clean general-purpose GPIOs with no boot-strapping or special functions.
@@ -411,7 +411,7 @@ void loop() {
       <h3>Very quiet sound</h3>
       <ul>
         <li>Power the module from 5V - 3.3V significantly reduces output power</li>
-        <li>GAIN pin left floating = 9dB. Tie to GND through a 100k resistor for 12dB. Tie directly to VIN for 15dB</li>
+        <li>GAIN pin left floating = 9dB. Tie directly to GND for 6dB. Tie directly to VIN for 15dB</li>
       </ul>
     </div>
     <div class="trouble-item">
