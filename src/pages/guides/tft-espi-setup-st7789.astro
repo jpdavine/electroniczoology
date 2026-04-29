@@ -1,0 +1,138 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+---
+<GuideLayout
+  title="TFT_eSPI Config - ST7789 240x240 Display"
+  description="User_Setup_Select.h config for driving an ST7789 240x240 TFT display with TFT_eSPI on an ESP32 Dev Board. Includes setup file selection, pin edits, and wiring."
+  toc={[
+    {href: '#overview', label: 'Overview'},
+    {href: '#wiring', label: 'Wiring'},
+    {href: '#user-setup', label: 'Config'},
+    {href: '#notes', label: 'Notes'},
+  ]}
+>
+
+  <div class="hero">
+    <div class="category">Display &bull; ESP32 &bull; TFT_eSPI</div>
+    <h1>TFT_eSPI Config<br>ST7789 240x240 TFT</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Display:</strong> ST7789 - 240x240 TFT</div>
+      <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin)</div>
+      <div class="meta-item"><strong>Library:</strong> TFT_eSPI by Bodmer</div>
+    </div>
+    <div class="badge badge-confirmed">&#10003; Confirmed Working</div>
+  </div>
+
+  <div class="back-link">
+    &larr; <a href="/guides/tft-espi-esp32">Back to TFT_eSPI main guide</a>
+  </div>
+
+  <!-- Overview -->
+  <div class="section" id="overview">
+    <h2>Overview</h2>
+    <p>The ST7789 is a 240x240 TFT display driven over SPI. It is the square equivalent of the GC9A01 and uses the same pin layout. Many modules use the same breakout board form factor.</p>
+    <p>This page covers the <code>User_Setup_Select.h</code> config to drive it with TFT_eSPI. Once configured, use the <a href="/guides/tft-espi-esp32#step-4" class="term-link">standard test sketch</a> to confirm it is working.</p>
+  </div>
+
+  <!-- Wiring -->
+  <div class="section" id="wiring">
+    <h2>Wiring</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Display Pin</th><th>ESP32 Pin</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>VCC</td><td>3.3V or 5V</td><td>Check your module - most accept both</td></tr>
+          <tr><td>GND</td><td>GND</td><td></td></tr>
+          <tr><td>SCL / SCLK</td><td>GPIO 18</td><td>SPI clock</td></tr>
+          <tr><td>SDA / MOSI</td><td>GPIO 23</td><td>SPI data</td></tr>
+          <tr><td>DC</td><td>GPIO 2</td><td>Data / command select</td></tr>
+          <tr><td>CS</td><td>GPIO 15</td><td>Chip select</td></tr>
+          <tr><td>RST</td><td>GPIO 4</td><td>Reset</td></tr>
+          <tr><td>MISO</td><td>GPIO 19</td><td>Optional</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>If your module has a BL (backlight) pin, tie it to 3.3V.</p>
+  </div>
+
+  <!-- Config -->
+  <div class="section" id="user-setup">
+    <h2>Config</h2>
+
+    <h3>1. Open User_Setup_Select.h</h3>
+    <p>Open <code>~/Arduino/libraries/TFT_eSPI/User_Setup_Select.h</code>. Comment out the default line and uncomment <code>Setup24</code>:</p>
+    <div class="code-wrap">
+      <pre><code>{`//#include <User_Setup.h>           // comment this out
+#include <User_Setups/Setup24_ST7789.h>  // uncomment this`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+
+    <h3>2. Edit the pins in Setup24</h3>
+    <p>Open <code>~/Arduino/libraries/TFT_eSPI/User_Setups/Setup24_ST7789.h</code>. The default uses NodeMCU-style pins - replace the active pin defines with these:</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Comment out</th><th>Uncomment / add</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>#define TFT_CS   -1</code></td><td><code>#define TFT_CS   15</code></td></tr>
+          <tr><td><code>#define TFT_DC   PIN_D1</code></td><td><code>#define TFT_DC    2</code></td></tr>
+          <tr><td><code>#define TFT_RST  PIN_D4</code></td><td><code>#define TFT_RST   4</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Also uncomment the ESP32 MOSI/SCLK/MISO lines already present in the file:</p>
+    <div class="code-wrap">
+      <pre><code>{`#define TFT_MISO 19
+#define TFT_MOSI 23
+#define TFT_SCLK 18`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+
+    <div class="callout callout-tip">
+      <strong>Only one line uncommented in User_Setup_Select.h at a time.</strong>
+      When switching displays, comment this line out and uncomment your next display. Close and reopen Arduino IDE after saving either file.
+    </div>
+  </div>
+
+  <!-- Notes -->
+  <div class="section" id="notes">
+    <h2>Notes</h2>
+    <div class="trouble-item">
+      <h3>Display is blank but no errors</h3>
+      <p>The ST7789 can be sensitive to the RST pin. Confirm GPIO 4 is wired to RST and not floating.</p>
+    </div>
+    <div class="trouble-item">
+      <h3>Image offset or wrong size</h3>
+      <p>Some ST7789 modules are 240x280 or 170x320. If the image is cropped or offset, update <code>TFT_WIDTH</code> and <code>TFT_HEIGHT</code> in Setup24 to match your actual display resolution.</p>
+    </div>
+  </div>
+
+  <div class="continue-link">
+    Config done - <a href="/guides/tft-espi-esp32#step-4">head back to the main guide and continue &rarr;</a>
+  </div>
+
+</GuideLayout>
+
+<style>
+  .back-link { margin-bottom: 2rem; font-size: 0.9rem; }
+  .back-link a { color: var(--amber); text-decoration: none; border-bottom: 1px dashed var(--amber); }
+  .back-link a:hover { opacity: 0.8; }
+
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.5rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 400px; }
+  th { background: #1a1a2e; color: #fff; text-align: left; padding: 0.6rem 1rem; font-weight: 600; }
+  td { padding: 0.55rem 1rem; border-bottom: 1px solid #eee; }
+  tr:nth-child(even) td { background: #fafafa; }
+  tr:last-child td { border-bottom: none; }
+
+  .trouble-item { background: #fafafa; border: 1px solid #e8e8e8; border-radius: 6px; padding: 1rem 1.25rem; margin-bottom: 1rem; }
+  .trouble-item h3 { margin: 0 0 0.4rem; font-size: 0.95rem; color: #c47a1e; }
+  .trouble-item p { margin: 0; font-size: 0.9rem; }
+
+  .continue-link { margin-top: 3rem; padding: 1rem 1.25rem; background: #f0f4ff; border-left: 4px solid #4a6cf7; border-radius: 0 6px 6px 0; font-size: 0.95rem; }
+  .continue-link a { color: #4a6cf7; text-decoration: none; font-weight: 600; }
+  .continue-link a:hover { text-decoration: underline; }
+</style>

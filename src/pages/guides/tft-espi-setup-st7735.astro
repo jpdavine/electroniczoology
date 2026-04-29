@@ -1,0 +1,149 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+---
+<GuideLayout
+  title="TFT_eSPI Config - ST7735 128x128 Display"
+  description="User_Setup_Select.h config for driving an ST7735 128x128 TFT display with TFT_eSPI on an ESP32 Dev Board. Includes setup file selection, pin edits, and wiring."
+  toc={[
+    {href: '#overview', label: 'Overview'},
+    {href: '#wiring', label: 'Wiring'},
+    {href: '#user-setup', label: 'Config'},
+    {href: '#notes', label: 'Notes'},
+  ]}
+>
+
+  <div class="hero">
+    <div class="category">Display &bull; ESP32 &bull; TFT_eSPI</div>
+    <h1>TFT_eSPI Config<br>ST7735 128x128 TFT</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Display:</strong> ST7735 - 128x128 TFT</div>
+      <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin)</div>
+      <div class="meta-item"><strong>Library:</strong> TFT_eSPI by Bodmer</div>
+    </div>
+    <div class="badge">&#10003; Confirmed Working</div>
+  </div>
+
+  <div class="back-link">
+    &larr; <a href="/guides/tft-espi-esp32">Back to TFT_eSPI main guide</a>
+  </div>
+
+  <!-- Overview -->
+  <div class="section" id="overview">
+    <h2>Overview</h2>
+    <p>The ST7735 is a 128x128 TFT display driven over SPI. It is one of the most common small TFT displays for ESP32 projects. Several colour tab variants exist - if colours look wrong after setup, see the Notes section.</p>
+    <p>This page covers the <code>User_Setup_Select.h</code> config to drive it with TFT_eSPI. Once configured, use the <a href="/guides/tft-espi-esp32#step-4" class="term-link">standard test sketch</a> to confirm it is working.</p>
+  </div>
+
+  <!-- Wiring -->
+  <div class="section" id="wiring">
+    <h2>Wiring</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Display Pin</th><th>ESP32 Pin</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>VCC</td><td>3.3V or 5V</td><td>5V tolerant on tested module - confirm with your board's datasheet</td></tr>
+          <tr><td>GND</td><td>GND</td><td></td></tr>
+          <tr><td>SCL / SCLK</td><td>GPIO 18</td><td>SPI clock</td></tr>
+          <tr><td>SDA / MOSI</td><td>GPIO 23</td><td>SPI data</td></tr>
+          <tr><td>DC / A0</td><td>GPIO 2</td><td>Data / command select</td></tr>
+          <tr><td>CS</td><td>GPIO 15</td><td>Chip select</td></tr>
+          <tr><td>RST</td><td>GPIO 4</td><td>Reset</td></tr>
+          <tr><td>MISO</td><td>GPIO 19</td><td>Optional</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>If your module has a BL (backlight) pin, tie it to 3.3V.</p>
+  </div>
+
+  <!-- Config -->
+  <div class="section" id="user-setup">
+    <h2>Config</h2>
+
+    <h3>1. Open User_Setup_Select.h</h3>
+    <p>Open <code>~/Arduino/libraries/TFT_eSPI/User_Setup_Select.h</code>. Comment out the default line and uncomment <code>Setup47</code>:</p>
+    <div class="code-wrap">
+      <pre><code>{`//#include <User_Setup.h>           // comment this out
+#include <User_Setups/Setup47_ST7735.h>  // uncomment this`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <div class="screenshot-wrap">
+      <img src="/images/sp7735UserSelect.png" alt="User_Setup_Select.h with Setup47_ST7735.h uncommented" />
+      <p class="screenshot-caption">User_Setup_Select.h - Setup47 uncommented</p>
+    </div>
+
+    <h3>2. Add CS pin to Setup47</h3>
+    <p>Open <code>~/Arduino/libraries/TFT_eSPI/User_Setups/Setup47_ST7735.h</code>. CS is commented out by default - uncomment it and set it to GPIO 15:</p>
+    <div class="code-wrap">
+      <pre><code>{`#define TFT_CS  15  // uncomment and set to GPIO 15`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>MOSI (23), SCLK (18), MISO (19), DC (2), and RST (4) are already correct - leave them as is.</p>
+    <div class="screenshot-wrap">
+      <img src="/images/st7735a.png" alt="Setup47 - uncomment the TFT_CS line" />
+      <p class="screenshot-caption">Uncomment the TFT_CS line</p>
+    </div>
+    <div class="screenshot-wrap">
+      <img src="/images/st7735b.png" alt="Setup47 - change value from 21 to 15" />
+      <p class="screenshot-caption">Change value from 21 to 15</p>
+    </div>
+
+    <div class="callout callout-tip">
+      <strong>Only one line uncommented in User_Setup_Select.h at a time.</strong>
+      When switching displays, comment this line out and uncomment your next display. Close and reopen Arduino IDE after saving either file.
+    </div>
+  </div>
+
+  <!-- Notes -->
+  <div class="section" id="notes">
+    <h2>Notes</h2>
+    <div class="trouble-item">
+      <h3>Wrong colours - red and blue swapped</h3>
+      <p>The ST7735 comes in several tab variants with different colour orders. If colours look inverted, try uncommenting <code>#define TFT_RGB_ORDER TFT_BGR</code> or <code>TFT_RGB</code> in the setup file.</p>
+    </div>
+    <div class="trouble-item">
+      <h3>ST7735 tab variants</h3>
+      <p>The setup file includes defines like <code>ST7735_REDTAB</code>, <code>ST7735_GREENTAB</code>, <code>ST7735_BLACKTAB</code>. If the display initialises but the image is offset or scrambled, try a different tab define. Your module's product listing usually states which variant it is.</p>
+    </div>
+  </div>
+
+  <div class="continue-link">
+    Config done - <a href="/guides/tft-espi-esp32#step-4">head back to the main guide and continue &rarr;</a>
+  </div>
+
+</GuideLayout>
+
+<style>
+  .back-link {
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+  }
+  .back-link a {
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1px dashed var(--amber);
+  }
+  .back-link a:hover { opacity: 0.8; }
+
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.5rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.9rem; min-width: 400px; }
+  th { background: #1a1a2e; color: #fff; text-align: left; padding: 0.6rem 1rem; font-weight: 600; }
+  td { padding: 0.55rem 1rem; border-bottom: 1px solid #eee; }
+  tr:nth-child(even) td { background: #fafafa; }
+  tr:last-child td { border-bottom: none; }
+
+  .trouble-item { background: #fafafa; border: 1px solid #e8e8e8; border-radius: 6px; padding: 1rem 1.25rem; margin-bottom: 1rem; }
+  .trouble-item h3 { margin: 0 0 0.4rem; font-size: 0.95rem; color: #c47a1e; }
+  .trouble-item p { margin: 0; font-size: 0.9rem; }
+
+  .side-by-side { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0 1.5rem; }
+  .screenshot-wrap { border: 1px solid #e0e0e0; border-radius: 6px; overflow: hidden; margin: 1rem 0 1.5rem; }
+  .screenshot-wrap img { width: 100%; display: block; }
+  .screenshot-caption { font-size: 0.8rem; color: #888; text-align: center; padding: 0.4rem; background: #fafafa; margin: 0; }
+  @media (max-width: 600px) { .side-by-side { grid-template-columns: 1fr; } }
+
+  .continue-link { margin-top: 3rem; padding: 1rem 1.25rem; background: #f0f4ff; border-left: 4px solid #4a6cf7; border-radius: 0 6px 6px 0; font-size: 0.95rem; }
+  .continue-link a { color: #4a6cf7; text-decoration: none; font-weight: 600; }
+  .continue-link a:hover { text-decoration: underline; }
+</style>

@@ -1,0 +1,452 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+---
+<GuideLayout
+  title="TFT_eSPI with ESP32 - All Displays, One Library"
+  description="How to use TFT_eSPI by Bodmer to drive SPI displays on an ESP32. One library, one API, swap displays by changing a config file. Covers setup, User_Setup.h, wiring, and a test sketch for ST7735, ST7789, and GC9A01."
+  toc={[
+    {href: '#why-tft-espi', label: 'Why TFT_eSPI'},
+    {href: '#how-it-works', label: 'How It Works'},
+    {href: '#step-1', label: 'Step 1 - Install the Library'},
+    {href: '#step-2', label: 'Step 2 - Pick Your Display'},
+    {href: '#step-3', label: 'Step 3 - Wire It Up'},
+    {href: '#step-4', label: 'Step 4 - Test Sketch'},
+    {href: '#troubleshooting', label: 'Troubleshooting'},
+  ]}
+>
+
+  <div class="hero">
+    <div class="category">Display &bull; ESP32</div>
+    <h1>TFT_eSPI by Bodmer<br>One Library for All SPI Displays</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Library:</strong> TFT_eSPI by Bodmer</div>
+      <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin)</div>
+      <div class="meta-item"><strong>Example display:</strong> GC9A01 240x240 round IPS TFT</div>
+      <div class="meta-item"><strong>Interface:</strong> SPI</div>
+    </div>
+    <div class="badge badge-confirmed">&#10003; Confirmed Working</div>
+  </div>
+
+  <!-- Why TFT_eSPI -->
+  <div class="section" id="why-tft-espi">
+    <h2>Why TFT_eSPI</h2>
+    <p>Most display guides pick one display and one library. That works until you get a second display, swap to a smaller board, or try to reuse code across projects - and suddenly you are learning a new API from scratch.</p>
+    <p>TFT_eSPI by Bodmer solves this. It is a single library that supports dozens of SPI display controllers - ST7735, ST7789, GC9A01, ILI9341, and more - all with the same API. To switch displays, you change a config file. The sketch stays the same.</p>
+    <blockquote class="lotr-quote">
+      "One library to rule them all, one library to find them,<br/>one library to drive them all and in the PROGMEM bind them."
+    </blockquote>
+    <div class="callout callout-why">
+      One library. One API. One sketch structure. The only thing that changes between displays is the <code>User_Setup.h</code> config - which driver, which pins, what speed.
+    </div>
+    <p>It is also the fastest option on ESP32, using hardware-accelerated SPI with optional DMA. The community is large and it is actively maintained.</p>
+
+    <h3>How it compares</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Library</th><th>Displays supported</th><th>API changes per display</th><th>ESP32 speed</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>TFT_eSPI</strong></td><td>Dozens (config-driven)</td><td>No - same sketch</td><td>Fast (hardware SPI + DMA)</td></tr>
+          <tr><td>Adafruit GFX</td><td>Per chip library</td><td>Yes - new lib per display</td><td>Moderate</td></tr>
+          <tr><td>Arduino_GFX</td><td>Many (constructor-driven)</td><td>Partial - constructor changes</td><td>Fast</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- How It Works -->
+  <div class="section" id="how-it-works">
+    <h2>How It Works</h2>
+    <p>Most libraries take pin numbers as constructor arguments in your sketch. TFT_eSPI works differently - display configuration lives in a setup file inside the library folder. You tell it which driver chip, which pins, and what SPI speed. The sketch itself has no pin numbers at all.</p>
+    <p>TFT_eSPI ships with a folder of ready-made setup files in <code>User_Setups/</code> - one per display and board combination. A separate file called <code>User_Setup_Select.h</code> controls which one is active - only one line is uncommented at a time.</p>
+    <p>To switch displays, you comment out the current line and uncomment your next display's line. The sketch never changes. Each display config page on this site tells you exactly which setup file to use and which pin values to update.</p>
+    <div class="callout callout-why">
+      <strong>User_Setup_Select.h is the one file to know.</strong>
+      It lives at <code>~/Arduino/libraries/TFT_eSPI/User_Setup_Select.h</code> - one uncommented line here controls everything.
+    </div>
+  </div>
+
+  <!-- Step 1 -->
+  <div class="section" id="step-1">
+    <h2>Step 1 - Install the Library</h2>
+    <div class="two-col">
+      <div class="card">
+        <h3>Parts</h3>
+        <ul>
+          <li>ESP32 Dev Board (38-pin)</li>
+          <li>GC9A01 240x240 round IPS TFT <em>(used as example - swap for any supported display)</em></li>
+          <li>Jumper wires</li>
+          <li>USB data cable for flashing</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Install TFT_eSPI</h3>
+        <ol class="install-steps">
+          <li>Open <strong>Arduino IDE</strong></li>
+          <li>Go to <strong>Tools &rarr; Manage Libraries</strong></li>
+          <li>In the search box type <strong>TFT_eSPI</strong></li>
+          <li>Several results will appear - find the one by <strong>Bodmer</strong> and click <strong>Install</strong></li>
+        </ol>
+      </div>
+    </div>
+    <div class="callout callout-why">
+      <strong>Why "by Bodmer"?</strong>
+      There are other libraries with similar names in the Library Manager. You want the one authored by Bodmer - it is the most widely used, actively maintained, and supports the widest range of displays. The author name appears in small text under the library title in the search results.
+    </div>
+    <p>Once installed, <strong>close and reopen Arduino IDE</strong> before continuing. The IDE needs a fresh start to pick up the new library correctly.</p>
+    <p>After reopening, the library folder will be at <code>~/Arduino/libraries/TFT_eSPI/</code>. Inside you will find <code>User_Setup_Select.h</code> and a <code>User_Setups/</code> folder - these are what you will edit in Step 2.</p>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="section" id="step-2">
+    <h2>Step 2 - Pick Your Display</h2>
+    <p>TFT_eSPI supports almost every SPI display available - ST7735, ST7789, GC9A01, ILI9341, ILI9488, and dozens more. If you bought an SPI TFT display, there is almost certainly a ready-made setup file for it already sitting in the <code>User_Setups/</code> folder. The config pages below cover the displays confirmed working on this site.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Display</th><th>Size</th><th>Status</th><th>Config Page</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>ST7735</td>
+            <td>128x128</td>
+            <td><span class="badge badge-confirmed" style="font-size:0.75rem;padding:0.2rem 0.6rem;">&#10003; Confirmed</span></td>
+            <td><a href="/guides/tft-espi-setup-st7735" class="term-link">ST7735 config &rarr;</a></td>
+          </tr>
+          <tr>
+            <td>ST7789</td>
+            <td>240x240</td>
+            <td><span class="badge badge-confirmed" style="font-size:0.75rem;padding:0.2rem 0.6rem;">&#10003; Confirmed</span></td>
+            <td><a href="/guides/tft-espi-setup-st7789" class="term-link">ST7789 config &rarr;</a></td>
+          </tr>
+          <tr>
+            <td>GC9A01</td>
+            <td>240x240 round</td>
+            <td><span class="badge badge-confirmed" style="font-size:0.75rem;padding:0.2rem 0.6rem;">&#10003; Confirmed</span></td>
+            <td><a href="/guides/tft-espi-setup-gc9a01" class="term-link">GC9A01 config &rarr;</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout callout-tip">
+      <strong>Done with the config page?</strong>
+      Come back here and continue with Step 3.
+    </div>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="section" id="step-3">
+    <h2>Step 3 - Wire It Up</h2>
+    <p>All SPI displays use the same five signals. The pin numbers below are the defaults used across all config pages on this site - consistent wiring means you can swap displays without rewiring.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Display Pin</th><th>ESP32 Pin</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>VCC</td><td>3.3V or 5V</td><td>Check your module - most accept both</td></tr>
+          <tr><td>GND</td><td>GND</td><td></td></tr>
+          <tr><td>SCL / SCLK</td><td>GPIO 18</td><td>SPI clock - hardware SPI default</td></tr>
+          <tr><td>SDA / MOSI</td><td>GPIO 23</td><td>SPI data - hardware SPI default</td></tr>
+          <tr><td>DC</td><td>GPIO 2</td><td>Data / command select</td></tr>
+          <tr><td>CS</td><td>GPIO 15</td><td>Chip select</td></tr>
+          <tr><td>RST</td><td>GPIO 4</td><td>Reset</td></tr>
+          <tr><td>MISO</td><td>GPIO 19</td><td>Optional - connect if your module has it</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>No MISO connection needed - SPI displays are write-only. Check your display's config page if your module labels pins differently.</p>
+    <div class="callout callout-tip">
+      <strong>Backlight pin (BL)</strong>
+      Some modules have a BL pin. Tie it to 3.3V for always-on backlight, or leave it unconnected if the display is already lit. It is not an SPI signal.
+    </div>
+  </div>
+
+  <!-- Step 4 -->
+  <div class="section" id="step-4">
+    <h2>Step 4 - Test Sketch</h2>
+    <p>Flash this to confirm wiring and config are both correct. Cycles red, green, blue (3 seconds each), then a 150-star warp speed starfield with the site name overlaid.</p>
+    <div class="code-wrap">
+      <pre><code>{`/*
+ * We stand on the shoulders of giants when we build
+ * with knowledge gained from others' efforts.
+ * That doesn't make us giants. Be humble.
+ * Create with care. Open source is the way.
+ *
+ * TFT_eSPI - Display Test Sketch
+ * --------------------------------
+ * Cycles red / green / blue (3s each), then a
+ * 150-star warp speed starfield with site name.
+ * No pin numbers in the sketch - all configured
+ * via User_Setup_Select.h.
+ *
+ * Board:   ESP32 Dev Board (38-pin)
+ * Library: TFT_eSPI by Bodmer
+ *
+ * Wiring (matches Setup46_GC9A01_ESP32.h defaults):
+ *   VCC  -> 3.3V or 5V   GND  -> GND
+ *   SCL  -> GPIO 18       SDA  -> GPIO 23
+ *   DC   -> GPIO 2        CS   -> GPIO 15
+ *   RST  -> GPIO 4        MISO -> GPIO 19
+ *
+ * Open source - MIT Licence
+ * Electronic Zoology - field notes from the garage
+ * https://electroniczoology.com/guides/tft-espi-esp32
+ */
+
+#include <TFT_eSPI.h>
+
+TFT_eSPI tft = TFT_eSPI();
+
+#define NUM_STARS 150
+#define SPEED     3.5f
+
+struct Star { float x, y, z; int px, py; };
+Star stars[NUM_STARS];
+
+int CX, CY;
+
+void resetStar(Star &s) {
+  s.x  = random(-CX, CX);
+  s.y  = random(-CY, CY);
+  s.z  = random(60, 240);
+  s.px = -1;
+  s.py = -1;
+}
+
+uint16_t grey(uint8_t v) {
+  return ((v >> 3) << 11) | ((v >> 2) << 5) | (v >> 3);
+}
+
+void printCentered(const char* text, int y) {
+  int len = strlen(text);
+  int size = 1;
+  for (int s = 4; s >= 1; s--) {
+    if (len * 6 * s <= tft.width() - 4) { size = s; break; }
+  }
+  tft.setTextSize(size);
+  tft.setCursor((tft.width() - len * 6 * size) / 2, y);
+  tft.print(text);
+}
+
+void drawTitle() {
+  tft.setTextColor(TFT_WHITE);
+  tft.setTextSize(2);
+  printCentered("Electronic", CY - 18);
+  printCentered("Zoology",    CY + 2);
+}
+
+void setup() {
+  tft.init();
+  tft.setRotation(0);
+  randomSeed(analogRead(0));
+
+  CX = tft.width()  / 2;
+  CY = tft.height() / 2;
+
+  tft.fillScreen(TFT_RED);   delay(3000);
+  tft.fillScreen(TFT_GREEN); delay(3000);
+  tft.fillScreen(TFT_BLUE);  delay(3000);
+  tft.fillScreen(TFT_BLACK);
+
+  for (int i = 0; i < NUM_STARS; i++) {
+    resetStar(stars[i]);
+    stars[i].z = random(1, 240);
+  }
+}
+
+void loop() {
+  for (int i = 0; i < NUM_STARS; i++) {
+    Star &s = stars[i];
+
+    if (s.px >= 0) {
+      tft.fillCircle(s.px, s.py, s.z > 120 ? 1 : 2, TFT_BLACK);
+    }
+
+    s.z -= SPEED;
+    if (s.z <= 1) { resetStar(s); continue; }
+
+    int sx = CX + (int)(s.x * (float)CX / s.z);
+    int sy = CY + (int)(s.y * (float)CY / s.z);
+
+    if (sx < 0 || sx >= tft.width() || sy < 0 || sy >= tft.height()) {
+      resetStar(s); continue;
+    }
+
+    uint8_t brightness = (uint8_t)((1.0f - s.z / 240.0f) * 220 + 35);
+    int     radius     = s.z < 80 ? 2 : 1;
+
+    tft.fillCircle(sx, sy, radius, grey(brightness));
+    s.px = sx;
+    s.py = sy;
+  }
+
+  drawTitle();
+  delay(1);
+}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+  </div>
+
+  <!-- Troubleshooting -->
+  <div class="section" id="troubleshooting">
+    <h2>Troubleshooting</h2>
+    <div class="trouble-item">
+      <h3>White screen / no output</h3>
+      <ul>
+        <li>Check <code>User_Setup.h</code> has the correct driver uncommented</li>
+        <li>Check wiring - DC and CS are the most commonly swapped pins</li>
+        <li>Confirm RST is connected, not floating</li>
+      </ul>
+    </div>
+    <div class="trouble-item">
+      <h3>Compile error: multiple drivers defined</h3>
+      <ul>
+        <li>Only one <code>#define *_DRIVER</code> line should be uncommented in <code>User_Setup.h</code></li>
+        <li>Open the file and comment out any extras</li>
+      </ul>
+    </div>
+    <div class="trouble-item">
+      <h3>Wrong colours or mirrored image</h3>
+      <ul>
+        <li>Try <code>tft.setRotation(1)</code>, <code>2</code>, or <code>3</code> in setup</li>
+        <li>Some ST7735 variants need a colour order flag in <code>User_Setup.h</code> - see the ST7735 config page</li>
+      </ul>
+    </div>
+    <div class="trouble-item">
+      <h3>Display works but is slow</h3>
+      <ul>
+        <li>Increase <code>SPI_FREQUENCY</code> in <code>User_Setup.h</code> - try <code>40000000</code> (40MHz)</li>
+        <li>Confirm you are using hardware SPI pins (GPIO 18/23) - software SPI is much slower</li>
+      </ul>
+    </div>
+    <div class="trouble-item">
+      <h3>Sketch compiled fine but nothing appears</h3>
+      <ul>
+        <li>Re-check that <code>User_Setup.h</code> was saved before compiling - Arduino IDE caches the library</li>
+        <li>Close and reopen Arduino IDE, then re-compile and flash</li>
+      </ul>
+    </div>
+    <div class="trouble-item">
+      <h3>Not sure if your config is being picked up?</h3>
+      <p>Flash this diagnostic sketch by Bodmer. It reads your active TFT_eSPI config from the processor and prints the driver, pins, SPI speed, and loaded fonts to Serial Monitor. Use it to confirm the sketch is actually picking up the setup file you uncommented in <code>User_Setup_Select.h</code> - if the wrong driver or pins appear in the output, the IDE is still using a cached config. Close and reopen Arduino IDE and flash again.</p>
+      <p>Open Serial Monitor at <strong>115200 baud</strong> after flashing.</p>
+      <div class="code-wrap">
+        <pre><code>{`/*
+ * TFT_eSPI - Read User Setup Diagnostic Sketch
+ * Prints active config to Serial Monitor at 115200 baud.
+ * Written by Bodmer - https://github.com/Bodmer/TFT_eSPI
+ */
+
+#include <SPI.h>
+#include <TFT_eSPI.h>
+
+TFT_eSPI tft = TFT_eSPI();
+
+#ifdef ARDUINO_ARCH_ESP8266
+  ADC_MODE(ADC_VCC);
+#endif
+
+setup_t user;
+
+void setup() {
+  Serial.begin(115200);
+  tft.init();
+}
+
+void loop(void) {
+  tft.getSetup(user);
+  Serial.print("\\n[code]\\n");
+  Serial.print("TFT_eSPI ver = "); Serial.println(user.version);
+  printProcessorName();
+  Serial.print("Transactions = "); Serial.println((user.trans  == 1) ? "Yes" : "No");
+  Serial.print("Interface    = "); Serial.println((user.serial == 1) ? "SPI" : "Parallel");
+  if (user.tft_driver != 0xE9D) {
+    Serial.print("Display driver = "); Serial.println(user.tft_driver, HEX);
+    Serial.print("Display width  = "); Serial.println(user.tft_width);
+    Serial.print("Display height = "); Serial.println(user.tft_height);
+    Serial.println();
+  }
+  if (user.pin_tft_mosi != -1) { Serial.print("MOSI    = GPIO "); Serial.println(user.pin_tft_mosi); }
+  if (user.pin_tft_miso != -1) { Serial.print("MISO    = GPIO "); Serial.println(user.pin_tft_miso); }
+  if (user.pin_tft_clk  != -1) { Serial.print("SCK     = GPIO "); Serial.println(user.pin_tft_clk); }
+  if (user.pin_tft_cs   != -1) { Serial.print("TFT_CS  = GPIO "); Serial.println(user.pin_tft_cs); }
+  if (user.pin_tft_dc   != -1) { Serial.print("TFT_DC  = GPIO "); Serial.println(user.pin_tft_dc); }
+  if (user.pin_tft_rst  != -1) { Serial.print("TFT_RST = GPIO "); Serial.println(user.pin_tft_rst); }
+  Serial.println();
+  if (user.serial == 1) { Serial.print("SPI frequency = "); Serial.println(user.tft_spi_freq / 10.0); }
+  Serial.println("[/code]");
+  delay(3000);
+}
+
+void printProcessorName(void) {
+  Serial.print("Processor = ");
+  if (user.esp == 0x8266) Serial.println("ESP8266");
+  if (user.esp == 0x32)   Serial.println("ESP32");
+  if (user.esp == 0x32F)  Serial.println("STM32");
+  if (user.esp == 0x2040) Serial.println("RP2040");
+  if (user.esp == 0x0000) Serial.println("Generic");
+}`}</code></pre>
+        <button class="copy-btn">Copy</button>
+      </div>
+      <p style="margin-top:1rem;">A correct config will look something like this in Serial Monitor:</p>
+      <div class="screenshot-wrap">
+        <img src="/images/conFerm.png" alt="Serial Monitor showing TFT_eSPI diagnostic output confirming driver and pin config" />
+      </div>
+    </div>
+  </div>
+
+</GuideLayout>
+
+<style>
+  .lotr-quote {
+    font-style: italic;
+    color: #6b21a8;
+    border-left: 3px solid #a855f7;
+    margin: 1.25rem 0;
+    padding: 0.6rem 1.25rem;
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.5rem; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    min-width: 400px;
+  }
+  th {
+    background: #1a1a2e;
+    color: #fff;
+    text-align: left;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+  }
+  td {
+    padding: 0.55rem 1rem;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+  }
+  tr:nth-child(even) td { background: #fafafa; }
+  tr:last-child td { border-bottom: none; }
+
+  .screenshot-wrap {
+    margin: 0.75rem 0 0;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .screenshot-wrap img { width: 100%; display: block; }
+
+  .install-steps {
+    padding-left: 1.2rem;
+    margin: 0.5rem 0 0;
+  }
+  .install-steps li {
+    margin-bottom: 0.4rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+</style>

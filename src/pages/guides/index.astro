@@ -12,6 +12,16 @@ const guides = [
     tags: ['ESP32', 'PAM8403', 'Audio', 'Arduino'],
   },
   {
+    slug: 'tft-espi-esp32',
+    title: 'TFT_eSPI with ESP32 - All Displays, One Library',
+    description: 'How to use TFT_eSPI by Bodmer to drive SPI displays on an ESP32. One library, one API, swap displays by changing a config file. Covers setup, User_Setup.h, wiring, and a test sketch for ST7735, ST7789, and GC9A01.',
+    category: 'Display',
+    date: '2026-04-29',
+    status: 'confirmed',
+    series: 'TFT_eSPI Library Tutorial',
+    tags: ['ESP32', 'TFT_eSPI', 'SPI', 'Arduino'],
+  },
+  {
     slug: 'gc9a01-round-display-esp32',
     title: 'GC9A01 Round TFT Display with ESP32',
     description: 'Wiring and driving a GC9A01 240x240 round IPS TFT display with an ESP32 Dev Board over SPI. Covers library setup, wiring, and a confirmed working test sketch.',
@@ -67,7 +77,7 @@ const guides = [
         return (
           <>
             {seriesHeader}
-            <a class={`guide-row ${g.series ? 'guide-row-series' : ''}`} href={`/guides/${g.slug}`}>
+            <a class={`guide-row ${g.series && g.step ? 'guide-row-series' : ''}`} href={`/guides/${g.slug}`}>
               <div class="row-meta">
                 <span class="row-category">{g.category}</span>
                 {g.step && <span class="row-step">Step {g.step} — {g.stepDesc}</span>}

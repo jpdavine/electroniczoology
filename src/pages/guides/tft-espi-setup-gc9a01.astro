@@ -1,0 +1,202 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+---
+<GuideLayout
+  title="TFT_eSPI Config - GC9A01 240x240 Round Display"
+  description="User_Setup.h config for driving a GC9A01 240x240 round IPS TFT display with TFT_eSPI on an ESP32 Dev Board. Includes full config, pin table, and wiring."
+  toc={[
+    {href: '#overview', label: 'Overview'},
+    {href: '#wiring', label: 'Wiring'},
+    {href: '#user-setup', label: 'User_Setup.h'},
+    {href: '#notes', label: 'Notes'},
+  ]}
+>
+
+  <div class="hero">
+    <div class="category">Display &bull; ESP32 &bull; TFT_eSPI</div>
+    <h1>TFT_eSPI Config<br>GC9A01 240x240 Round Display</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Display:</strong> GC9A01 - 240x240 round IPS TFT</div>
+      <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin)</div>
+      <div class="meta-item"><strong>Library:</strong> TFT_eSPI by Bodmer</div>
+    </div>
+    <div class="badge">&#10003; Confirmed Working</div>
+  </div>
+
+  <div class="back-link">
+    &larr; <a href="/guides/tft-espi-esp32">Back to TFT_eSPI main guide</a>
+  </div>
+
+  <!-- Overview -->
+  <div class="section" id="overview">
+    <h2>Overview</h2>
+    <p>The GC9A01 is a 240x240 round IPS TFT display driven over SPI. It is write-only - no MISO line needed. The breakout module includes onboard voltage regulation so it runs from 3.3V or 5V.</p>
+    <p>This page covers the <code>User_Setup.h</code> config to drive it with TFT_eSPI. Once this config is in place, use the <a href="/guides/tft-espi-esp32#sketch" class="term-link">standard test sketch</a> to confirm it is working.</p>
+  </div>
+
+  <!-- Wiring -->
+  <div class="section" id="wiring">
+    <h2>Wiring</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Display Pin</th><th>ESP32 Pin</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>VCC</td><td>3.3V or 5V</td><td>Module has onboard regulator - accepts both</td></tr>
+          <tr><td>GND</td><td>GND</td><td></td></tr>
+          <tr><td>SCL</td><td>GPIO 18</td><td>SPI clock</td></tr>
+          <tr><td>SDA</td><td>GPIO 23</td><td>SPI data (MOSI)</td></tr>
+          <tr><td>DC</td><td>GPIO 2</td><td>Data / command select</td></tr>
+          <tr><td>CS</td><td>GPIO 15</td><td>Chip select</td></tr>
+          <tr><td>RST</td><td>GPIO 4</td><td>Reset</td></tr>
+          <tr><td>MISO</td><td>GPIO 19</td><td>Optional - connect if your module has it</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>If your module has a BL (backlight) pin, tie it to 3.3V.</p>
+  </div>
+
+  <!-- Config -->
+  <div class="section" id="user-setup">
+    <h2>Config</h2>
+
+    <h3>1. Open User_Setup_Select.h</h3>
+    <p>Open <code>~/Arduino/libraries/TFT_eSPI/User_Setup_Select.h</code>. Comment out the default line and uncomment <code>Setup46</code>:</p>
+    <div class="code-wrap">
+      <pre><code>{`//#include <User_Setup.h>           // comment this out
+#include <User_Setups/Setup46_GC9A01_ESP32.h>  // uncomment this`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <div class="side-by-side">
+      <div class="screenshot-wrap">
+        <img src="/images/userSetUpH1.png" alt="User_Setup_Select.h before - default line active" />
+        <p class="screenshot-caption">Before - default active</p>
+      </div>
+      <div class="screenshot-wrap">
+        <img src="/images/userSetUpH2.png" alt="User_Setup_Select.h after - Setup46 uncommented" />
+        <p class="screenshot-caption">After - Setup46 uncommented</p>
+      </div>
+    </div>
+
+    <h3>2. Check Setup46 pins</h3>
+    <p>The default pins in <code>Setup46_GC9A01_ESP32.h</code> already match the wiring above - no changes needed. Open the file and confirm yours looks like this:</p>
+    <div class="screenshot-wrap">
+      <img src="/images/setup46.png" alt="Setup46_GC9A01_ESP32.h showing the default pin definitions" />
+      <p class="screenshot-caption">Setup46_GC9A01_ESP32.h - default pin definitions</p>
+    </div>
+
+    <div class="callout callout-tip">
+      <strong>Only one line uncommented in User_Setup_Select.h at a time.</strong>
+      When switching displays, comment this line out and uncomment your next display. Close and reopen Arduino IDE after saving either file.
+    </div>
+  </div>
+
+  <!-- Notes -->
+  <div class="section" id="notes">
+    <h2>Notes</h2>
+    <div class="trouble-item">
+      <h3>SPI speed</h3>
+      <p>27MHz is a safe starting point. The GC9A01 can run faster - try <code>40000000</code> once confirmed working for smoother animation.</p>
+    </div>
+    <div class="trouble-item">
+      <h3>Rotation</h3>
+      <p>The GC9A01 is a round display so rotation matters less visually, but <code>tft.setRotation(0)</code> through <code>3</code> rotates the coordinate origin. Use whichever matches how your display is mounted.</p>
+    </div>
+    <div class="trouble-item">
+      <h3>White screen after flashing</h3>
+      <p>Almost always a wiring issue - DC and CS are the most commonly swapped pins. Check RST is connected and not floating.</p>
+    </div>
+  </div>
+
+  <div class="continue-link">
+    Config done - <a href="/guides/tft-espi-esp32#sketch">head back to the main guide and continue &rarr;</a>
+  </div>
+
+</GuideLayout>
+
+<style>
+  .back-link {
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+  }
+  .back-link a {
+    color: var(--amber);
+    text-decoration: none;
+    border-bottom: 1px dashed var(--amber);
+  }
+  .back-link a:hover { opacity: 0.8; }
+
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.5rem; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    min-width: 400px;
+  }
+  th {
+    background: #1a1a2e;
+    color: #fff;
+    text-align: left;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+  }
+  td {
+    padding: 0.55rem 1rem;
+    border-bottom: 1px solid #eee;
+  }
+  tr:nth-child(even) td { background: #fafafa; }
+  tr:last-child td { border-bottom: none; }
+
+  .trouble-item {
+    background: #fafafa;
+    border: 1px solid #e8e8e8;
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+  }
+  .trouble-item h3 { margin: 0 0 0.4rem; font-size: 0.95rem; color: #c47a1e; }
+  .trouble-item p { margin: 0; font-size: 0.9rem; }
+
+  .continue-link {
+    margin-top: 3rem;
+    padding: 1rem 1.25rem;
+    background: #f0f4ff;
+    border-left: 4px solid #4a6cf7;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.95rem;
+  }
+  .continue-link a {
+    color: #4a6cf7;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .continue-link a:hover { text-decoration: underline; }
+
+  .side-by-side {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0 1.5rem;
+  }
+  .screenshot-wrap {
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .screenshot-wrap img {
+    width: 100%;
+    display: block;
+  }
+  .screenshot-caption {
+    font-size: 0.8rem;
+    color: #888;
+    text-align: center;
+    padding: 0.4rem;
+    background: #fafafa;
+    margin: 0;
+  }
+  @media (max-width: 600px) {
+    .side-by-side { grid-template-columns: 1fr; }
+  }
+</style>
