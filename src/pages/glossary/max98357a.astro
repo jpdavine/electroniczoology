@@ -1,0 +1,75 @@
+---
+import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
+---
+<GlossaryEntry
+  category="Audio"
+  title="MAX98357A I2S Amplifier Module"
+  subtitle="3W mono class-D I2S digital amplifier - no DAC, no caps, just three wires"
+  backTo="/guides/max98357a-esp32-audio#what-you-need"
+  backLabel="Back to MAX98357A guide"
+  highlights={[
+    'Speaker output: 4-8Ω, 3W',
+    'Power input: 2.5-5.5V (5V recommended)',
+    'Default gain: 9dB (L+R)/2 mono mix when SD floating',
+    'Interface: I2S digital - BCLK, LRC, DIN',
+    'No coupling caps, no decoupling caps needed',
+  ]}
+>
+  <div slot="svg" style="display:flex;flex-direction:column;gap:0.75rem;align-items:center;">
+    <img src="/images/max98357a-front.png" alt="MAX98357A module front showing pin labels" style="max-width:260px;border-radius:6px;"/>
+    <img src="/images/max98357a-back.png" alt="MAX98357A module back showing specs - 4-8Ω 3W, 9dB default gain" style="max-width:260px;border-radius:6px;"/>
+  </div>
+  <Fragment slot="desc">
+    <p>The MAX98357A is a digital I2S class-D amplifier. It takes audio as a digital I2S signal directly from a microcontroller, converts it to analogue internally, and drives a speaker - all in one chip. No external DAC, no coupling capacitor, no decoupling capacitor.</p>
+
+    <h2>Pin reference</h2>
+    <table>
+      <thead><tr><th>Pin</th><th>Function</th><th>Connect to</th></tr></thead>
+      <tbody>
+        <tr><td>VIN</td><td>Power</td><td>5V (2.5-5.5V range)</td></tr>
+        <tr><td>GND</td><td>Ground</td><td>GND</td></tr>
+        <tr><td>BCLK</td><td>I2S bit clock</td><td>GPIO27 (ESP32)</td></tr>
+        <tr><td>LRC</td><td>I2S word select</td><td>GPIO14 (ESP32)</td></tr>
+        <tr><td>DIN</td><td>I2S data in</td><td>GPIO13 (ESP32)</td></tr>
+        <tr><td>SD</td><td>Shutdown / gain select</td><td>Leave floating (enabled, 9dB)</td></tr>
+        <tr><td>GAIN</td><td>Gain select</td><td>Leave floating (9dB default)</td></tr>
+      </tbody>
+    </table>
+
+    <h2>GAIN pin options</h2>
+    <table>
+      <thead><tr><th>GAIN wiring</th><th>Gain</th></tr></thead>
+      <tbody>
+        <tr><td>Floating</td><td>9dB (default)</td></tr>
+        <tr><td>GND via 100k resistor</td><td>12dB</td></tr>
+        <tr><td>Directly to VIN</td><td>15dB (loudest)</td></tr>
+        <tr><td>Directly to GND</td><td>6dB</td></tr>
+      </tbody>
+    </table>
+
+    <h2>SD pin behaviour</h2>
+    <p>Left floating, the module is enabled and outputs a mono mix of the left and right I2S channels - (L+R)/2. This is the correct state for mono audio. Pulling SD to GND shuts the amp down. SD can also be driven with PWM for software volume control, but hardware gain via the GAIN pin is simpler.</p>
+  </Fragment>
+</GlossaryEntry>
+
+<style>
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    margin: 0.75rem 0 1.25rem;
+  }
+  th {
+    background: #1a1a2e;
+    color: #fff;
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+  }
+  td {
+    padding: 0.45rem 0.75rem;
+    border-bottom: 1px solid #eee;
+  }
+  tr:nth-child(even) td { background: #fafafa; }
+  tr:last-child td { border-bottom: none; }
+</style>

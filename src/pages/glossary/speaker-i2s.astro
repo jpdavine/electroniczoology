@@ -1,0 +1,46 @@
+---
+import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
+---
+<GlossaryEntry
+  category="Output Device"
+  title="4-8 Ohm Speaker"
+  subtitle="Passive speaker, any small size"
+  backTo="/guides/max98357a-esp32-audio#what-you-need"
+  backLabel="Back to MAX98357A guide"
+  highlights={[
+    '4 ohm - louder, draws more current',
+    '8 ohm - safer for the amp, slightly quieter',
+    'Any physical size works - bigger cone = more bass',
+    'Connect to the two output terminals on the MAX98357A module',
+    'Polarity just affects phase, not function',
+  ]}
+>
+  <svg slot="svg" viewBox="0 0 280 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:260px;display:block;margin:auto">
+    <ellipse cx="140" cy="90" rx="90" ry="90" fill="#1e1e2e"/>
+    <ellipse cx="140" cy="90" rx="80" ry="80" fill="none" stroke="#555" stroke-width="6"/>
+    <ellipse cx="140" cy="90" rx="66" ry="66" fill="#2a2a3a" stroke="#555" stroke-width="1"/>
+    <ellipse cx="140" cy="90" rx="22" ry="22" fill="#333" stroke="#555" stroke-width="1.5"/>
+    <rect x="108" y="172" width="16" height="22" rx="2" fill="#e8a020"/>
+    <text x="116" y="187" fill="#1a1a1a" font-size="9" font-family="monospace" text-anchor="middle" font-weight="bold">+</text>
+    <rect x="156" y="172" width="16" height="22" rx="2" fill="#555"/>
+    <text x="164" y="187" fill="#ccc" font-size="9" font-family="monospace" text-anchor="middle">-</text>
+  </svg>
+  <Fragment slot="desc">
+    <p>The MAX98357A can drive any speaker between 4 and 8 ohms impedance. Laptop speakers, small hobby speakers, and salvaged speakers all work.</p>
+    <p>Lower impedance (4 ohm) draws more current and plays louder; higher impedance (8 ohm) is easier on the amplifier. Connect the two wires to the screw terminal on the MAX98357A module.</p>
+
+    <h2>Testing a speaker with a multimeter</h2>
+    <p>Set your multimeter to <strong>resistance (ohms, &Omega;)</strong> - the lowest range, usually 200&Omega;. Touch the probes to the two speaker terminals. A working speaker reads its rated impedance - typically 4-8&Omega;. You may see the cone give a small kick as the probes make contact; that's normal.</p>
+
+    <h3>What the reading means</h3>
+    <ul>
+      <li><strong>4-8&Omega;</strong> - speaker is good</li>
+      <li><strong>0&Omega; or very close to 0</strong> - voice coil is shorted, speaker is dead</li>
+      <li><strong>OL / open loop / infinite</strong> - wire is broken or voice coil is burnt out, speaker is dead</li>
+      <li><strong>Anything in between</strong> - note that AC impedance at audio frequencies is slightly higher than the DC resistance your multimeter reads, so a nominal 8&Omega; speaker often reads 6-7&Omega; on a multimeter - that's fine</li>
+    </ul>
+
+    <h3>Quick continuity check</h3>
+    <p>If your multimeter has a <strong>continuity / beep mode</strong>, use that instead. Touch probes to the terminals - a beep means the coil is intact. No beep means open circuit (dead speaker). This is faster than reading ohms when you just want a pass/fail result.</p>
+  </Fragment>
+</GlossaryEntry>
