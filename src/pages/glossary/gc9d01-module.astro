@@ -1,0 +1,71 @@
+---
+import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
+---
+<GlossaryEntry
+  category="Display"
+  title="GC9D01 160x160 Round TFT Module"
+  subtitle="0.71 inch round TFT display - often mislabelled as GC9A01"
+  backTo="/guides/gc9d01-round-display-esp32#what-you-need"
+  backLabel="Back to GC9D01 guide"
+  highlights={[
+    '160x160 round TFT display, 0.71 inch',
+    'Driver chip: GC9D01 - NOT GC9A01 despite common mislabelling',
+    '3.3V only - no 5V tolerance',
+    'SPI interface: SCL, SDA, RES, DC, CS, BL',
+    'BL to 3.3V for always-on backlight - no GPIO needed',
+  ]}
+>
+  <div slot="svg" style="display:flex;flex-direction:column;gap:0.75rem;align-items:center;">
+    <img src="/images/gc9d01-module-pins.jpg" alt="GC9D01 160x160 round TFT module showing pin labels GND VDD SCL SDA RES DC CS BL" style="max-width:280px;border-radius:6px;"/>
+  </div>
+  <Fragment slot="desc">
+    <p>A 0.71 inch round TFT display driven by a GC9D01 controller. Many listings sell this as a "GC9A01" - the two chips share a similar command set but have different init sequences. Using the wrong driver gives vertical lines or incorrect colours. The size is the giveaway: GC9A01 is 240x240, GC9D01 is 160x160.</p>
+
+    <h2>Pin reference</h2>
+    <table>
+      <thead><tr><th>Module Pin</th><th>Function</th><th>Connect to</th></tr></thead>
+      <tbody>
+        <tr><td>GND</td><td>Ground</td><td>GND</td></tr>
+        <tr><td>VDD</td><td>Power</td><td>3.3V only</td></tr>
+        <tr><td>SCL</td><td>SPI clock</td><td>GPIO18 (ESP32)</td></tr>
+        <tr><td>SDA</td><td>SPI data (MOSI)</td><td>GPIO23 (ESP32)</td></tr>
+        <tr><td>RES</td><td>Reset</td><td>GPIO4 (ESP32)</td></tr>
+        <tr><td>DC</td><td>Data / command select</td><td>GPIO27 (ESP32)</td></tr>
+        <tr><td>CS</td><td>Chip select</td><td>GPIO5 (ESP32)</td></tr>
+        <tr><td>BL</td><td>Backlight</td><td>3.3V (always-on)</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Important notes</h2>
+    <ul>
+      <li><strong>3.3V only</strong> - this module has no onboard voltage regulator. 5V will damage it.</li>
+      <li><strong>Do not use GPIO2 for DC</strong> - it is a boot strapping pin. The display holds DC low during SPI transfers which puts the ESP32 into download mode. Use GPIO27.</li>
+      <li><strong>MISO not connected</strong> - SPI displays are write-only.</li>
+      <li><strong>BL to 3.3V</strong> - wire directly, no GPIO needed for always-on backlight.</li>
+    </ul>
+  </Fragment>
+</GlossaryEntry>
+
+<style>
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    margin: 0.75rem 0 1.25rem;
+  }
+  th {
+    background: #1a1a2e;
+    color: #fff;
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+  }
+  td {
+    padding: 0.45rem 0.75rem;
+    border-bottom: 1px solid #eee;
+  }
+  tr:nth-child(even) td { background: #fafafa; }
+  tr:last-child td { border-bottom: none; }
+  ul { margin: 0.5rem 0 0 1.2rem; font-size: 0.9rem; line-height: 1.8; }
+  li { margin-bottom: 0.3rem; }
+</style>
