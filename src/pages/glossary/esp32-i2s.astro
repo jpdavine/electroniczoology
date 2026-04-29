@@ -1,0 +1,66 @@
+---
+import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
+---
+<GlossaryEntry
+  category="Microcontroller"
+  title="ESP32 Dev Board"
+  subtitle="38-pin development board - I2S audio pins for the MAX98357A guide"
+  backTo="/guides/max98357a-esp32-audio#what-you-need"
+  backLabel="Back to MAX98357A guide"
+  highlights={[
+    'GPIO27 - I2S BCLK (bit clock) → MAX98357A BCLK',
+    'GPIO14 - I2S LRCLK (word select) → MAX98357A LRC',
+    'GPIO13 - I2S DOUT (data out) → MAX98357A DIN',
+    '5V - powers the MAX98357A VIN',
+    'GND - shared ground for all components',
+  ]}
+>
+  <img slot="svg" src="/components/esp32-dev-board.png" alt="ESP32 WROOM-32 38-pin dev board" style="max-width:280px;border-radius:6px;"/>
+  <Fragment slot="desc">
+    <p style="font-size:0.7rem;color:#999;margin-bottom:0.1rem;">Official Espressif documentation:</p>
+    <a href="https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32/esp32-devkitc/user_guide.html"
+       target="_blank" rel="noopener"
+       style="display:inline-block;margin-bottom:1rem;font-size:0.95rem;color:#7a8ab0;text-decoration:none;">
+      ESP32-DevKitC V4 user guide &rarr;
+    </a>
+    <p>The ESP32 is a dual-core 240MHz microcontroller with built-in WiFi and Bluetooth. The 38-pin dev board breaks all GPIO pins out on two rows of headers.</p>
+    <p>For I2S audio, the ESP32 has a hardware I2S peripheral that generates the bit clock, word select, and data signals in hardware. Any GPIO can be assigned to each I2S signal in software - the MAX98357A guide uses GPIO27, GPIO14, and GPIO13.</p>
+
+    <h2>Pins used in this guide</h2>
+    <table>
+      <thead><tr><th>ESP32 Pin</th><th>MAX98357A Pin</th><th>Signal</th></tr></thead>
+      <tbody>
+        <tr><td>5V</td><td>VIN</td><td>Power</td></tr>
+        <tr><td>GND</td><td>GND</td><td>Common ground</td></tr>
+        <tr><td>GPIO27</td><td>BCLK</td><td>I2S bit clock</td></tr>
+        <tr><td>GPIO14</td><td>LRC</td><td>I2S word select (LRCLK)</td></tr>
+        <tr><td>GPIO13</td><td>DIN</td><td>I2S data out from ESP32</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Why these pins</h2>
+    <p>GPIO27, GPIO14, and GPIO13 are all clean general-purpose GPIOs with no boot-strapping or special functions that could interfere with I2S. The ESP32's DAC pins (GPIO25 and GPIO26) are deliberately avoided here to keep DAC available for other projects. All three I2S pins are on the same side of the board, which keeps wiring tidy.</p>
+  </Fragment>
+</GlossaryEntry>
+
+<style>
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    margin: 0.75rem 0 1.25rem;
+  }
+  th {
+    background: #1a1a2e;
+    color: #fff;
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+  }
+  td {
+    padding: 0.45rem 0.75rem;
+    border-bottom: 1px solid #eee;
+  }
+  tr:nth-child(even) td { background: #fafafa; }
+  tr:last-child td { border-bottom: none; }
+</style>

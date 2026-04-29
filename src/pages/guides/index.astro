@@ -3,6 +3,15 @@ import Base from '../../layouts/Base.astro';
 
 const guides = [
   {
+    slug: 'max98357a-esp32-audio',
+    title: 'MAX98357A I2S Amplifier with ESP32',
+    description: 'Play audio on an ESP32 Dev Board using a MAX98357A I2S amplifier. Digital audio direct from the ESP32 - no DAC, no caps. Covers wiring, I2S setup, audio prep, and the full sketch.',
+    category: 'Audio',
+    date: '2026-04-29',
+    status: 'wip',
+    tags: ['ESP32', 'MAX98357A', 'I2S', 'Audio', 'Arduino'],
+  },
+  {
     slug: 'pam8403-esp32-audio',
     title: 'PAM8403 Audio Amplifier with ESP32',
     description: 'Playing audio clips from an ESP32 dev board through a PAM8403 amplifier and a speaker. Covers wiring, audio prep, WAV-to-header conversion, and the full Arduino sketch.',
@@ -20,6 +29,15 @@ const guides = [
     status: 'confirmed',
     series: 'TFT_eSPI Library Tutorial',
     tags: ['ESP32', 'TFT_eSPI', 'SPI', 'Arduino'],
+  },
+  {
+    slug: 'gc9d01-round-display-esp32',
+    title: 'GC9D01 160x160 Round TFT Display with ESP32',
+    description: 'Wire and drive a GC9D01 160x160 round TFT with an ESP32. Covers the common GC9A01 mislabelling problem, correct library and constructor, wiring gotchas, and a confirmed working test sketch.',
+    category: 'Display',
+    date: '2026-04-29',
+    status: 'confirmed',
+    tags: ['ESP32', 'GC9D01', 'Arduino_GFX', 'SPI', 'Arduino'],
   },
   {
     slug: 'gc9a01-round-display-esp32',

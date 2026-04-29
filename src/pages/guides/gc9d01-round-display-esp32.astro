@@ -1,0 +1,276 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+---
+<GuideLayout
+  title="GC9D01 160x160 Round TFT Display with ESP32"
+  description="How to wire and drive a GC9D01 160x160 round TFT display with an ESP32 Dev Board. Covers the mislabelling problem, library setup, wiring, and a confirmed working test sketch."
+  toc={[
+    {href: '#what-you-need', label: 'What You Need'},
+    {href: '#not-a-gc9a01', label: 'Not a GC9A01'},
+    {href: '#wiring', label: 'Wiring'},
+    {href: '#library', label: 'Library Setup'},
+    {href: '#sketch', label: 'Test Sketch'},
+    {href: '#troubleshooting', label: 'Troubleshooting'},
+  ]}
+>
+
+  <div class="hero">
+    <div class="category">Display &bull; ESP32</div>
+    <h1>GC9D01 160x160 Round TFT<br>with ESP32 Dev Board</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Display:</strong> GC9D01 - 160x160 round TFT</div>
+      <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin)</div>
+      <div class="meta-item"><strong>Library:</strong> Arduino_GFX by Moon On Our Nation</div>
+      <div class="meta-item"><strong>Interface:</strong> SPI</div>
+    </div>
+    <div class="badge">&#10003; Confirmed Working</div>
+  </div>
+
+  <!-- What You Need -->
+  <div class="section" id="what-you-need">
+    <h2>What You Need</h2>
+    <div class="two-col">
+      <div class="card">
+        <h3>Parts</h3>
+        <ul>
+          <li>ESP32 Dev Board (38-pin)</li>
+          <li>GC9D01 160x160 round TFT module</li>
+          <li>Jumper wires</li>
+          <li>USB data cable for flashing</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Software</h3>
+        <ul>
+          <li>Arduino IDE with ESP32 board support</li>
+          <li><code>Arduino_GFX_Library</code> by Moon On Our Nation</li>
+        </ul>
+        <p style="margin-top:1rem;font-size:0.85rem;color:#666;">Install via Arduino IDE Library Manager - search <strong>Arduino_GFX</strong>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Not a GC9A01 -->
+  <div class="section" id="not-a-gc9a01">
+    <h2>Not a GC9A01</h2>
+    <p>Many 0.71" 160x160 round displays are sold as "GC9A01" - same listing, same photo, wrong chip. The actual driver is the GC9D01. They share a similar command set but have different init sequences. Using the GC9A01 driver on a GC9D01 gives vertical lines, wrong colours, or no output at all.</p>
+    <div class="callout callout-tip">
+      <strong>How to tell which chip you have.</strong>
+      Size is the giveaway - the GC9A01 is 240x240, the GC9D01 is 160x160. If your round display is around 0.71" across and the listing says GC9A01, it's almost certainly a GC9D01.
+    </div>
+    <p>Arduino_GFX v1.6.1+ has native GC9D01 support via <code>Arduino_GC9D01</code>. Use that constructor and the init sequence is correct from the start. TFT_eSPI does not have a GC9D01 driver - Arduino_GFX is the right library for this display.</p>
+  </div>
+
+  <!-- Wiring -->
+  <div class="section" id="wiring">
+    <h2>Wiring</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Display Pin</th><th>ESP32 Pin</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>VCC</td><td>3.3V</td><td>3.3V only - no 5V tolerance on this module</td></tr>
+          <tr><td>GND</td><td>GND</td><td></td></tr>
+          <tr><td>SCL</td><td>GPIO 18</td><td>SPI clock (SCLK)</td></tr>
+          <tr><td>SDA</td><td>GPIO 23</td><td>SPI data (MOSI)</td></tr>
+          <tr><td>DC</td><td>GPIO 27</td><td>Data / Command select</td></tr>
+          <tr><td>CS</td><td>GPIO 5</td><td>Chip select</td></tr>
+          <tr><td>RST</td><td>GPIO 4</td><td>Reset</td></tr>
+          <tr><td>BL</td><td>3.3V</td><td>Backlight - wire directly to 3.3V for always-on</td></tr>
+          <tr><td>MISO</td><td>Not connected</td><td>Display is write-only</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout callout-tip">
+      <strong>Do not use GPIO 2 for DC.</strong>
+      GPIO 2 is a boot strapping pin on the ESP32. Using it for DC causes upload failures - the display holds it low during SPI transfers, which puts the ESP32 into download mode. GPIO 27 works correctly.
+    </div>
+  </div>
+
+  <!-- Library -->
+  <div class="section" id="library">
+    <h2>Library Setup</h2>
+    <p>Open Arduino IDE, go to <strong>Tools &rarr; Manage Libraries</strong>, search for <strong>Arduino_GFX</strong> and install <strong>Arduino_GFX Library</strong> by Moon On Our Nation. Version 1.6.1 or later is required for GC9D01 support.</p>
+    <div class="callout callout-tip">
+      <strong>IPS must be false.</strong>
+      The constructor takes an IPS argument. Setting it to <code>true</code> inverts the colours on this panel. Use <code>false</code>.
+    </div>
+    <div class="code-wrap">
+      <pre><code>{`Arduino_DataBus *bus = new Arduino_HWSPI(27, 5); // DC, CS
+Arduino_GFX *gfx = new Arduino_GC9D01(bus, 4, 0, false); // RST, rotation, IPS=false`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+  </div>
+
+  <!-- Test Sketch -->
+  <div class="section" id="sketch">
+    <h2>Test Sketch</h2>
+    <p>Flash this to confirm wiring and library are both correct. Cycles red, green, blue, white, and black (500ms each), then a 150-star warp speed starfield. Smooth animation means everything is working.</p>
+    <div class="code-wrap">
+      <pre><code>{`/*
+ * We stand on the shoulders of giants when we build
+ * with knowledge gained from others' efforts.
+ * That doesn't make us giants. Be humble.
+ * Create with care. Open source is the way.
+ *
+ * GC9D01 160x160 Round TFT - Test Sketch
+ * ----------------------------------------
+ * Cycles red / green / blue / white / black (500ms each),
+ * then a 150-star warp speed starfield with site name.
+ *
+ * Board:   ESP32 Dev Board (38-pin)
+ * Library: Arduino_GFX_Library by Moon On Our Nation
+ *
+ * Wiring:
+ *   VCC -> 3.3V (3.3V ONLY)    GND -> GND
+ *   SCL -> GPIO 18              SDA -> GPIO 23
+ *   DC  -> GPIO 27              CS  -> GPIO 5
+ *   RST -> GPIO 4               BL  -> 3.3V
+ *
+ * Open source - MIT Licence
+ * Electronic Zoology - field notes from the garage
+ * https://electroniczoology.com/guides/gc9d01-round-display-esp32
+ */
+
+#include <Arduino_GFX_Library.h>
+
+Arduino_DataBus *bus = new Arduino_HWSPI(27, 5);         // DC, CS
+Arduino_GFX *gfx = new Arduino_GC9D01(bus, 4, 0, false); // RST, rotation, IPS=false
+
+#define CX        80
+#define CY        80
+#define NUM_STARS 150
+#define SPEED     3.5f
+
+struct Star { float x, y, z; int px, py; };
+Star stars[NUM_STARS];
+
+void resetStar(Star &s) {
+  s.x  = random(-80, 80);
+  s.y  = random(-80, 80);
+  s.z  = random(40, 160);
+  s.px = -1;
+  s.py = -1;
+}
+
+uint16_t grey(uint8_t v) {
+  return ((v >> 3) << 11) | ((v >> 2) << 5) | (v >> 3);
+}
+
+void drawTitle() {
+  gfx->setTextColor(0xFFFF);
+  gfx->setTextSize(1);
+  gfx->setCursor(50, 71);
+  gfx->print("Electronic");
+  gfx->setCursor(47, 82);
+  gfx->print("Zoology.com");
+}
+
+void setup() {
+  randomSeed(analogRead(0));
+  gfx->begin();
+
+  gfx->fillScreen(0xF800); delay(500); // red
+  gfx->fillScreen(0x07E0); delay(500); // green
+  gfx->fillScreen(0x001F); delay(500); // blue
+  gfx->fillScreen(0xFFFF); delay(500); // white
+  gfx->fillScreen(0x0000); delay(500); // black
+
+  for (int i = 0; i < NUM_STARS; i++) {
+    resetStar(stars[i]);
+    stars[i].z = random(1, 160);
+  }
+}
+
+void loop() {
+  for (int i = 0; i < NUM_STARS; i++) {
+    Star &s = stars[i];
+
+    if (s.px >= 0) {
+      gfx->fillCircle(s.px, s.py, s.z > 80 ? 1 : 2, 0x0000);
+    }
+
+    s.z -= SPEED;
+    if (s.z <= 1) { resetStar(s); continue; }
+
+    int sx = CX + (int)(s.x * 80.0f / s.z);
+    int sy = CY + (int)(s.y * 80.0f / s.z);
+
+    if (sx < 0 || sx >= 160 || sy < 0 || sy >= 160) {
+      resetStar(s); continue;
+    }
+
+    uint8_t brightness = (uint8_t)((1.0f - s.z / 160.0f) * 220 + 35);
+    int     radius     = s.z < 50 ? 2 : 1;
+
+    gfx->fillCircle(sx, sy, radius, grey(brightness));
+    s.px = sx;
+    s.py = sy;
+  }
+
+  drawTitle();
+}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+  </div>
+
+  <!-- Troubleshooting -->
+  <div class="section" id="troubleshooting">
+    <h2>Troubleshooting</h2>
+    <div class="trouble-item">
+      <h3>Vertical lines or wrong colours</h3>
+      <ul>
+        <li>You're using the GC9A01 driver on a GC9D01 - use <code>Arduino_GC9D01</code> not <code>Arduino_GC9A01</code></li>
+        <li>Check the IPS argument in the constructor is <code>false</code> - <code>true</code> inverts colours</li>
+      </ul>
+    </div>
+    <div class="trouble-item">
+      <h3>Upload fails / goes into download mode</h3>
+      <ul>
+        <li>DC is wired to GPIO 2 - move it to GPIO 27 (GPIO 2 is a boot strapping pin)</li>
+      </ul>
+    </div>
+    <div class="trouble-item">
+      <h3>White screen / no output</h3>
+      <ul>
+        <li>Check wiring - DC and CS are the most commonly swapped pins</li>
+        <li>Confirm RST is connected, not floating</li>
+        <li>Confirm VCC is on 3.3V - this module has no 5V tolerance</li>
+        <li>Confirm BL is connected to 3.3V</li>
+      </ul>
+    </div>
+    <div class="trouble-item">
+      <h3>Library not found / compile error</h3>
+      <ul>
+        <li>Make sure you installed <strong>Arduino_GFX Library</strong> by Moon On Our Nation, version 1.6.1 or later</li>
+        <li>Close and reopen Arduino IDE after installing</li>
+      </ul>
+    </div>
+  </div>
+
+</GuideLayout>
+
+<style>
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.5rem; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    min-width: 400px;
+  }
+  th {
+    background: #1a1a2e;
+    color: #fff;
+    text-align: left;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+  }
+  td {
+    padding: 0.55rem 1rem;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+  }
+  tr:nth-child(even) td { background: #fafafa; }
+  tr:last-child td { border-bottom: none; }
+</style>

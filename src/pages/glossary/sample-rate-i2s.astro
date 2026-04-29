@@ -1,0 +1,137 @@
+---
+import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
+---
+<GlossaryEntry
+  category="Audio"
+  title="Sample Rate"
+  subtitle="How many audio samples per second — and why it controls both quality and file size"
+  backTo="/guides/max98357a-esp32-audio#sketch"
+  backLabel="Back to MAX98357A guide"
+  highlights={[
+    '44100 Hz = CD quality, ~88KB per second of audio',
+    '22050 Hz = half the size, speech stays clear',
+    '16000 Hz = nearly triple the capacity, voice only',
+    'SAMPLE_RATE in the sketch must match ffmpeg -ar',
+  ]}
+>
+  <svg slot="svg" viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:320px;display:block;margin:auto">
+    <rect x="10" y="10" width="300" height="140" rx="8" fill="#1e1e2e" stroke="#313244" stroke-width="1.5"/>
+    <!-- waveform line -->
+    <polyline points="20,80 40,50 60,80 80,110 100,80 120,50 140,80 160,110 180,80 200,50 220,80 240,110 260,80 280,50 300,80"
+      fill="none" stroke="#cba6f7" stroke-width="1.5"/>
+    <!-- sample dots -->
+    <circle cx="40"  cy="50"  r="4" fill="#a6e3a1"/>
+    <circle cx="80"  cy="110" r="4" fill="#a6e3a1"/>
+    <circle cx="120" cy="50"  r="4" fill="#a6e3a1"/>
+    <circle cx="160" cy="110" r="4" fill="#a6e3a1"/>
+    <circle cx="200" cy="50"  r="4" fill="#a6e3a1"/>
+    <circle cx="240" cy="110" r="4" fill="#a6e3a1"/>
+    <circle cx="280" cy="50"  r="4" fill="#a6e3a1"/>
+    <text x="160" y="148" fill="#6c7086" font-size="8" font-family="monospace" text-anchor="middle">each dot = one sample</text>
+  </svg>
+  <Fragment slot="desc">
+    <p>Sample rate is how many times per second the audio is measured and stored as a number. At 44100 Hz, the audio is captured 44,100 times every second. Each of those measurements is one 16-bit integer in your <code>clip.h</code> array.</p>
+    <p>More samples per second = higher quality = larger file. Fewer samples = smaller file = lower quality. The trick is finding the lowest rate that still sounds good for what you need.</p>
+
+    <h2>The practical options</h2>
+    <table>
+      <thead><tr><th>Sample rate</th><th>Size per second</th><th>Good for</th></tr></thead>
+      <tbody>
+        <tr><td>44100 Hz</td><td>~88 KB</td><td>Music, anything that needs to sound great</td></tr>
+        <tr><td>22050 Hz</td><td>~44 KB</td><td>Speech, sound effects - half the size, still clear</td></tr>
+        <tr><td>16000 Hz</td><td>~32 KB</td><td>Voice only - nearly triple capacity, fully intelligible</td></tr>
+      </tbody>
+    </table>
+
+    <h2>They must match</h2>
+    <p>The sample rate in your sketch and the rate you converted the audio to with ffmpeg must be the same number. If they do not match, the audio will play back at the wrong speed and wrong pitch.</p>
+    <p>In the sketch:</p>
+    <div class="code-wrap">
+      <pre><code>#define SAMPLE_RATE 22050</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>In the ffmpeg conversion command:</p>
+    <div class="code-wrap">
+      <pre><code>ffmpeg -y -i /tmp/myclip.wav -ar 22050 -ac 1 -acodec pcm_s16le /tmp/clip_i2s.wav</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>Change both together and they will always stay in sync.</p>
+  </Fragment>
+</GlossaryEntry>
+
+<style>
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    margin: 0.75rem 0 1.25rem;
+  }
+  th {
+    background: #1a1a2e;
+    color: #fff;
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+  }
+  td {
+    padding: 0.45rem 0.75rem;
+    border-bottom: 1px solid #eee;
+  }
+  tr:nth-child(even) td { background: #fafafa; }
+  tr:last-child td { border-bottom: none; }
+
+  pre {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    margin: 0.75rem 0 1rem;
+  }
+  pre code {
+    font-family: "Fira Code", "Cascadia Code", Consolas, monospace;
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+  code {
+    font-family: "Fira Code", "Cascadia Code", Consolas, monospace;
+    background: #f0f0f0;
+    padding: 0.15em 0.4em;
+    border-radius: 3px;
+    font-size: 0.875em;
+    color: #c0392b;
+  }
+  .code-wrap { position: relative; }
+  .copy-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: #313244;
+    color: #cdd6f4;
+    border: none;
+    border-radius: 4px;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.72rem;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .code-wrap:hover .copy-btn { opacity: 1; }
+  .copy-btn.copied { color: #a6e3a1; }
+</style>
+
+<script is:inline>
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pre = btn.closest('.code-wrap').querySelector('pre');
+      navigator.clipboard.writeText(pre.innerText).then(() => {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+      });
+    });
+  });
+</script>
