@@ -1,0 +1,120 @@
+---
+import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
+---
+<GlossaryEntry
+  category="Microcontroller"
+  title="ESP32-C3"
+  subtitle="Using the ESP32-C3 with the MAX98357A guide - what changes, what stays the same"
+  backTo="/guides/max98357a-esp32-audio#wiring"
+  backLabel="Back to MAX98357A guide"
+  highlights={[
+    'Use GPIO4 (BCLK), GPIO5 (LRC), GPIO6 (DIN)',
+    'Select "ESP32C3 Dev Module" in Arduino IDE',
+    'Only change needed in the sketch: the three pin #defines',
+    'Same wiring to MAX98357A, same audio prep, same partition scheme',
+    'Avoid GPIO8, GPIO9, and GPIO11-17',
+  ]}
+>
+  <div slot="svg" style="display:flex;flex-direction:column;gap:0.75rem;align-items:center;">
+    <img src="/images/esp32c3-front.png" alt="ESP32-C3 Super Mini front - USB-C port and chip" style="max-width:260px;border-radius:6px;"/>
+    <img src="/images/esp32c3-back.png" alt="ESP32-C3 Super Mini back - pin labels including GPIO4, GPIO5, GPIO6" style="max-width:260px;border-radius:6px;"/>
+  </div>
+  <Fragment slot="desc">
+    <p>The ESP32-C3 is a single-core RISC-V microcontroller with WiFi and Bluetooth. It has one I2S peripheral and works with the MAX98357A guide - the only changes needed are the board selection in Arduino IDE and the three pin numbers in the sketch.</p>
+
+    <h2>Pins to use</h2>
+    <table>
+      <thead><tr><th>ESP32-C3 Pin</th><th>MAX98357A Pin</th><th>Signal</th></tr></thead>
+      <tbody>
+        <tr><td>5V</td><td>VIN</td><td>Power</td></tr>
+        <tr><td>GND</td><td>GND</td><td>Common ground</td></tr>
+        <tr><td>GPIO4</td><td>BCLK</td><td>I2S bit clock</td></tr>
+        <tr><td>GPIO5</td><td>LRC</td><td>I2S word select (LRCLK)</td></tr>
+        <tr><td>GPIO6</td><td>DIN</td><td>I2S data out from ESP32-C3</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Pins to avoid</h2>
+    <table>
+      <thead><tr><th>GPIO range</th><th>Why to avoid</th></tr></thead>
+      <tbody>
+        <tr><td>GPIO0</td><td>Boot strapping pin - affects startup mode</td></tr>
+        <tr><td>GPIO8, GPIO9</td><td>Strapping pins - can interfere with flashing</td></tr>
+        <tr><td>GPIO11-17</td><td>SPI flash - connected to internal flash chip</td></tr>
+        <tr><td>GPIO18, GPIO19</td><td>USB D- / D+ on boards with USB-CDC</td></tr>
+      </tbody>
+    </table>
+
+    <h2>Sketch changes</h2>
+    <p>The guide sketches already include the ESP32-C3 pin defines as commented-out alternatives. Comment out the ESP32 Dev Board lines and uncomment the C3 lines:</p>
+    <div class="code-wrap">
+      <pre><code>{`// comment these out:
+//#define I2S_BCLK   27
+//#define I2S_LRCLK  14
+//#define I2S_DOUT   13
+
+// uncomment these:
+#define I2S_BCLK   4
+#define I2S_LRCLK  5
+#define I2S_DOUT   6`}</code></pre>
+    </div>
+    <p style="font-size:0.85rem;color:#666;">The guide uses the legacy I2S driver which works on ESP32-C3 with Arduino-ESP32 v2.x, and still compiles on v3.x with deprecation warnings. Everything else in the sketch stays the same.</p>
+
+    <h2>Arduino IDE settings</h2>
+    <table>
+      <thead><tr><th>Setting</th><th>Value</th></tr></thead>
+      <tbody>
+        <tr><td>Board</td><td>ESP32C3 Dev Module</td></tr>
+        <tr><td>Partition Scheme</td><td>Huge APP (3MB No OTA) - same as the guide</td></tr>
+        <tr><td>USB CDC On Boot</td><td>Enabled (needed if you use Serial.print for debugging)</td></tr>
+      </tbody>
+    </table>
+
+    <h2>What stays the same</h2>
+    <ul>
+      <li>Wiring to the MAX98357A module - pin functions are identical</li>
+      <li>Audio preparation with espeak-ng and ffmpeg</li>
+      <li>WAV-to-header Python script</li>
+      <li>The rest of the sketch - I2S config, DMA setup, playback loop</li>
+    </ul>
+  </Fragment>
+</GlossaryEntry>
+
+<style>
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    margin: 0.75rem 0 1.25rem;
+  }
+  th {
+    background: #1a1a2e;
+    color: #fff;
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+  }
+  td {
+    padding: 0.45rem 0.75rem;
+    border-bottom: 1px solid #eee;
+  }
+  tr:nth-child(even) td { background: #fafafa; }
+  tr:last-child td { border-bottom: none; }
+
+  .code-wrap {
+    position: relative;
+    background: #1a1a2e;
+    border-radius: 6px;
+    margin: 0.5rem 0 1rem;
+  }
+  .code-wrap pre {
+    margin: 0;
+    padding: 0.9rem 1rem;
+    overflow-x: auto;
+  }
+  .code-wrap code {
+    font-family: monospace;
+    font-size: 0.85rem;
+    color: #c9d1d9;
+  }
+</style>

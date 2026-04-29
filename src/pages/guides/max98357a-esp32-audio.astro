@@ -17,10 +17,10 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
 
   <div class="hero">
     <div class="category">Audio &bull; ESP32</div>
-    <h1>MAX98357A I2S Amplifier<br>with ESP32 Dev Board</h1>
+    <h1>MAX98357A I2S Amplifier<br>ESP32 Dev Board &bull; ESP32-C3</h1>
     <div class="meta">
       <div class="meta-item"><strong>Amp:</strong> MAX98357A (3.2W mono class-D, I2S)</div>
-      <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin)</div>
+      <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin) or ESP32-C3</div>
       <div class="meta-item"><strong>Speaker:</strong> 4-8&#8486; speaker</div>
       <div class="meta-item"><strong>Interface:</strong> I2S (digital)</div>
     </div>
@@ -38,7 +38,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <div class="card">
         <h3>Parts</h3>
         <ul>
-          <li><a href="/glossary/esp32-i2s" class="term-link">ESP32 Dev Board (38-pin)</a></li>
+          <li><a href="/glossary/esp32-i2s" class="term-link">ESP32 Dev Board (38-pin)</a> or <a href="/glossary/esp32c3-i2s" class="term-link">ESP32-C3</a></li>
           <li><a href="/glossary/max98357a" class="term-link">MAX98357A I2S amplifier module</a></li>
           <li><a href="/glossary/speaker-i2s" class="term-link">4-8&#8486; speaker</a></li>
           <li>Jumper wires</li>
@@ -81,16 +81,16 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <div class="table-wrap">
       <table>
         <thead>
-          <tr><th>MAX98357A Pin</th><th>ESP32 Dev Board</th><th>Notes</th></tr>
+          <tr><th>MAX98357A Pin</th><th>ESP32 Dev Board</th><th>ESP32-C3</th><th>Notes</th></tr>
         </thead>
         <tbody>
-          <tr><td>VIN</td><td>5V</td><td>5V recommended - 3.3V works at lower volume</td></tr>
-          <tr><td>GND</td><td>GND</td><td></td></tr>
-          <tr><td>LRC</td><td>GPIO14</td><td>I2S word select (LRCLK)</td></tr>
-          <tr><td>BCLK</td><td>GPIO27</td><td>I2S bit clock</td></tr>
-          <tr><td>DIN</td><td>GPIO13</td><td>I2S data out from ESP32</td></tr>
-          <tr><td>SD</td><td>Not connected</td><td>Leave floating - amp enabled, mono mix of L+R</td></tr>
-          <tr><td>GAIN</td><td>Not connected</td><td>Leave floating - 9dB gain</td></tr>
+          <tr><td>VIN</td><td>5V</td><td>5V</td><td>5V recommended - 3.3V works at lower volume</td></tr>
+          <tr><td>GND</td><td>GND</td><td>GND</td><td></td></tr>
+          <tr><td>LRC</td><td>GPIO14</td><td>GPIO5</td><td>I2S word select (LRCLK)</td></tr>
+          <tr><td>BCLK</td><td>GPIO27</td><td>GPIO4</td><td>I2S bit clock</td></tr>
+          <tr><td>DIN</td><td>GPIO13</td><td>GPIO6</td><td>I2S data out</td></tr>
+          <tr><td>SD</td><td>Not connected</td><td>Not connected</td><td>Leave floating - amp enabled, mono mix of L+R</td></tr>
+          <tr><td>GAIN</td><td>Not connected</td><td>Not connected</td><td>Leave floating - 9dB gain</td></tr>
         </tbody>
       </table>
     </div>
@@ -102,6 +102,10 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <div class="callout callout-tip">
       <strong>No capacitors needed.</strong>
       The signal path is fully digital right up to the amp chip. There is no DC offset to block and the module handles its own power supply filtering. Three signal wires and power is all you need.
+    </div>
+    <div class="callout callout-why">
+      <strong>Using an ESP32-C3?</strong>
+      The pin numbers and board selection are different. <a href="/glossary/esp32c3-i2s" class="term-link">See ESP32-C3 differences &rarr;</a>
     </div>
   </div>
 
@@ -231,13 +235,18 @@ print('Done: ' + str(len(samples)) + ' samples -> ' + output_file)`}</code></pre
  * Generates a 440Hz sine wave via I2S to confirm
  * wiring and amp are working. No audio file needed.
  *
- * Board:   ESP32 Dev Board (38-pin)
+ * Board:   ESP32 Dev Board (38-pin) or ESP32-C3
  * Amp:     MAX98357A
  *
- * Wiring:
+ * Wiring (ESP32 Dev Board):
  *   VIN  -> 5V      GND  -> GND
  *   BCLK -> GPIO27  LRC  -> GPIO14
  *   DIN  -> GPIO13  SD   -> not connected
+ *
+ * Wiring (ESP32-C3):
+ *   VIN  -> 5V      GND  -> GND
+ *   BCLK -> GPIO4   LRC  -> GPIO5
+ *   DIN  -> GPIO6   SD   -> not connected
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
@@ -247,9 +256,14 @@ print('Done: ' + str(len(samples)) + ' samples -> ' + output_file)`}</code></pre
 #include <driver/i2s.h>
 #include <math.h>
 
+// ESP32 Dev Board (38-pin)
 #define I2S_BCLK   27
 #define I2S_LRCLK  14
 #define I2S_DOUT   13
+// ESP32-C3 - comment out the three lines above and uncomment these:
+//#define I2S_BCLK   4
+//#define I2S_LRCLK  5
+//#define I2S_DOUT   6
 
 #define SAMPLE_RATE 44100
 #define FREQUENCY   440
@@ -314,13 +328,18 @@ void loop() {
  * Plays a 16-bit PCM audio clip stored in PROGMEM
  * via I2S to a MAX98357A amplifier and speaker.
  *
- * Board:   ESP32 Dev Board (38-pin)
+ * Board:   ESP32 Dev Board (38-pin) or ESP32-C3
  * Amp:     MAX98357A
  *
- * Wiring:
+ * Wiring (ESP32 Dev Board):
  *   VIN  -> 5V      GND  -> GND
  *   BCLK -> GPIO27  LRC  -> GPIO14
  *   DIN  -> GPIO13  SD   -> not connected
+ *
+ * Wiring (ESP32-C3):
+ *   VIN  -> 5V      GND  -> GND
+ *   BCLK -> GPIO4   LRC  -> GPIO5
+ *   DIN  -> GPIO6   SD   -> not connected
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
@@ -330,9 +349,14 @@ void loop() {
 #include <driver/i2s.h>
 #include "clip.h"
 
+// ESP32 Dev Board (38-pin)
 #define I2S_BCLK    27
 #define I2S_LRCLK   14
 #define I2S_DOUT    13
+// ESP32-C3 - comment out the three lines above and uncomment these:
+//#define I2S_BCLK   4
+//#define I2S_LRCLK  5
+//#define I2S_DOUT   6
 
 #define SAMPLE_RATE 44100  // 44100=CD quality, 22050=half size, 16000=speech only
 #define VOLUME      0.8f   // 0.0 = silent, 1.0 = max
