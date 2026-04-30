@@ -52,11 +52,13 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
           <li>Any image editor (GIMP, Photoshop, etc.)</li>
         </ul>
         <p style="margin-top:1rem;font-size:0.85rem;color:#666;">Install on Arch Linux:</p>
+        <p class="cmd-label">Copy and paste into terminal</p>
         <div class="code-wrap">
           <pre><code>sudo pacman -S python python-pillow</code></pre>
           <button class="copy-btn">Copy</button>
         </div>
         <p style="font-size:0.85rem;color:#666;">Other systems:</p>
+        <p class="cmd-label">Copy and paste into terminal</p>
         <div class="code-wrap">
           <pre><code>pip3 install Pillow</code></pre>
           <button class="copy-btn">Copy</button>
@@ -157,6 +159,7 @@ if __name__ == "__main__":
 
     <h3>Run it</h3>
     <p style="font-size:0.88rem;color:#555;margin-bottom:0.4rem;">Replace the <code class="placeholder">highlighted</code> parts with your own values:</p>
+    <p class="cmd-label">Copy and paste into terminal</p>
     <div class="code-wrap">
       <pre><code>python3 image_to_rgb565.py myface.png myface</code></pre>
       <button class="copy-btn">Copy</button>

@@ -5,11 +5,12 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   title="Multiple Audio Clips - MAX98357A I2S"
   description="Play multiple audio clips on an ESP32 with a MAX98357A I2S amplifier. Button trigger, auto sequence, and linked playlist modes. Covers clip prep, updated header script, and full sketches."
   toc={[
+    {href: '#what-you-need', label: 'What You Need'},
+    {href: '#how-it-works', label: 'How It Works'},
+    {href: '#wiring', label: 'Wiring'},
     {href: '#before-you-start', label: 'Before You Start'},
     {href: '#preparing-clips', label: 'Preparing Your Clips'},
-    {href: '#button-mode', label: 'Button Mode'},
-    {href: '#auto-sequence', label: 'Auto Sequence'},
-    {href: '#linked-sequence', label: 'Linked Sequence'},
+    {href: '#the-sketch', label: 'The Sketch'},
     {href: '#troubleshooting', label: 'Troubleshooting'},
   ]}
 >
@@ -18,32 +19,150 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <div class="category">Audio &bull; ESP32</div>
     <h1>Multiple Audio Clips<br>MAX98357A I2S</h1>
     <div class="meta">
-      <div class="meta-item"><strong>Modes:</strong> Button trigger, Auto sequence, Linked playlist</div>
+      <div class="meta-item"><strong>Mode:</strong> Auto sequence - loops forever</div>
       <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin) or ESP32-C3</div>
       <div class="meta-item"><strong>Amp:</strong> MAX98357A</div>
     </div>
-    <div class="series-step">MAX98357A I2S Series - Step 3 of 3 - Multiple clips</div>
-    <div class="badge badge-wip">&#9881; Under Construction</div>
+    <div class="series-step">MAX98357A I2S Series - Step 3 of 4 - Multiple clips, auto sequence</div>
+    <div class="badge badge-confirmed">&#10003; Confirmed Working</div>
   </div>
 
-  <!-- Before You Start -->
-  <div class="section" id="before-you-start">
-    <h2>Before You Start</h2>
-    <p>This guide extends the MAX98357A I2S guide. You should already have the amp wired up and a single clip playing before continuing here.</p>
-    <p style="margin-top:0.75rem;">This guide covers only what is new: preparing multiple clips with unique variable names, and three sketch modes for triggering playback.</p>
+  <!-- What You Need -->
+  <div class="section" id="what-you-need">
+    <h2>What You Need</h2>
+    <div class="two-col">
+      <div class="card">
+        <h3>Parts</h3>
+        <ul>
+          <li><a href="/glossary/esp32-i2s" class="term-link">ESP32 Dev Board (38-pin)</a> or <a href="/glossary/esp32c3-i2s" class="term-link">ESP32-C3</a></li>
+          <li><a href="/glossary/max98357a" class="term-link">MAX98357A I2S amplifier module</a></li>
+          <li><a href="/glossary/speaker-i2s" class="term-link">4-8&#8486; speaker (1W or above)</a></li>
+          <li>Tactile button <em>(button mode only)</em></li>
+          <li>Jumper wires</li>
+          <li>USB-C cable for flashing</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Software</h3>
+        <ul>
+          <li>Arduino IDE with ESP32 board support</li>
+          <li><code>ffmpeg</code> - convert audio files</li>
+          <li>Python 3 - WAV to header conversion</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- How It Works -->
+  <div class="section" id="how-it-works">
+    <h2>How It Works</h2>
+    <p>The hardware is the same as Step 2 - the MAX98357A receives I2S audio from the ESP32, converts it to analogue, and drives the speaker. Three signal wires, no capacitors, no DAC.</p>
+    <p>This guide adds multiple clips. Each clip is a separate C array stored in flash via <code>PROGMEM</code> and included as a header file. The sketch works through all clips in sequence and loops forever. For button-triggered playback and custom sequence control, see <a href="/guides/max98357a-playback-modes" class="term-link">Step 4 &rarr;</a></p>
     <div class="callout callout-why">
       <strong>Flash memory budget</strong>
       Three 2-second clips at 44100Hz 16-bit mono = ~517KB of flash. The ESP32 has around 1.2MB available under the Huge APP partition scheme. Plan your clips accordingly - drop to 22050Hz for speech to halve the size per clip.
     </div>
   </div>
 
+  <!-- Wiring -->
+  <div class="section" id="wiring">
+    <h2>Wiring</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>MAX98357A Pin</th><th>ESP32 Dev Board</th><th>ESP32-C3</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>VIN</td><td>5V</td><td>5V</td><td>5V recommended - 3.3V works at lower volume</td></tr>
+          <tr><td>GND</td><td>GND</td><td>GND</td><td></td></tr>
+          <tr><td>LRC</td><td>GPIO14</td><td>GPIO5</td><td>I2S word select (LRCLK)</td></tr>
+          <tr><td>BCLK</td><td>GPIO27</td><td>GPIO4</td><td>I2S bit clock</td></tr>
+          <tr><td>DIN</td><td>GPIO13</td><td>GPIO6</td><td>I2S data out</td></tr>
+          <tr><td>SD</td><td>Not connected</td><td>Not connected</td><td>Leave floating - amp enabled</td></tr>
+          <tr><td>GAIN</td><td>Not connected</td><td>Not connected</td><td>Leave floating - 9dB gain</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Button wiring is covered in the Button Mode section below - it is only needed for that mode.</p>
+  </div>
+
+  <!-- Before You Start -->
+  <div class="section" id="before-you-start">
+    <h2>Before You Start</h2>
+    <p>This guide extends the MAX98357A I2S guide. You should already have the amp wired up and a single clip playing before continuing here.</p>
+  </div>
+
+  <h3 class="steps-outline-heading">Page outline</h3>
+  <ol class="steps-outline">
+    <li>Create a folder and cut each clip into it</li>
+    <li>Save the converter script</li>
+    <li>Run the batch - one header file per clip</li>
+    <li>Flash the sketch</li>
+  </ol>
+
   <!-- Preparing Clips -->
   <div class="section" id="preparing-clips">
     <h2>Preparing Your Clips</h2>
-    <p>Run the ffmpeg conversion once per clip as in <a href="/guides/max98357a-esp32-audio#preparing-audio" class="term-link">Step 2 - Playing a Clip</a>. Then use the updated script below to convert each WAV to a header file - it takes a third argument for the variable name so each header is unique.</p>
+    <p>Create a folder, cut your clips into it one by one, then run the batch converter to produce a header file for each clip.</p>
+
+    <h3>Create a clips folder</h3>
+    <p>Create a folder to hold your WAV files:</p>
+    <p class="cmd-label">Copy and paste into terminal</p>
+    <div class="code-wrap">
+      <pre><code>mkdir ~/myclips</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>Name each WAV file using a valid C identifier - letters, numbers, and underscores only, and it cannot start with a number. <code>clip1.wav</code>, <code>beep_short.wav</code>, and <code>alarm2.wav</code> are fine. <code>my clip.wav</code>, <code>hello-world.wav</code>, and <code>1beep.wav</code> are not - the filename becomes the variable name in the sketch, and an invalid name will generate broken C code that won't compile.</p>
+
+    <h3>Find your clip in a video</h3>
+    <p>Open the video in a media player such as VLC. Play through until you find the section you want. Note the timestamp at the bottom of the player for where your clip starts and where it ends.</p>
+    <div class="callout callout-tip">
+      <strong>Reading the timestamp:</strong>
+      In VLC the current position shows in the bottom left as HH:MM:SS. Pause at the start of your clip, write down the time, then do the same for the end.
+    </div>
+    <p>Use ffmpeg to cut just that section and save it directly into your clips folder:</p>
+    <p class="cmd-label">Copy and paste into terminal</p>
+    <div class="code-wrap">
+      <pre><code>ffmpeg -i ~/Videos/myvideo.mp4 -ss 00:01:23 -to 00:01:27 ~/myclips/clip1.wav</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p><strong>What the flags mean:</strong></p>
+    <ul class="flag-list">
+      <li><code>-i ~/Videos/myvideo.mp4</code> - your input file. Not sure of the path? Drag the file into a terminal and the full path pastes in automatically.</li>
+      <li><code>-ss 00:01:23</code> - start cutting at this timestamp</li>
+      <li><code>-to 00:01:27</code> - stop cutting at this timestamp</li>
+      <li><code>~/myclips/clip1.wav</code> - output, saved directly into your clips folder. The filename becomes the variable name in the sketch - follow the naming rules above.</li>
+    </ul>
+    <p><strong>Examples:</strong></p>
+    <p style="font-size:0.85rem;color:#666;margin-bottom:0.25rem;">If the source file is in your home folder:</p>
+    <p class="cmd-label">Copy and paste into terminal</p>
+    <div class="code-wrap">
+      <pre><code>ffmpeg -i ~/mysound.wav -ss 00:01:23 -to 00:01:27 ~/myclips/clip1.wav</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p style="font-size:0.85rem;color:#666;margin-bottom:0.25rem;">If the source file is in Downloads:</p>
+    <p class="cmd-label">Copy and paste into terminal</p>
+    <div class="code-wrap">
+      <pre><code>ffmpeg -i ~/Downloads/mysound.mp3 -ss 00:01:23 -to 00:01:27 ~/myclips/clip1.wav</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p style="font-size:0.85rem;color:#666;margin-bottom:0.25rem;">If the source is a video - ffmpeg extracts the audio automatically:</p>
+    <p class="cmd-label">Copy and paste into terminal</p>
+    <div class="code-wrap">
+      <pre><code>ffmpeg -i ~/Videos/myvideo.mp4 -ss 00:01:23 -to 00:01:27 ~/myclips/clip1.wav</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p style="font-size:0.85rem;color:#666;margin-bottom:0.25rem;">If the filename has spaces - wrap it in quotes:</p>
+    <p class="cmd-label">Copy and paste into terminal</p>
+    <div class="code-wrap">
+      <pre><code>ffmpeg -i "/home/j/My Audio File.wav" -ss 00:01:23 -to 00:01:27 ~/myclips/clip1.wav</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+
+    <p>Repeat for each clip, changing the timestamps and filename each time. Once all clips are in the folder, move on.</p>
 
     <h3>New script - wav_to_i2s_header_multi.py</h3>
-    <p>Save this as a new file - <code>wav_to_i2s_header_multi.py</code>. It works the same as the script from Step 2 but takes a third argument for the variable name so each header is unique. <a href="/glossary/save-a-script-i2s-multi" class="term-link">How to save a script &rarr;</a></p>
+    <p>Save this as a new file - <code>wav_to_i2s_header_multi.py</code>. It takes a third argument for the variable name so each header is unique. <a href="/glossary/save-a-script-i2s-multi" class="term-link">How to save a script &rarr;</a></p>
     <div class="code-wrap">
       <pre><code>{`import sys, wave, struct
 
@@ -74,45 +193,34 @@ print('Done: ' + str(len(samples)) + ' samples -> ' + output_file)`}</code></pre
       <button class="copy-btn">Copy</button>
     </div>
 
-    <h3>Convert your clips</h3>
-    <p>Run once per clip. The third argument sets the variable name used in the sketch. It must be a valid C identifier - letters, numbers, and underscores only, and it cannot start with a number. <code>clip1</code>, <code>beep_short</code>, and <code>alarm2</code> are fine. <code>my clip</code>, <code>hello-world</code>, and <code>1beep</code> are not - they will generate broken C code that won't compile.</p>
+    <h3>Convert all clips</h3>
+    <p>Once all your WAVs are in the folder, run this once to convert the whole batch. Each <code>.h</code> file is named after its source file automatically.</p>
+    <p class="cmd-label">Copy and paste into terminal</p>
     <div class="code-wrap">
-      <pre><code>python3 wav_to_i2s_header_multi.py /tmp/clip1_i2s.wav clip1.h clip1</code></pre>
-      <button class="copy-btn">Copy</button>
-    </div>
-    <p>Repeat for each clip, changing the input file, output header name, and variable name - for example <code>clip2_i2s.wav clip2.h clip2</code>, <code>clip3_i2s.wav clip3.h clip3</code>, and so on.</p>
-    <p>Each header defines <code>clip1_data</code> / <code>clip1_len</code>, <code>clip2_data</code> / <code>clip2_len</code>, and so on. Place all <code>.h</code> files in your <a href="/glossary/sketch-folder" class="term-link">sketch folder</a> alongside the <code>.ino</code> file.</p>
-
-    <h3>Batch convert a whole folder</h3>
-    <p>If all your source files are in one folder, this shell loop runs ffmpeg and the header script on every WAV in one go. Each <code>.h</code> file is named after its source file automatically.</p>
-    <div class="code-wrap">
-      <pre><code>{`for f in ~/Downloads/myclips/*.wav; do
+      <pre><code>{`for f in ~/myclips/*.wav; do
   name=$(basename "$f" .wav)
   ffmpeg -y -i "$f" -ar 44100 -ac 1 -acodec pcm_s16le "/tmp/\${name}_i2s.wav"
   python3 ~/wav_to_i2s_header_multi.py "/tmp/\${name}_i2s.wav" "\${name}.h" "$name"
 done`}</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
-    <p>Replace <code>~/Downloads/myclips/</code> with the path to your audio folder. The <code>.h</code> files land in your current directory - move them all into your sketch folder alongside the <code>.ino</code> file.</p>
+    <p>The <code>.h</code> files land in your current directory - move them all into your <a href="/glossary/sketch-folder" class="term-link">sketch folder</a> alongside the <code>.ino</code> file.</p>
+    <div class="callout callout-why">
+      <strong>Why 44100 Hz?</strong>
+      It is the CD standard - the lowest sample rate that captures the full range of human hearing cleanly. At 44100 Hz 16-bit mono, one second of audio = ~88KB of flash. With multiple clips that adds up fast - three 2-second clips is around 517KB. For speech, drop to 22050 Hz to halve the size per clip with no noticeable quality loss. Change the <code>-ar</code> value in the batch loop and update <code>SAMPLE_RATE</code> in the sketch to match.
+    </div>
     <div class="callout callout-tip">
       <strong>MP3, M4A, video files?</strong>
       ffmpeg handles any format - just change <code>*.wav</code> to match your files: <code>*.mp3</code>, <code>*.m4a</code>, <code>*.mp4</code>, etc.
     </div>
   </div>
 
-  <!-- Button Mode -->
-  <div class="section" id="button-mode">
-    <h2>Button Mode</h2>
-    <p>Each button press plays the next clip. After the last it loops back to the first. Connect a button between <strong>GPIO18</strong> and <strong>GND</strong> - no resistor needed, the sketch uses the internal pull-up.</p>
-    <div class="table-wrap">
-      <table>
-        <thead><tr><th>Button leg</th><th>ESP32 Dev Board</th><th>ESP32-C3</th></tr></thead>
-        <tbody>
-          <tr><td>One leg</td><td>GPIO18</td><td>GPIO10</td></tr>
-          <tr><td>Other leg</td><td>GND</td><td>GND</td></tr>
-        </tbody>
-      </table>
-    </div>
+
+
+  <!-- The Sketch -->
+  <div class="section" id="the-sketch">
+    <h2>The Sketch</h2>
+    <p>Plays every clip in order, repeating forever.</p>
     <div class="code-wrap">
       <pre><code>{`/*
  * We stand on the shoulders of giants when we build
@@ -120,20 +228,18 @@ done`}</code></pre>
  * That doesn't make us giants. Be humble.
  * Create with care. Open source is the way.
  *
- * MAX98357A I2S - Multiple Clips, Button Trigger
+ * MAX98357A I2S - Multiple Clips, Auto Sequence
  * -----------------------------------------------
- * Cycles through audio clips on each button press.
+ * Plays all clips in order, repeating forever.
  *
  * Board:   ESP32 Dev Board (38-pin) or ESP32-C3
  * Amp:     MAX98357A
  *
  * Wiring (ESP32 Dev Board):
  *   BCLK -> GPIO27  LRC -> GPIO14  DIN -> GPIO13
- *   Button: GPIO18 -> GND
  *
  * Wiring (ESP32-C3):
  *   BCLK -> GPIO4   LRC -> GPIO5   DIN -> GPIO6
- *   Button: GPIO10 -> GND
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
@@ -149,12 +255,10 @@ done`}</code></pre>
 #define I2S_BCLK    27
 #define I2S_LRCLK   14
 #define I2S_DOUT    13
-#define BUTTON_PIN  18
-// ESP32-C3 - comment out the four lines above and uncomment these:
+// ESP32-C3 - comment out the three lines above and uncomment these:
 //#define I2S_BCLK    4
 //#define I2S_LRCLK   5
 //#define I2S_DOUT    6
-//#define BUTTON_PIN  10
 
 #define SAMPLE_RATE 44100
 #define VOLUME      0.8f
@@ -177,8 +281,6 @@ const Clip clips[] = {
 };
 const int CLIP_COUNT = sizeof(clips) / sizeof(clips[0]);
 
-int currentClip = 0;
-
 void playClip(const Clip& c) {
   size_t total = c.len / sizeof(int16_t);
   size_t written;
@@ -194,8 +296,6 @@ void playClip(const Clip& c) {
 }
 
 void setup() {
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
-
   i2s_config_t cfg = {
     .mode                 = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX),
     .sample_rate          = SAMPLE_RATE,
@@ -219,253 +319,12 @@ void setup() {
 }
 
 void loop() {
-  if (digitalRead(BUTTON_PIN) == LOW) {
-    delay(30);
-    if (digitalRead(BUTTON_PIN) == LOW) {
-      playClip(clips[currentClip]);
-      currentClip = (currentClip + 1) % CLIP_COUNT;
-      while (digitalRead(BUTTON_PIN) == LOW);
-    }
-  }
-}`}</code></pre>
-      <button class="copy-btn">Copy</button>
-    </div>
-  </div>
-
-  <!-- Auto Sequence -->
-  <div class="section" id="auto-sequence">
-    <h2>Auto Sequence</h2>
-    <p>Plays every clip in order on boot. No button needed. Move the loop into <code>loop()</code> instead of <code>setup()</code> to repeat forever.</p>
-    <div class="code-wrap">
-      <pre><code>{`/*
- * We stand on the shoulders of giants when we build
- * with knowledge gained from others' efforts.
- * That doesn't make us giants. Be humble.
- * Create with care. Open source is the way.
- *
- * MAX98357A I2S - Multiple Clips, Auto Sequence
- * -----------------------------------------------
- * Plays all clips in order once on boot.
- *
- * Board:   ESP32 Dev Board (38-pin) or ESP32-C3
- * Amp:     MAX98357A
- *
- * Wiring (ESP32 Dev Board):
- *   BCLK -> GPIO27  LRC -> GPIO14  DIN -> GPIO13
- *
- * Wiring (ESP32-C3):
- *   BCLK -> GPIO4   LRC -> GPIO5   DIN -> GPIO6
- *
- * Open source - MIT Licence
- * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/max98357a-multiple-clips
- */
-
-#include <driver/i2s.h>
-#include "clip1.h"
-#include "clip2.h"
-#include "clip3.h"
-
-// ESP32 Dev Board (38-pin)
-#define I2S_BCLK    27
-#define I2S_LRCLK   14
-#define I2S_DOUT    13
-// ESP32-C3 - comment out the three lines above and uncomment these:
-//#define I2S_BCLK    4
-//#define I2S_LRCLK   5
-//#define I2S_DOUT    6
-
-#define SAMPLE_RATE 44100
-#define VOLUME      0.8f
-#define BUF_SAMPLES 256
-
-int16_t i2s_buf[BUF_SAMPLES * 2];
-
-struct Clip {
-  const int16_t* data;
-  size_t len;
-};
-
-// Add or remove rows to match your clips.
-// The name here must match the var_name you used with wav_to_i2s_header.py.
-// Also update the #include lines above.
-const Clip clips[] = {
-  { clip1_data, clip1_len },
-  { clip2_data, clip2_len },
-  { clip3_data, clip3_len },
-};
-const int CLIP_COUNT = sizeof(clips) / sizeof(clips[0]);
-
-void playClip(const Clip& c) {
-  size_t total = c.len / sizeof(int16_t);
-  size_t written;
-  for (size_t pos = 0; pos < total; pos += BUF_SAMPLES) {
-    size_t count = min((size_t)BUF_SAMPLES, total - pos);
-    for (size_t i = 0; i < count; i++) {
-      int16_t s = (int16_t)((int16_t)pgm_read_word(&c.data[pos + i]) * VOLUME);
-      i2s_buf[i * 2]     = s;
-      i2s_buf[i * 2 + 1] = s;
-    }
-    i2s_write(I2S_NUM_0, i2s_buf, count * 2 * sizeof(int16_t), &written, portMAX_DELAY);
-  }
-}
-
-void setup() {
-  i2s_config_t cfg = {
-    .mode                 = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX),
-    .sample_rate          = SAMPLE_RATE,
-    .bits_per_sample      = I2S_BITS_PER_SAMPLE_16BIT,
-    .channel_format       = I2S_CHANNEL_FMT_RIGHT_LEFT,
-    .communication_format = I2S_COMM_FORMAT_STAND_I2S,
-    .intr_alloc_flags     = ESP_INTR_FLAG_LEVEL1,
-    .dma_buf_count        = 8,
-    .dma_buf_len          = 64,
-    .use_apll             = false,
-    .tx_desc_auto_clear   = true,
-  };
-  i2s_pin_config_t pins = {
-    .bck_io_num   = I2S_BCLK,
-    .ws_io_num    = I2S_LRCLK,
-    .data_out_num = I2S_DOUT,
-    .data_in_num  = I2S_PIN_NO_CHANGE,
-  };
-  i2s_driver_install(I2S_NUM_0, &cfg, 0, NULL);
-  i2s_set_pin(I2S_NUM_0, &pins);
-
   for (int i = 0; i < CLIP_COUNT; i++) {
     playClip(clips[i]);
     delay(500);
   }
-}
-
-void loop() { }`}</code></pre>
+}`}</code></pre>
       <button class="copy-btn">Copy</button>
-    </div>
-    <div class="callout callout-tip">
-      <strong>Loop continuously?</strong>
-      Move the <code>for</code> loop and <code>delay</code> into <code>loop()</code> instead of <code>setup()</code> - the sequence repeats forever.
-    </div>
-  </div>
-
-  <!-- Linked Sequence -->
-  <div class="section" id="linked-sequence">
-    <h2>Linked Sequence</h2>
-    <p>Define a playlist array to control the exact order - repeat clips, skip some, or build a specific sequence. The <code>clips[]</code> array is indexed from 0.</p>
-    <div class="code-wrap">
-      <pre><code>{`/*
- * We stand on the shoulders of giants when we build
- * with knowledge gained from others' efforts.
- * That doesn't make us giants. Be humble.
- * Create with care. Open source is the way.
- *
- * MAX98357A I2S - Multiple Clips, Linked Sequence
- * ------------------------------------------------
- * Plays clips in a user-defined playlist order.
- *
- * Board:   ESP32 Dev Board (38-pin) or ESP32-C3
- * Amp:     MAX98357A
- *
- * Wiring (ESP32 Dev Board):
- *   BCLK -> GPIO27  LRC -> GPIO14  DIN -> GPIO13
- *
- * Wiring (ESP32-C3):
- *   BCLK -> GPIO4   LRC -> GPIO5   DIN -> GPIO6
- *
- * Open source - MIT Licence
- * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/max98357a-multiple-clips
- */
-
-#include <driver/i2s.h>
-#include "clip1.h"
-#include "clip2.h"
-#include "clip3.h"
-
-// ESP32 Dev Board (38-pin)
-#define I2S_BCLK    27
-#define I2S_LRCLK   14
-#define I2S_DOUT    13
-// ESP32-C3 - comment out the three lines above and uncomment these:
-//#define I2S_BCLK    4
-//#define I2S_LRCLK   5
-//#define I2S_DOUT    6
-
-#define SAMPLE_RATE 44100
-#define VOLUME      0.8f
-#define BUF_SAMPLES 256
-
-int16_t i2s_buf[BUF_SAMPLES * 2];
-
-struct Clip {
-  const int16_t* data;
-  size_t len;
-};
-
-// Add or remove rows to match your clips.
-// The name here must match the var_name you used with wav_to_i2s_header.py.
-// Also update the #include lines above.
-const Clip clips[] = {
-  { clip1_data, clip1_len },  // index 0
-  { clip2_data, clip2_len },  // index 1
-  { clip3_data, clip3_len },  // index 2
-};
-
-// edit this to set the playback order - repeat indices to replay a clip
-const int playlist[]   = { 0, 1, 0, 2, 1 };
-const int PLAYLIST_LEN = sizeof(playlist) / sizeof(playlist[0]);
-
-void playClip(const Clip& c) {
-  size_t total = c.len / sizeof(int16_t);
-  size_t written;
-  for (size_t pos = 0; pos < total; pos += BUF_SAMPLES) {
-    size_t count = min((size_t)BUF_SAMPLES, total - pos);
-    for (size_t i = 0; i < count; i++) {
-      int16_t s = (int16_t)((int16_t)pgm_read_word(&c.data[pos + i]) * VOLUME);
-      i2s_buf[i * 2]     = s;
-      i2s_buf[i * 2 + 1] = s;
-    }
-    i2s_write(I2S_NUM_0, i2s_buf, count * 2 * sizeof(int16_t), &written, portMAX_DELAY);
-  }
-}
-
-void setup() {
-  i2s_config_t cfg = {
-    .mode                 = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX),
-    .sample_rate          = SAMPLE_RATE,
-    .bits_per_sample      = I2S_BITS_PER_SAMPLE_16BIT,
-    .channel_format       = I2S_CHANNEL_FMT_RIGHT_LEFT,
-    .communication_format = I2S_COMM_FORMAT_STAND_I2S,
-    .intr_alloc_flags     = ESP_INTR_FLAG_LEVEL1,
-    .dma_buf_count        = 8,
-    .dma_buf_len          = 64,
-    .use_apll             = false,
-    .tx_desc_auto_clear   = true,
-  };
-  i2s_pin_config_t pins = {
-    .bck_io_num   = I2S_BCLK,
-    .ws_io_num    = I2S_LRCLK,
-    .data_out_num = I2S_DOUT,
-    .data_in_num  = I2S_PIN_NO_CHANGE,
-  };
-  i2s_driver_install(I2S_NUM_0, &cfg, 0, NULL);
-  i2s_set_pin(I2S_NUM_0, &pins);
-
-  for (int i = 0; i < PLAYLIST_LEN; i++) {
-    playClip(clips[playlist[i]]);
-    delay(500);
-  }
-}
-
-void loop() { }`}</code></pre>
-      <button class="copy-btn">Copy</button>
-    </div>
-    <div class="callout callout-why">
-      <strong>How the index works</strong>
-      <code>playlist[i]</code> is a number pointing to a position in the <code>clips[]</code> array. <code>0</code> = clip1, <code>1</code> = clip2, <code>2</code> = clip3. Repeat an index to play that clip more than once. The example <code>{ 0, 1, 0, 2, 1 }</code> plays: clip1, clip2, clip1 again, clip3, clip2 again.
-    </div>
-    <div class="callout callout-tip">
-      <strong>Loop continuously?</strong>
-      Move the <code>for</code> loop and <code>delay</code> into <code>loop()</code> instead of <code>setup()</code> - the playlist repeats forever.
     </div>
   </div>
 
@@ -497,6 +356,22 @@ void loop() { }`}</code></pre>
 </GuideLayout>
 
 <style>
+  .steps-outline-heading {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #888;
+    margin: 0 0 0.4rem;
+  }
+
+  .steps-outline {
+    margin: 0 0 2rem 1.2rem;
+    font-size: 0.95rem;
+    line-height: 1.9;
+    color: #333;
+  }
+
   .table-wrap { overflow-x: auto; margin: 1rem 0 1.5rem; }
   table {
     width: 100%;

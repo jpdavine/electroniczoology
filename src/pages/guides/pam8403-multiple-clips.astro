@@ -46,6 +46,7 @@ import Base from '../../layouts/Base.astro';
     <div class="section" id="preparing-clips">
       <h2>Preparing Your Clips</h2>
       <p>Run the ffmpeg and <code>wav_to_header.py</code> process from the PAM guide once per clip. Name each header file and variable uniquely:</p>
+      <p class="cmd-label">Copy and paste into terminal</p>
       <div class="code-wrap">
         <pre><code>python3 wav_to_header.py /tmp/clip1_8bit.wav clip1.h clip1
 python3 wav_to_header.py /tmp/clip2_8bit.wav clip2.h clip2
@@ -348,6 +349,12 @@ void loop() &#123; &#125;</code></pre>
 </Base>
 
 <style>
+  .cmd-label {
+    font-size: 0.75rem;
+    color: #888;
+    margin: 0 0 0.25rem;
+  }
+
   .pam-wrap {
     max-width: 1140px;
     margin: 0 auto;

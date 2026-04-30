@@ -26,9 +26,6 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <div class="badge">&#10003; Confirmed Working</div>
   </div>
 
-  <div class="terminal-note">
-    Commands are shown in dark code blocks - open a terminal and press <strong>Enter</strong> after each one.
-  </div>
 
   <!-- What You Need -->
   <div class="section" id="what-you-need">
@@ -55,6 +52,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
           <li>Python 3 - WAV to C header</li>
         </ul>
         <p style="margin-top:1rem;font-size:0.85rem;color:#666;">Install on Arch Linux:</p>
+        <p class="cmd-label">Copy and paste into terminal</p>
         <div class="code-wrap">
           <pre><code>sudo pacman -S espeak-ng ffmpeg python</code></pre>
           <button class="copy-btn">Copy</button>
@@ -108,12 +106,14 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   <div class="section" id="preparing-audio">
     <h2>Preparing an Audio Clip</h2>
     <h3>Option 1 - Generate a voice clip with espeak-ng</h3>
+    <p class="cmd-label">Copy and paste into terminal</p>
     <div class="code-wrap">
       <pre><code>espeak-ng -w /tmp/myclip.wav "your text here"</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
     <h3>Option 2 - Extract from an existing audio/video file</h3>
     <p>Use ffmpeg to cut a section from any WAV, MP3, or video file:</p>
+    <p class="cmd-label">Copy and paste into terminal</p>
     <div class="code-wrap">
       <pre><code>ffmpeg -i /path/to/source.wav -ss 00:00:05 -to 00:00:08 /tmp/myclip.wav</code></pre>
       <button class="copy-btn">Copy</button>
@@ -131,27 +131,32 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     </div>
     <p><strong>Examples:</strong></p>
     <p style="font-size:0.85rem;color:#666;margin-bottom:0.25rem;">If the file is in your home folder:</p>
+    <p class="cmd-label">Copy and paste into terminal</p>
     <div class="code-wrap">
       <pre><code>ffmpeg -i ~/mysound.wav -ss 00:00:05 -to 00:00:08 /tmp/myclip.wav</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
     <p style="font-size:0.85rem;color:#666;margin-bottom:0.25rem;">If the file is in Downloads:</p>
+    <p class="cmd-label">Copy and paste into terminal</p>
     <div class="code-wrap">
       <pre><code>ffmpeg -i ~/Downloads/mysound.mp3 -ss 00:00:05 -to 00:00:08 /tmp/myclip.wav</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
     <p style="font-size:0.85rem;color:#666;margin-bottom:0.25rem;">If the file is a video - ffmpeg extracts the audio automatically:</p>
+    <p class="cmd-label">Copy and paste into terminal</p>
     <div class="code-wrap">
       <pre><code>ffmpeg -i ~/Videos/myvideo.mp4 -ss 00:00:05 -to 00:00:08 /tmp/myclip.wav</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
     <p style="font-size:0.85rem;color:#666;margin-bottom:0.25rem;">If the filename has spaces - wrap it in quotes:</p>
+    <p class="cmd-label">Copy and paste into terminal</p>
     <div class="code-wrap">
       <pre><code>ffmpeg -i "/home/j/My Audio File.wav" -ss 00:00:05 -to 00:00:08 /tmp/myclip.wav</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
     <h3>Convert to ESP32-friendly format</h3>
     <p>The ESP32 DAC works best at 8kHz, 8-bit, mono:</p>
+    <p class="cmd-label">Copy and paste into terminal</p>
     <div class="code-wrap">
       <pre><code>ffmpeg -y -i /tmp/myclip.wav -ar 8000 -ac 1 -acodec pcm_u8 /tmp/myclip_8bit.wav</code></pre>
       <button class="copy-btn">Copy</button>
@@ -207,6 +212,7 @@ with open(output_file, 'w') as f:
 print(f"Done: &#123;len(pcm)&#125; bytes -> &#123;output_file&#125;")</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
+    <p class="cmd-label">Copy and paste into terminal</p>
     <div class="code-wrap">
       <pre><code>python3 wav_to_header.py /tmp/myclip_8bit.wav myclip.h myclip</code></pre>
       <button class="copy-btn">Copy</button>

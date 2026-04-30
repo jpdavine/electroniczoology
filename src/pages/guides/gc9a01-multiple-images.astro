@@ -58,6 +58,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   <div class="section" id="batch">
     <h2>Batch Convert</h2>
     <p>If all your images are in one folder, convert them all at once with a shell loop. Each <code>.h</code> file is named after its source image automatically.</p>
+    <p class="cmd-label">Copy and paste into terminal</p>
     <div class="code-wrap">
       <pre><code>for f in ~/Downloads/myimages/*.png; do name=$(basename "$f" .png); python3 ~/image_to_rgb565.py "$f" "$name"; done</code></pre>
       <button class="copy-btn">Copy</button>
