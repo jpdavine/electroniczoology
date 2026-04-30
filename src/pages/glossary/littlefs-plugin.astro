@@ -10,7 +10,7 @@ import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
   highlights={[
     'The plugin adds a filesystem upload option to Arduino IDE',
     'Files in your sketch data/ folder get uploaded to the ESP32',
-    'Copy the .vsix file into ~/.arduinoIDE/plugins/ - no extraction needed',
+    'Extract the .vsix (it is a zip) and put the folder into ~/.arduinoIDE/plugins/',
     'Upload the filesystem separately from the sketch - they are independent',
   ]}
 >
@@ -39,12 +39,13 @@ import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
     <h2>Arduino IDE 2.x - install the plugin</h2>
 
     <h3>Step 1 - Download the plugin</h3>
-    <p>Go to the <a href="https://github.com/earlephilhower/arduino-littlefs-upload/releases" class="term-link" target="_blank" rel="noopener">arduino-littlefs-upload releases page &rarr;</a> and download the latest <code>.vsix</code> file. Do not extract it.</p>
+    <p>Go to the <a href="https://github.com/earlephilhower/arduino-littlefs-upload/releases" class="term-link" target="_blank" rel="noopener">arduino-littlefs-upload releases page &rarr;</a> and download the latest <code>.vsix</code> file.</p>
 
-    <h3>Step 2 - Copy it into the plugins folder</h3>
+    <h3>Step 2 - Extract and install</h3>
+    <p>The <code>.vsix</code> is a zip file. Extract it - you will get a folder. That folder goes into <code>~/.arduinoIDE/plugins/</code>.</p>
     <ol>
       <li>Close Arduino IDE completely</li>
-      <li>Create the plugins folder - open a terminal and run:</li>
+      <li>Create the plugins folder:</li>
     </ol>
     <p class="cmd-label">Copy and paste into terminal</p>
     <div class="code-wrap">
@@ -52,7 +53,8 @@ import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
       <button class="copy-btn">Copy</button>
     </div>
     <ol start="3">
-      <li>Copy the downloaded <code>.vsix</code> file into <code>~/.arduinoIDE/plugins/</code></li>
+      <li>Right-click the <code>.vsix</code> file and extract it - or rename it to <code>.zip</code> and extract</li>
+      <li>Move the extracted folder into <code>~/.arduinoIDE/plugins/</code></li>
       <li>Restart Arduino IDE</li>
     </ol>
     <div class="callout callout-why">
