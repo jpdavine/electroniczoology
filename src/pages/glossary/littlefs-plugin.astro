@@ -10,7 +10,7 @@ import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
   highlights={[
     'The plugin adds a filesystem upload option to Arduino IDE',
     'Files in your sketch data/ folder get uploaded to the ESP32',
-    'Arduino IDE 2.x uses a .vsix plugin installed via the command palette',
+    'Copy the .vsix file into ~/.arduinoIDE/plugins/ - no extraction needed',
     'Upload the filesystem separately from the sketch - they are independent',
   ]}
 >
@@ -36,22 +36,27 @@ import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
   <Fragment slot="desc">
     <p>Arduino IDE does not upload the <code>data/</code> folder by default. The LittleFS plugin adds that ability - it packages everything in the folder into a filesystem image and flashes it to the ESP32's filesystem partition.</p>
 
-    <h2>Arduino IDE 2.x - VSIX plugin</h2>
+    <h2>Arduino IDE 2.x - install the plugin</h2>
 
     <h3>Step 1 - Download the plugin</h3>
-    <p>Go to the <a href="https://github.com/earlephilhower/arduino-littlefs-upload/releases" class="term-link" target="_blank" rel="noopener">arduino-littlefs-upload releases page &rarr;</a> and download the latest <code>.vsix</code> file. No extraction needed - install it as-is.</p>
+    <p>Go to the <a href="https://github.com/earlephilhower/arduino-littlefs-upload/releases" class="term-link" target="_blank" rel="noopener">arduino-littlefs-upload releases page &rarr;</a> and download the latest <code>.vsix</code> file. Do not extract it.</p>
 
-    <h3>Step 2 - Install it</h3>
+    <h3>Step 2 - Copy it into the plugins folder</h3>
     <ol>
-      <li>Open Arduino IDE 2.x</li>
-      <li>Open the command palette: <strong>Ctrl+Shift+P</strong></li>
-      <li>Type <strong>Install plugin from VSIX</strong> and select it</li>
-      <li>Navigate to and select the downloaded <code>.vsix</code> file</li>
-      <li>Restart Arduino IDE when prompted</li>
+      <li>Close Arduino IDE completely</li>
+      <li>Open your file manager and enable hidden files (<strong>Ctrl+H</strong> in most file managers)</li>
+      <li>Navigate to <code>~/.arduinoIDE/</code></li>
+      <li>Create a folder named <code>plugins</code> if it does not exist</li>
+      <li>Copy the downloaded <code>.vsix</code> file into that folder</li>
+      <li>Restart Arduino IDE</li>
     </ol>
+    <div class="callout callout-why">
+      <strong>The folder is hidden.</strong>
+      <code>.arduinoIDE</code> starts with a dot, which makes it hidden by default on Linux. Press <strong>Ctrl+H</strong> in your file manager to show hidden folders.
+    </div>
 
     <h3>Step 3 - Confirm it installed</h3>
-    <p>Open the command palette again (<strong>Ctrl+Shift+P</strong>) and type <strong>Upload LittleFS</strong>. If the option appears, the plugin is installed correctly.</p>
+    <p>Open the command palette (<strong>Ctrl+Shift+P</strong>) and type <strong>Upload LittleFS</strong>. If <strong>Upload LittleFS to Pico/ESP8266/ESP32</strong> appears, the plugin is ready.</p>
 
 
     <h2>How to upload the filesystem</h2>
