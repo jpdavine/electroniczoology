@@ -10,6 +10,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     {href: '#button-mode', label: 'Button Mode'},
     {href: '#auto-sequence', label: 'Auto Sequence'},
     {href: '#linked-sequence', label: 'Linked Sequence'},
+    {href: '#troubleshooting', label: 'Troubleshooting'},
   ]}
 >
 
@@ -21,7 +22,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin) or ESP32-C3</div>
       <div class="meta-item"><strong>Amp:</strong> MAX98357A</div>
     </div>
-    <div class="series-step">MAX98357A I2S Series &mdash; Step 3 of 3 &mdash; Multiple clips</div>
+    <div class="series-step">MAX98357A I2S Series - Step 3 of 3 - Multiple clips</div>
     <div class="badge badge-wip">&#9881; Under Construction</div>
   </div>
 
@@ -32,7 +33,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <p style="margin-top:0.75rem;">This guide covers only what is new: preparing multiple clips with unique variable names, and three sketch modes for triggering playback.</p>
     <div class="callout callout-why">
       <strong>Flash memory budget</strong>
-      Three 2-second clips at 44100Hz 16-bit mono = ~528KB of flash. The ESP32 has around 1.2MB available under the Huge APP partition scheme. Plan your clips accordingly - drop to 22050Hz for speech to halve the size per clip.
+      Three 2-second clips at 44100Hz 16-bit mono = ~517KB of flash. The ESP32 has around 1.2MB available under the Huge APP partition scheme. Plan your clips accordingly - drop to 22050Hz for speech to halve the size per clip.
     </div>
   </div>
 
@@ -74,7 +75,7 @@ print('Done: ' + str(len(samples)) + ' samples -> ' + output_file)`}</code></pre
     </div>
 
     <h3>Convert your clips</h3>
-    <p>Run once per clip. The third argument sets the variable name used in the sketch.</p>
+    <p>Run once per clip. The third argument sets the variable name used in the sketch. It must be a valid C identifier - letters, numbers, and underscores only, and it cannot start with a number. <code>clip1</code>, <code>beep_short</code>, and <code>alarm2</code> are fine. <code>my clip</code>, <code>hello-world</code>, and <code>1beep</code> are not - they will generate broken C code that won't compile.</p>
     <div class="code-wrap">
       <pre><code>python3 wav_to_i2s_header.py /tmp/clip1_i2s.wav clip1.h clip1</code></pre>
       <button class="copy-btn">Copy</button>
@@ -166,18 +167,13 @@ struct Clip {
   size_t len;
 };
 
-// Clip names - change to match the var_name you used with wav_to_i2s_header.py
+// Add or remove rows to match your clips.
+// The name here must match the var_name you used with wav_to_i2s_header.py.
 // Also update the #include lines above.
-#define C1  clip1
-#define C2  clip2
-#define C3  clip3
-#define _MK(n) { n##_data, n##_len }
-#define MK(n)  _MK(n)
-
 const Clip clips[] = {
-  MK(C1),
-  MK(C2),
-  MK(C3),
+  { clip1_data, clip1_len },
+  { clip2_data, clip2_len },
+  { clip3_data, clip3_len },
 };
 const int CLIP_COUNT = sizeof(clips) / sizeof(clips[0]);
 
@@ -290,18 +286,13 @@ struct Clip {
   size_t len;
 };
 
-// Clip names - change to match the var_name you used with wav_to_i2s_header.py
+// Add or remove rows to match your clips.
+// The name here must match the var_name you used with wav_to_i2s_header.py.
 // Also update the #include lines above.
-#define C1  clip1
-#define C2  clip2
-#define C3  clip3
-#define _MK(n) { n##_data, n##_len }
-#define MK(n)  _MK(n)
-
 const Clip clips[] = {
-  MK(C1),
-  MK(C2),
-  MK(C3),
+  { clip1_data, clip1_len },
+  { clip2_data, clip2_len },
+  { clip3_data, clip3_len },
 };
 const int CLIP_COUNT = sizeof(clips) / sizeof(clips[0]);
 
@@ -410,18 +401,13 @@ struct Clip {
   size_t len;
 };
 
-// Clip names - change to match the var_name you used with wav_to_i2s_header.py
+// Add or remove rows to match your clips.
+// The name here must match the var_name you used with wav_to_i2s_header.py.
 // Also update the #include lines above.
-#define C1  clip1
-#define C2  clip2
-#define C3  clip3
-#define _MK(n) { n##_data, n##_len }
-#define MK(n)  _MK(n)
-
 const Clip clips[] = {
-  MK(C1),  // index 0
-  MK(C2),  // index 1
-  MK(C3),  // index 2
+  { clip1_data, clip1_len },  // index 0
+  { clip2_data, clip2_len },  // index 1
+  { clip3_data, clip3_len },  // index 2
 };
 
 // edit this to set the playback order - repeat indices to replay a clip
@@ -476,6 +462,35 @@ void loop() { }`}</code></pre>
     <div class="callout callout-why">
       <strong>How the index works</strong>
       <code>playlist[i]</code> is a number pointing to a position in the <code>clips[]</code> array. <code>0</code> = clip1, <code>1</code> = clip2, <code>2</code> = clip3. Repeat an index to play that clip more than once. The example <code>{ 0, 1, 0, 2, 1 }</code> plays: clip1, clip2, clip1 again, clip3, clip2 again.
+    </div>
+    <div class="callout callout-tip">
+      <strong>Loop continuously?</strong>
+      Move the <code>for</code> loop and <code>delay</code> into <code>loop()</code> instead of <code>setup()</code> - the playlist repeats forever.
+    </div>
+  </div>
+
+  <!-- Troubleshooting -->
+  <div class="section" id="troubleshooting">
+    <h2>Troubleshooting</h2>
+    <div class="trouble-item">
+      <h3>Linker error: multiple definition of &lsquo;audio_data&rsquo;</h3>
+      <ul>
+        <li>Two header files are using the same variable name. Each clip must have a unique <code>var_name</code> when you run <code>wav_to_i2s_header.py</code> - check that you passed a different third argument for each clip.</li>
+      </ul>
+    </div>
+    <div class="trouble-item">
+      <h3>Sketch too large - won&rsquo;t fit in flash</h3>
+      <ul>
+        <li>Switch to the Huge APP partition scheme in Arduino IDE under Tools &rarr; Partition Scheme. This gives around 1.2MB for your sketch and clips combined.</li>
+        <li>Drop the sample rate: re-convert your clips with <code>-ar 22050</code> in ffmpeg and update <code>SAMPLE_RATE</code> in the sketch. Speech stays clear at 22050Hz and clips are half the size.</li>
+        <li>Trim clips shorter - every second at 44100Hz 16-bit mono is ~86KB.</li>
+      </ul>
+    </div>
+    <div class="trouble-item">
+      <h3>Compile error: &lsquo;clip1_data&rsquo; was not declared in this scope</h3>
+      <ul>
+        <li>The <code>#include</code> line at the top of the sketch doesn&rsquo;t match the <code>.h</code> filename you generated. Check that <code>clip1.h</code> is in your sketch folder and that the filename in the <code>#include</code> matches exactly.</li>
+      </ul>
     </div>
   </div>
 
