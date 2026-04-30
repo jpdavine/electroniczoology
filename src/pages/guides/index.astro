@@ -3,12 +3,39 @@ import Base from '../../layouts/Base.astro';
 
 const guides = [
   {
-    slug: 'max98357a-esp32-audio',
-    title: 'MAX98357A I2S Amplifier - ESP32 Dev Board & ESP32-C3',
-    description: 'Play audio on an ESP32 Dev Board or ESP32-C3 using a MAX98357A I2S amplifier. Digital audio direct from the ESP32 - no DAC, no caps. Covers wiring, I2S setup, audio prep, and the full sketch.',
+    slug: 'max98357a-wiring-tone-test',
+    title: 'MAX98357A I2S - Wiring & Tone Test',
+    description: 'Wire up a MAX98357A I2S amplifier to an ESP32 Dev Board or ESP32-C3 and confirm it works with a 440Hz tone test sketch. No audio files needed.',
     category: 'Audio',
     date: '2026-04-29',
     status: 'confirmed',
+    series: 'MAX98357A I2S Series',
+    step: 1,
+    stepDesc: 'Wiring & tone test',
+    tags: ['ESP32', 'ESP32-C3', 'MAX98357A', 'I2S', 'Audio', 'Arduino'],
+  },
+  {
+    slug: 'max98357a-esp32-audio',
+    title: 'MAX98357A I2S Amplifier - ESP32 Dev Board & ESP32-C3',
+    description: 'Play audio on an ESP32 Dev Board or ESP32-C3 using a MAX98357A I2S amplifier. Digital audio direct from the ESP32 - no DAC, no caps. Covers audio prep, WAV-to-header conversion, and the full sketch.',
+    category: 'Audio',
+    date: '2026-04-29',
+    status: 'confirmed',
+    series: 'MAX98357A I2S Series',
+    step: 2,
+    stepDesc: 'Playing a clip from PROGMEM',
+    tags: ['ESP32', 'ESP32-C3', 'MAX98357A', 'I2S', 'Audio', 'Arduino'],
+  },
+  {
+    slug: 'max98357a-multiple-clips',
+    title: 'Multiple Audio Clips - MAX98357A I2S',
+    description: 'Play multiple audio clips on an ESP32 with a MAX98357A I2S amplifier. Button trigger, auto sequence, and linked playlist modes.',
+    category: 'Audio',
+    date: '2026-04-29',
+    status: 'wip',
+    series: 'MAX98357A I2S Series',
+    step: 3,
+    stepDesc: 'Multiple clips - button, sequence, playlist',
     tags: ['ESP32', 'ESP32-C3', 'MAX98357A', 'I2S', 'Audio', 'Arduino'],
   },
   {
@@ -32,7 +59,7 @@ const guides = [
   },
   {
     slug: 'gc9d01-round-display-esp32',
-    title: 'GC9D01 160x160 Round TFT Display with ESP32',
+    title: 'GC9D01 160x160 Round TFT with ESP32',
     description: 'Wire and drive a GC9D01 160x160 round TFT with an ESP32. Covers the common GC9A01 mislabelling problem, correct library and constructor, wiring gotchas, and a confirmed working test sketch.',
     category: 'Display',
     date: '2026-04-29',
@@ -48,34 +75,61 @@ const guides = [
     status: 'confirmed',
     series: 'GC9A01 Display Series',
     step: 1,
-    stepDesc: 'Getting it working — wiring and first display',
+    stepDesc: 'Wiring and first display',
     tags: ['ESP32', 'GC9A01', 'TFT', 'SPI', 'Arduino'],
   },
   {
     slug: 'gc9a01-custom-image',
-    title: 'Display a Custom Image on the GC9A01 Round TFT',
+    title: 'Display a Custom Image on the GC9A01',
     description: 'Convert any image to RGB565 and display it on a GC9A01 240x240 round IPS TFT with an ESP32. Covers image prep in GIMP, the Python conversion script, and the full Arduino sketch.',
     category: 'Display',
     date: '2026-04-28',
     status: 'confirmed',
     series: 'GC9A01 Display Series',
     step: 2,
-    stepDesc: 'Your first image — converting and displaying custom art',
+    stepDesc: 'Custom image from PROGMEM',
     tags: ['ESP32', 'GC9A01', 'RGB565', 'Images', 'Python', 'Arduino'],
   },
   {
     slug: 'gc9a01-multiple-images',
-    title: 'Cycling Multiple Images on the GC9A01 Round TFT',
+    title: 'Cycling Multiple Images on the GC9A01',
     description: 'Batch convert a folder of images to RGB565 and cycle through them on a GC9A01 round display. Covers batch conversion, flash memory limits, partition scheme, and the full cycling sketch.',
     category: 'Display',
     date: '2026-04-28',
     status: 'confirmed',
     series: 'GC9A01 Display Series',
     step: 3,
-    stepDesc: 'Cycling images — batch conversion and memory management',
+    stepDesc: 'Cycling images - batch conversion and memory',
     tags: ['ESP32', 'GC9A01', 'RGB565', 'Images', 'Python', 'Arduino'],
   },
 ];
+
+// Build tree preserving guide order
+const categoryOrder: string[] = [];
+const tree: Record<string, Array<
+  | { type: 'series'; name: string; guides: typeof guides }
+  | { type: 'standalone'; guide: (typeof guides)[0] }
+>> = {};
+
+for (const g of guides) {
+  if (!tree[g.category]) {
+    tree[g.category] = [];
+    categoryOrder.push(g.category);
+  }
+  if (g.series) {
+    const existing = tree[g.category].find(n => n.type === 'series' && n.name === g.series) as { type: 'series'; name: string; guides: typeof guides } | undefined;
+    if (existing) {
+      existing.guides.push(g);
+    } else {
+      tree[g.category].push({ type: 'series', name: g.series, guides: [g] });
+    }
+  } else {
+    tree[g.category].push({ type: 'standalone', guide: g });
+  }
+}
+
+const totalCount = guides.length;
+const catCounts = Object.fromEntries(categoryOrder.map(cat => [cat, guides.filter(g => g.category === cat).length]));
 ---
 <Base title="Guides">
 
@@ -85,37 +139,57 @@ const guides = [
     <p>Step-by-step guides built on real hardware in the garage. Confirmed working means tested and verified. Untested means the code is written but not yet run on hardware.</p>
   </div>
 
-  <div class="guide-list">
-    {(() => {
-      let lastSeries = null;
-      return guides.map((g) => {
-        const seriesHeader = g.series && g.series !== lastSeries
-          ? (lastSeries = g.series, <div class="series-label">{g.series}</div>)
-          : (lastSeries = g.series || null, null);
-        return (
-          <>
-            {seriesHeader}
-            <a class={`guide-row ${g.series && g.step ? 'guide-row-series' : ''}`} href={`/guides/${g.slug}`}>
-              <div class="row-meta">
-                <span class="row-category">{g.category}</span>
-                {g.step && <span class="row-step">Step {g.step} — {g.stepDesc}</span>}
-                <span class={`row-badge ${g.status === 'untested' ? 'row-badge-untested' : g.status === 'wip' ? 'row-badge-wip' : ''}`}>
-                  {g.status === 'untested' ? '⚠ Untested' : g.status === 'wip' ? '⚙ Under Construction' : '✓ Confirmed Working'}
-                </span>
-                <span class="row-date">{new Date(g.date).toLocaleDateString('en-AU', { year: 'numeric', month: 'short' })}</span>
-              </div>
-              <h2>{g.title}</h2>
-              <p>{g.description}</p>
-              {g.tags && (
-                <div class="tags">
-                  {g.tags.map((t) => <span class="tag">{t}</span>)}
+  <div class="cat-filter">
+    <button class="cat-btn active" data-filter="all">All ({totalCount})</button>
+    {categoryOrder.map(cat => (
+      <button class="cat-btn" data-filter={cat}>{cat} ({catCounts[cat]})</button>
+    ))}
+  </div>
+
+  <div class="guide-tree">
+    {categoryOrder.map(cat => (
+      <div class="tree-category" data-cat={cat}>
+        <div class="tree-cat-header">
+          <span class="tree-cat-label">{cat}</span>
+        </div>
+
+        <div class="tree-branch">
+          {tree[cat].map(node => {
+            if (node.type === 'series') {
+              return (
+                <div class="tree-node">
+                  <div class="tree-series-label">{node.name}</div>
+                  <div class="tree-subbranch">
+                    {node.guides.map(g => (
+                      <a class="tree-leaf" href={`/guides/${g.slug}`}>
+                        <span class="leaf-left">
+                          {g.step && <span class="leaf-step">Step {g.step}</span>}
+                          <span class="leaf-title">{g.stepDesc || g.title}</span>
+                        </span>
+                        <span class={`leaf-badge ${g.status === 'untested' ? 'badge-untested' : g.status === 'wip' ? 'badge-wip' : 'badge-confirmed'}`}>
+                          {g.status === 'untested' ? '⚠ Untested' : g.status === 'wip' ? '⚙ WIP' : '✓ Confirmed'}
+                        </span>
+                      </a>
+                    ))}
+                  </div>
                 </div>
-              )}
-            </a>
-          </>
-        );
-      });
-    })()}
+              );
+            } else {
+              return (
+                <a class="tree-leaf tree-leaf-root" href={`/guides/${node.guide.slug}`}>
+                  <span class="leaf-left">
+                    <span class="leaf-title">{node.guide.title}</span>
+                  </span>
+                  <span class={`leaf-badge ${node.guide.status === 'untested' ? 'badge-untested' : node.guide.status === 'wip' ? 'badge-wip' : 'badge-confirmed'}`}>
+                    {node.guide.status === 'untested' ? '⚠ Untested' : node.guide.status === 'wip' ? '⚙ WIP' : '✓ Confirmed'}
+                  </span>
+                </a>
+              );
+            }
+          })}
+        </div>
+      </div>
+    ))}
   </div>
 
 </Base>
@@ -141,87 +215,176 @@ const guides = [
   }
   .page-header p { color: #555; }
 
-  .guide-list { display: flex; flex-direction: column; gap: 1rem; }
-
-  .guide-row {
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 1.5rem 2rem;
-    text-decoration: none;
-    color: inherit;
-    display: block;
-    transition: border-color 0.15s, box-shadow 0.15s;
+  /* Filter buttons */
+  .cat-filter {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
   }
-  .guide-row:hover {
-    border-color: #a855f7;
-    box-shadow: 0 4px 16px rgba(168,85,247,0.08);
+  .cat-btn {
+    background: #f0f0f0;
+    color: #555;
+    border: none;
+    border-radius: 20px;
+    padding: 0.4rem 1.1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .cat-btn:hover { background: #e8e0ff; color: #a855f7; }
+  .cat-btn.active { background: #a855f7; color: #fff; }
+
+  /* Tree */
+  .guide-tree {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
   }
 
-  .row-meta {
+  /* Category block */
+  .tree-category {}
+
+  .tree-cat-header {
+    margin-bottom: 0.6rem;
+  }
+  .tree-cat-label {
+    font-size: 0.68rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2.5px;
+    color: #bbb;
+  }
+
+  /* Main branch - vertical line down the left */
+  .tree-branch {
+    border-left: 2px solid #e8e8e8;
+    margin-left: 0.4rem;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Series node */
+  .tree-node {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.5rem;
+  }
+
+  .tree-series-label {
+    position: relative;
+    padding: 0.55rem 0.75rem 0.55rem 1.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: #a855f7;
+  }
+  .tree-series-label::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.25rem;
+    height: 2px;
+    background: #e8e8e8;
+  }
+
+  /* Sub-branch for series guides */
+  .tree-subbranch {
+    border-left: 2px solid #ece8f8;
+    margin-left: 1.75rem;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 0.5rem;
+  }
+
+  /* Guide leaf */
+  .tree-leaf {
+    position: relative;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 1rem;
-    margin-bottom: 0.4rem;
-    flex-wrap: wrap;
+    padding: 0.6rem 1rem 0.6rem 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    border-radius: 0 6px 6px 0;
+    transition: background 0.12s;
   }
-  .row-category {
-    font-size: 0.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: #a855f7;
+  .tree-leaf::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1.25rem;
+    height: 2px;
+    background: #ece8f8;
   }
-  .row-badge {
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: #fff;
-    background: #2ecc71;
-    padding: 0.1rem 0.55rem;
-    border-radius: 20px;
-    letter-spacing: 0.5px;
-  }
-  .row-badge-untested { background: #e67e22; }
-  .row-badge-wip { background: #6b7280; }
+  .tree-leaf:hover { background: #faf6ff; }
 
-  .series-label {
-    font-size: 0.72rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: #a855f7;
-    padding: 0.5rem 0 0.25rem;
-    margin-top: 0.5rem;
+  /* Root-level standalone guide (direct child of .tree-branch) */
+  .tree-leaf-root {
+    margin: 0.2rem 0;
   }
-  .guide-row-series {
-    border-left: 3px solid #a855f7;
-    padding-left: calc(2rem - 3px);
+  .tree-leaf-root::before {
+    background: #e8e8e8;
   }
-  .row-step {
-    font-size: 0.7rem;
+
+  .leaf-left {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .leaf-step {
+    font-size: 0.68rem;
     font-weight: 700;
     background: #f3e8ff;
     color: #a855f7;
-    padding: 0.1rem 0.55rem;
+    padding: 0.15rem 0.5rem;
     border-radius: 20px;
-    letter-spacing: 0.5px;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
-  .row-date { font-size: 0.8rem; color: #888; }
 
-  .guide-row h2 {
-    font-size: 1.15rem;
-    font-weight: 700;
+  .leaf-title {
+    font-size: 0.95rem;
+    font-weight: 600;
     color: #1a1a2e;
-    margin-bottom: 0.4rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .guide-row p { font-size: 0.9rem; color: #555; line-height: 1.6; }
 
-  .tags { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
-  .tag {
-    font-size: 0.75rem;
-    background: #f0f0f0;
-    color: #555;
-    padding: 0.2rem 0.6rem;
+  .leaf-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #fff;
+    padding: 0.15rem 0.6rem;
     border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
+  .badge-confirmed { background: #2ecc71; }
+  .badge-untested { background: #e67e22; }
+  .badge-wip { background: #6b7280; }
 </style>
+
+<script is:inline>
+  document.querySelectorAll('.cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const filter = btn.dataset.filter;
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.tree-category').forEach(el => {
+        el.style.display = filter === 'all' || el.dataset.cat === filter ? '' : 'none';
+      });
+    });
+  });
+</script>

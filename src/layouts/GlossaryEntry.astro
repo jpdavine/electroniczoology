@@ -4,7 +4,7 @@ const { category, title, subtitle, highlights, backTo = '/guides/pam8403-esp32-a
 ---
 <Base title={title} description={subtitle}>
   <div class="gloss-page">
-    <a href={backTo} class="back-link">&larr; {backLabel}</a>
+    <a href={backTo} class="back-link" onclick="history.back(); return false;">&larr; {backLabel}</a>
     <div class="gloss-card">
       <div class="gloss-svg">
         <slot name="svg" />

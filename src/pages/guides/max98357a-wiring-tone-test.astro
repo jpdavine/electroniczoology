@@ -1,0 +1,214 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+---
+<GuideLayout
+  title="MAX98357A I2S - Wiring & Tone Test"
+  description="Wire up a MAX98357A I2S amplifier to an ESP32 Dev Board or ESP32-C3 and confirm it works with a 440Hz tone test sketch. No audio files needed."
+  toc={[
+    {href: '#what-you-need', label: 'What You Need'},
+    {href: '#how-it-works', label: 'How It Works'},
+    {href: '#wiring', label: 'Wiring'},
+    {href: '#tone-test', label: 'Tone Test'},
+  ]}
+>
+
+  <div class="hero">
+    <div class="category">Audio &bull; ESP32</div>
+    <h1>MAX98357A I2S<br>Wiring &amp; Tone Test</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Amp:</strong> MAX98357A (3.2W mono class-D, I2S)</div>
+      <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin) or ESP32-C3</div>
+      <div class="meta-item"><strong>Goal:</strong> Confirm wiring and I2S are working</div>
+    </div>
+    <div class="series-step">MAX98357A I2S Series &mdash; Step 1 of 3 &mdash; Wiring and tone test</div>
+    <div class="badge badge-confirmed">&#10003; Confirmed Working</div>
+  </div>
+
+  <!-- What You Need -->
+  <div class="section" id="what-you-need">
+    <h2>What You Need</h2>
+    <div class="two-col">
+      <div class="card">
+        <h3>Parts</h3>
+        <ul>
+          <li><a href="/glossary/esp32-i2s" class="term-link">ESP32 Dev Board (38-pin)</a> or <a href="/glossary/esp32c3-i2s" class="term-link">ESP32-C3</a></li>
+          <li><a href="/glossary/max98357a" class="term-link">MAX98357A I2S amplifier module</a></li>
+          <li><a href="/glossary/speaker-i2s" class="term-link">4-8&#8486; speaker (1W or above)</a></li>
+          <li>Jumper wires</li>
+          <li>USB-C cable for flashing</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Software</h3>
+        <ul>
+          <li>Arduino IDE with ESP32 board support</li>
+        </ul>
+        <p style="margin-top:0.75rem;font-size:0.85rem;color:#666;">No audio tools needed for this step - the tone test generates a 440Hz sine wave in code.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- How It Works -->
+  <div class="section" id="how-it-works">
+    <h2>How It Works</h2>
+    <p>The MAX98357A is a digital I2S amplifier. It receives audio as a digital signal directly from the ESP32's I2S peripheral, converts it to analogue internally, and drives a speaker - all in one chip. No external DAC, no coupling capacitors, no decoupling capacitors. Just three signal wires and power.</p>
+    <p>I2S (Inter-IC Sound) carries three signals: a bit clock (BCLK), a word select line (LRCLK) that indicates left or right channel, and a serial data line (DIN). The ESP32 generates all three in hardware. The tone test sketch feeds a 440Hz sine wave directly into the I2S peripheral - no audio file, no conversion, just maths.</p>
+    <div class="callout callout-why">
+      <strong>Why I2S and not the DAC?</strong>
+      The ESP32 has DAC pins, but I2S is the better choice: the signal stays digital all the way to the amp, giving 16-bit resolution, no DC offset, and no noise pickup on the signal wire. The MAX98357A handles the digital-to-analogue conversion internally.
+    </div>
+  </div>
+
+  <!-- Wiring -->
+  <div class="section" id="wiring">
+    <h2>Wiring</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>MAX98357A Pin</th><th>ESP32 Dev Board</th><th>ESP32-C3</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>VIN</td><td>5V</td><td>5V</td><td>5V recommended - 3.3V works at lower volume</td></tr>
+          <tr><td>GND</td><td>GND</td><td>GND</td><td></td></tr>
+          <tr><td>LRC</td><td>GPIO14</td><td>GPIO5</td><td>I2S word select (LRCLK)</td></tr>
+          <tr><td>BCLK</td><td>GPIO27</td><td>GPIO4</td><td>I2S bit clock</td></tr>
+          <tr><td>DIN</td><td>GPIO13</td><td>GPIO6</td><td>I2S data out</td></tr>
+          <tr><td>SD</td><td>Not connected</td><td>Not connected</td><td>Leave floating - amp enabled, mono mix of L+R</td></tr>
+          <tr><td>GAIN</td><td>Not connected</td><td>Not connected</td><td>Leave floating - 9dB gain</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Connect your speaker to the two output terminals on the MAX98357A module. Polarity only affects phase - either orientation will produce sound. Use a speaker rated 1W or above.</p>
+    <div class="callout callout-tip">
+      <strong>No capacitors needed.</strong>
+      The signal path is fully digital right up to the amp chip. Three signal wires and power is all you need.
+    </div>
+    <div class="callout callout-why">
+      <strong>Using an ESP32-C3?</strong>
+      The pin numbers and board selection are different. <a href="/glossary/esp32c3-i2s" class="term-link">See ESP32-C3 differences &rarr;</a>
+    </div>
+  </div>
+
+  <!-- Tone Test -->
+  <div class="section" id="tone-test">
+    <h2>Tone Test</h2>
+    <p>Flash this sketch. It generates a continuous 440Hz sine wave via I2S - no audio file needed. If you hear a tone, wiring and I2S are confirmed working and you are ready for Step 2.</p>
+    <div class="code-wrap">
+      <pre><code>{`/*
+ * We stand on the shoulders of giants when we build
+ * with knowledge gained from others' efforts.
+ * That doesn't make us giants. Be humble.
+ * Create with care. Open source is the way.
+ *
+ * MAX98357A I2S - Tone Test
+ * --------------------------
+ * Generates a 440Hz sine wave via I2S to confirm
+ * wiring and amp are working. No audio file needed.
+ *
+ * Board:   ESP32 Dev Board (38-pin) or ESP32-C3
+ * Amp:     MAX98357A
+ *
+ * Wiring (ESP32 Dev Board):
+ *   VIN  -> 5V      GND  -> GND
+ *   BCLK -> GPIO27  LRC  -> GPIO14
+ *   DIN  -> GPIO13  SD   -> not connected
+ *
+ * Wiring (ESP32-C3):
+ *   VIN  -> 5V      GND  -> GND
+ *   BCLK -> GPIO4   LRC  -> GPIO5
+ *   DIN  -> GPIO6   SD   -> not connected
+ *
+ * Open source - MIT Licence
+ * Electronic Zoology - field notes from the garage
+ * https://electroniczoology.com/guides/max98357a-wiring-tone-test
+ */
+
+#include <driver/i2s.h>
+#include <math.h>
+
+// ESP32 Dev Board (38-pin)
+#define I2S_BCLK   27
+#define I2S_LRCLK  14
+#define I2S_DOUT   13
+// ESP32-C3 - comment out the three lines above and uncomment these:
+//#define I2S_BCLK   4
+//#define I2S_LRCLK  5
+//#define I2S_DOUT   6
+
+#define SAMPLE_RATE 44100
+#define FREQUENCY   440
+#define AMPLITUDE   20000
+#define BUF_SIZE    256
+
+int16_t buf[BUF_SIZE];
+
+void setup() {
+  i2s_config_t cfg = {
+    .mode                 = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX),
+    .sample_rate          = SAMPLE_RATE,
+    .bits_per_sample      = I2S_BITS_PER_SAMPLE_16BIT,
+    .channel_format       = I2S_CHANNEL_FMT_RIGHT_LEFT,
+    .communication_format = I2S_COMM_FORMAT_STAND_I2S,
+    .intr_alloc_flags     = ESP_INTR_FLAG_LEVEL1,
+    .dma_buf_count        = 8,
+    .dma_buf_len          = 64,
+    .use_apll             = false,
+    .tx_desc_auto_clear   = true,
+  };
+  i2s_pin_config_t pins = {
+    .bck_io_num   = I2S_BCLK,
+    .ws_io_num    = I2S_LRCLK,
+    .data_out_num = I2S_DOUT,
+    .data_in_num  = I2S_PIN_NO_CHANGE,
+  };
+  i2s_driver_install(I2S_NUM_0, &cfg, 0, NULL);
+  i2s_set_pin(I2S_NUM_0, &pins);
+}
+
+void loop() {
+  static uint32_t phase = 0;
+  size_t written;
+
+  for (int i = 0; i < BUF_SIZE; i += 2) {
+    int16_t sample = (int16_t)(AMPLITUDE * sinf(2.0f * M_PI * FREQUENCY * phase / SAMPLE_RATE));
+    buf[i]     = sample;
+    buf[i + 1] = sample;
+    phase++;
+    if (phase >= SAMPLE_RATE) phase = 0;
+  }
+
+  i2s_write(I2S_NUM_0, buf, sizeof(buf), &written, portMAX_DELAY);
+}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <div class="callout callout-tip">
+      <strong>Tone confirmed - ready for Step 2.</strong>
+      Once you hear the tone, move on to <a href="/guides/max98357a-esp32-audio" class="term-link">Step 2 - Playing a clip &rarr;</a>
+    </div>
+  </div>
+
+</GuideLayout>
+
+<style>
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.5rem; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    min-width: 400px;
+  }
+  th {
+    background: #1a1a2e;
+    color: #fff;
+    text-align: left;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+  }
+  td {
+    padding: 0.55rem 1rem;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+  }
+  tr:nth-child(even) td { background: #fafafa; }
+  tr:last-child td { border-bottom: none; }
+</style>
