@@ -93,7 +93,9 @@ print('Done: ' + str(len(samples)) + ' samples -> ' + output_file)`}</code></pre
     <p><strong>Text editor:</strong> save as <code>wav_to_i2s_header_multi.py</code>. Make sure it saves as plain text - not a Word document or rich text file. Your home folder (<code>/home/yourname/</code>) or a project folder works well.</p>
 
     <h2>Step 4 - Run it</h2>
-    <p>The script outputs a <code>.h</code> file directly into your sketch folder - the same folder as your <code>.ino</code> file. Give the full path to that folder in the command.</p>
+
+    <h3>Option 1 - output directly to your sketch folder</h3>
+    <p>Give the full path to your sketch folder in the command - the <code>.h</code> file lands there ready to compile.</p>
     <p>Replace <code>/path/to/your/sketch/</code> with the actual path to your sketch folder:</p>
     <div class="code-wrap">
       <pre><code>python3 wav_to_i2s_header_multi.py /tmp/clip1_i2s.wav /path/to/your/sketch/clip1.h clip1</code></pre>
@@ -105,6 +107,18 @@ print('Done: ' + str(len(samples)) + ' samples -> ' + output_file)`}</code></pre
       <button class="copy-btn">Copy</button>
     </div>
     <p>Not sure of the path? Open your sketch folder in a file manager, then drag it into the terminal - the full path will be pasted in automatically.</p>
+
+    <h3>Option 2 - output to the current directory</h3>
+    <p>If you are not sure of your sketch path yet, run the script without a folder - the <code>.h</code> file will appear in whatever directory your terminal is currently in.</p>
+    <div class="code-wrap">
+      <pre><code>python3 wav_to_i2s_header_multi.py /tmp/clip1_i2s.wav clip1.h clip1</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>Then move the file into your sketch folder before compiling. You can drag it there in your file manager, or use the terminal:</p>
+    <div class="code-wrap">
+      <pre><code>mv clip1.h /path/to/your/sketch/</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
     <p>After running, open your sketch folder and confirm the <code>.h</code> file is there before compiling.</p>
   </Fragment>
 </GlossaryEntry>
