@@ -44,10 +44,15 @@ import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
     <h3>Step 2 - Copy it into the plugins folder</h3>
     <ol>
       <li>Close Arduino IDE completely</li>
-      <li>Open your file manager and enable hidden files (<strong>Ctrl+H</strong> in most file managers)</li>
-      <li>Navigate to <code>~/.arduinoIDE/</code></li>
-      <li>Create a folder named <code>plugins</code> if it does not exist</li>
-      <li>Copy the downloaded <code>.vsix</code> file into that folder</li>
+      <li>Create the plugins folder - open a terminal and run:</li>
+    </ol>
+    <p class="cmd-label">Copy and paste into terminal</p>
+    <div class="code-wrap">
+      <pre><code>mkdir -p ~/.arduinoIDE/plugins</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <ol start="3">
+      <li>Copy the downloaded <code>.vsix</code> file into <code>~/.arduinoIDE/plugins/</code></li>
       <li>Restart Arduino IDE</li>
     </ol>
     <div class="callout callout-why">
