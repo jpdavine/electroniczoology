@@ -42,8 +42,8 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <h2>Preparing Your Clips</h2>
     <p>Run the ffmpeg conversion once per clip as in <a href="/guides/max98357a-esp32-audio#preparing-audio" class="term-link">Step 2 - Playing a Clip</a>. Then use the updated script below to convert each WAV to a header file - it takes a third argument for the variable name so each header is unique.</p>
 
-    <h3>Updated script - wav_to_i2s_header.py</h3>
-    <p>Replace your existing script with this version, or save it alongside it. The only change is the added <code>var_name</code> parameter. <a href="/glossary/save-a-script-i2s" class="term-link">How to save a script &rarr;</a></p>
+    <h3>New script - wav_to_i2s_header_multi.py</h3>
+    <p>Save this as a new file - <code>wav_to_i2s_header_multi.py</code>. It works the same as the script from Step 2 but takes a third argument for the variable name so each header is unique. <a href="/glossary/save-a-script-i2s-multi" class="term-link">How to save a script &rarr;</a></p>
     <div class="code-wrap">
       <pre><code>{`import sys, wave, struct
 
@@ -77,7 +77,7 @@ print('Done: ' + str(len(samples)) + ' samples -> ' + output_file)`}</code></pre
     <h3>Convert your clips</h3>
     <p>Run once per clip. The third argument sets the variable name used in the sketch. It must be a valid C identifier - letters, numbers, and underscores only, and it cannot start with a number. <code>clip1</code>, <code>beep_short</code>, and <code>alarm2</code> are fine. <code>my clip</code>, <code>hello-world</code>, and <code>1beep</code> are not - they will generate broken C code that won't compile.</p>
     <div class="code-wrap">
-      <pre><code>python3 wav_to_i2s_header.py /tmp/clip1_i2s.wav clip1.h clip1</code></pre>
+      <pre><code>python3 wav_to_i2s_header_multi.py /tmp/clip1_i2s.wav clip1.h clip1</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
     <p>Repeat for each clip, changing the input file, output header name, and variable name - for example <code>clip2_i2s.wav clip2.h clip2</code>, <code>clip3_i2s.wav clip3.h clip3</code>, and so on.</p>
@@ -89,7 +89,7 @@ print('Done: ' + str(len(samples)) + ' samples -> ' + output_file)`}</code></pre
       <pre><code>{`for f in ~/Downloads/myclips/*.wav; do
   name=$(basename "$f" .wav)
   ffmpeg -y -i "$f" -ar 44100 -ac 1 -acodec pcm_s16le "/tmp/\${name}_i2s.wav"
-  python3 ~/wav_to_i2s_header.py "/tmp/\${name}_i2s.wav" "\${name}.h" "$name"
+  python3 ~/wav_to_i2s_header_multi.py "/tmp/\${name}_i2s.wav" "\${name}.h" "$name"
 done`}</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
