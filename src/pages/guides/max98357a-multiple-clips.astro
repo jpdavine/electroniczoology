@@ -23,7 +23,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin) or ESP32-C3</div>
       <div class="meta-item"><strong>Amp:</strong> MAX98357A</div>
     </div>
-    <div class="series-step">MAX98357A I2S Series - Step 3 of 4 - Multiple clips, auto sequence</div>
+    <div class="series-step">MAX98357A I2S Series - Step 3 of 5 - Multiple clips, auto sequence</div>
     <div class="badge badge-confirmed">&#10003; Confirmed Working</div>
   </div>
 
@@ -89,7 +89,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   <!-- Before You Start -->
   <div class="section" id="before-you-start">
     <h2>Before You Start</h2>
-    <p>This guide extends the MAX98357A I2S guide. You should already have the amp wired up and a single clip playing before continuing here.</p>
+    <p>These guides are ordered by complexity but each one stands alone - if you believe and have courage, stand tall and boldly continue. If this is your first time, start at <a href="/guides/max98357a-wiring-tone-test" class="term-link">Step 1 &rarr;</a></p>
   </div>
 
   <h3 class="steps-outline-heading">Page outline</h3>
@@ -351,6 +351,10 @@ void loop() {
         <li>The <code>#include</code> line at the top of the sketch doesn&rsquo;t match the <code>.h</code> filename you generated. Check that <code>clip1.h</code> is in your sketch folder and that the filename in the <code>#include</code> matches exactly.</li>
       </ul>
     </div>
+  </div>
+
+  <div class="terminal-note">
+    Need more space for clips? We've got you covered - <a href="/guides/max98357a-littlefs" class="term-link">Step 4 - LittleFS Audio &rarr;</a> stores clips in the filesystem partition instead of the app partition, giving you more room and no recompile to swap clips out.
   </div>
 
 </GuideLayout>

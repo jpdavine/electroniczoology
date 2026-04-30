@@ -1,0 +1,331 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+---
+<GuideLayout
+  title="LittleFS Audio - MAX98357A I2S"
+  description="Store and play audio clips from LittleFS on an ESP32 with a MAX98357A I2S amplifier. No recompile to change clips - upload WAV files directly to the filesystem."
+  toc={[
+    {href: '#what-you-need', label: 'What You Need'},
+    {href: '#how-it-works', label: 'How It Works'},
+    {href: '#wiring', label: 'Wiring'},
+    {href: '#before-you-start', label: 'Before You Start'},
+    {href: '#preparing-clips', label: 'Preparing Your Clips'},
+    {href: '#uploading', label: 'Uploading to LittleFS'},
+    {href: '#sketch', label: 'The Sketch'},
+    {href: '#troubleshooting', label: 'Troubleshooting'},
+  ]}
+>
+
+  <div class="hero">
+    <div class="category">Audio &bull; ESP32</div>
+    <h1>LittleFS Audio<br>MAX98357A I2S</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Storage:</strong> LittleFS filesystem - max out your chip's full memory potential</div>
+      <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin) or ESP32-C3</div>
+      <div class="meta-item"><strong>Amp:</strong> MAX98357A</div>
+    </div>
+    <div class="series-step">MAX98357A I2S Series - Step 4 of 5 - LittleFS audio</div>
+    <div class="badge badge-wip">&#9881; Under Construction</div>
+  </div>
+
+  <div class="terminal-note">
+    This guide continues from <a href="/guides/max98357a-multiple-clips" class="term-link">Step 3 - Multiple Clips &rarr;</a>
+  </div>
+
+  <!-- What You Need -->
+  <div class="section" id="what-you-need">
+    <h2>What You Need</h2>
+    <div class="two-col">
+      <div class="card">
+        <h3>Parts</h3>
+        <ul>
+          <li><a href="/glossary/esp32-i2s" class="term-link">ESP32 Dev Board (38-pin)</a> or <a href="/glossary/esp32c3-i2s" class="term-link">ESP32-C3</a></li>
+          <li><a href="/glossary/max98357a" class="term-link">MAX98357A I2S amplifier module</a></li>
+          <li><a href="/glossary/speaker-i2s" class="term-link">4-8&#8486; speaker (1W or above)</a></li>
+          <li>Jumper wires</li>
+          <li>USB-C cable for flashing</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Software</h3>
+        <ul>
+          <li>Arduino IDE with ESP32 board support</li>
+          <li>Arduino ESP32 LittleFS upload plugin</li>
+          <li><code>ffmpeg</code> - convert audio files</li>
+          <li>Python 3</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- How It Works -->
+  <div class="section" id="how-it-works">
+    <h2>How It Works</h2>
+    <p>In Steps 2 and 3, audio clips are compiled directly into the sketch as C arrays in PROGMEM. That approach is simple but every clip change requires a recompile and reflash of the full sketch - and the number of clips is limited by the app partition size.</p>
+    <p>LittleFS is a small filesystem that lives in its own partition on the ESP32's flash. Audio files sit in the filesystem as plain WAV files. The sketch reads them at runtime and streams them to I2S. To change or add clips, you upload a new filesystem image - no recompile needed.</p>
+    <div class="callout callout-why">
+      <strong>How much space does LittleFS get?</strong>
+      Under the default partition scheme the app gets 1MB and LittleFS gets around 1.5MB. Under Huge APP, the app gets 3MB and LittleFS gets around 1MB. Choose your partition scheme based on whether you need more sketch space or more clip space.
+    </div>
+  </div>
+
+  <!-- Wiring -->
+  <div class="section" id="wiring">
+    <h2>Wiring</h2>
+    <p>Wiring is identical to Step 2 - no changes needed.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>MAX98357A Pin</th><th>ESP32 Dev Board</th><th>ESP32-C3</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>VIN</td><td>5V</td><td>5V</td><td>5V recommended - 3.3V works at lower volume</td></tr>
+          <tr><td>GND</td><td>GND</td><td>GND</td><td></td></tr>
+          <tr><td>LRC</td><td>GPIO14</td><td>GPIO5</td><td>I2S word select (LRCLK)</td></tr>
+          <tr><td>BCLK</td><td>GPIO27</td><td>GPIO4</td><td>I2S bit clock</td></tr>
+          <tr><td>DIN</td><td>GPIO13</td><td>GPIO6</td><td>I2S data out</td></tr>
+          <tr><td>SD</td><td>Not connected</td><td>Not connected</td><td>Leave floating - amp enabled</td></tr>
+          <tr><td>GAIN</td><td>Not connected</td><td>Not connected</td><td>Leave floating - 9dB gain</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Before You Start -->
+  <div class="section" id="before-you-start">
+    <h2>Before You Start</h2>
+    <p>These guides are ordered by complexity but each one stands alone - if you believe and have courage, stand tall and boldly continue. If this is your first time, start at <a href="/guides/max98357a-wiring-tone-test" class="term-link">Step 1 &rarr;</a></p>
+  </div>
+
+  <!-- Preparing Clips -->
+  <div class="section" id="preparing-clips">
+    <h2>Preparing Your Clips</h2>
+    <p>LittleFS stores plain WAV files - no Python script, no header conversion. One ffmpeg command cuts and converts each clip directly into your sketch's <code>data/</code> folder.</p>
+
+    <h3>Create the data folder</h3>
+    <p>Inside your sketch folder, create a folder called exactly <code>data</code>. This is where LittleFS picks up the files to upload.</p>
+    <p class="cmd-label">Copy and paste into terminal</p>
+    <div class="code-wrap">
+      <pre><code>mkdir ~/Arduino/YourSketchName/data</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>Replace <code>YourSketchName</code> with your actual sketch folder name.</p>
+
+    <h3>Cut and convert your clips</h3>
+    <p>Open the source video or audio in VLC, note the start and end timestamps, then run ffmpeg once per clip. This cuts the section and converts to the format the sketch expects in one step.</p>
+    <p class="cmd-label">Copy and paste into terminal</p>
+    <div class="code-wrap">
+      <pre><code>ffmpeg -i ~/Videos/myvideo.mp4 -ss 00:01:23 -to 00:01:27 -ar 44100 -ac 1 -acodec pcm_s16le ~/Arduino/YourSketchName/data/clip1.wav</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p><strong>What the flags mean:</strong></p>
+    <ul class="flag-list">
+      <li><code>-ss 00:01:23</code> - start cutting at this timestamp</li>
+      <li><code>-to 00:01:27</code> - stop cutting at this timestamp</li>
+      <li><code>-ar 44100</code> - sample rate 44100 Hz</li>
+      <li><code>-ac 1</code> - mono</li>
+      <li><code>-acodec pcm_s16le</code> - 16-bit signed PCM - the format the sketch expects</li>
+      <li><code>~/Arduino/YourSketchName/data/clip1.wav</code> - output goes straight into the data folder</li>
+    </ul>
+    <p>Repeat for each clip, changing the timestamps and filename each time. Name files with numbers or simple names - the sketch plays them in filesystem order.</p>
+    <div class="callout callout-why">
+      <strong>Why 44100 Hz?</strong>
+      It is the CD standard - the lowest sample rate that captures the full range of human hearing cleanly. Drop to 22050 Hz for speech to halve the file size with no noticeable quality loss. Change <code>-ar</code> here and <code>SAMPLE_RATE</code> in the sketch to match.
+    </div>
+  </div>
+
+  <!-- Uploading -->
+  <div class="section" id="uploading">
+    <h2>Uploading to LittleFS</h2>
+    <p>Arduino IDE 2.x needs the LittleFS upload plugin installed before you can upload the data folder.</p>
+
+    <h3>Install the plugin</h3>
+    <p>The plugin adds the upload option to Arduino IDE. <a href="/glossary/littlefs-plugin" class="term-link">Full install instructions - IDE 2.x and 1.x &rarr;</a></p>
+
+    <h3>Upload the filesystem</h3>
+    <p>With your sketch open and your ESP32 connected:</p>
+    <ol>
+      <li>Close the Serial Monitor if it is open - it locks the port</li>
+      <li>In Arduino IDE 2.x, open the command palette: <strong>Ctrl+Shift+P</strong></li>
+      <li>Type <strong>Upload LittleFS</strong> and select it</li>
+      <li>Wait for the upload to complete - you will see <strong>LittleFS upload finished</strong> in the output</li>
+    </ol>
+    <div class="callout callout-why">
+      <strong>Flash the sketch first, then upload the filesystem.</strong>
+      The filesystem upload does not touch the app partition. Flash the sketch once via USB, then upload the filesystem. After that, updating clips only requires a new filesystem upload - no sketch reflash needed.
+    </div>
+  </div>
+
+  <!-- Sketch -->
+  <div class="section" id="sketch">
+    <h2>The Sketch</h2>
+    <p>Reads every <code>.wav</code> file from LittleFS in order and plays them in a continuous loop. Add or remove clips by uploading a new filesystem image - the sketch never needs to change.</p>
+    <div class="code-wrap">
+      <pre><code>{`/*
+ * We stand on the shoulders of giants when we build
+ * with knowledge gained from others' efforts.
+ * That doesn't make us giants. Be humble.
+ * Create with care. Open source is the way.
+ *
+ * MAX98357A I2S - LittleFS Audio
+ * --------------------------------
+ * Reads WAV files from LittleFS and plays them
+ * via I2S in a continuous loop. 44100Hz 16-bit mono.
+ *
+ * Board:   ESP32 Dev Board (38-pin) or ESP32-C3
+ * Amp:     MAX98357A
+ *
+ * Wiring (ESP32 Dev Board):
+ *   BCLK -> GPIO27  LRC -> GPIO14  DIN -> GPIO13
+ *
+ * Wiring (ESP32-C3):
+ *   BCLK -> GPIO4   LRC -> GPIO5   DIN -> GPIO6
+ *
+ * Partition scheme: Default (gives ~1.5MB to LittleFS)
+ *
+ * Open source - MIT Licence
+ * Electronic Zoology - field notes from the garage
+ * https://electroniczoology.com/guides/max98357a-littlefs
+ */
+
+#include <driver/i2s.h>
+#include <LittleFS.h>
+
+// ESP32 Dev Board (38-pin)
+#define I2S_BCLK    27
+#define I2S_LRCLK   14
+#define I2S_DOUT    13
+// ESP32-C3 - comment out the three lines above and uncomment these:
+//#define I2S_BCLK    4
+//#define I2S_LRCLK   5
+//#define I2S_DOUT    6
+
+#define SAMPLE_RATE  44100
+#define VOLUME       0.8f
+#define BUF_SAMPLES  256
+#define WAV_HEADER   44   // standard PCM WAV header size in bytes
+
+int16_t i2s_buf[BUF_SAMPLES * 2];
+
+void playFile(const char* path) {
+  File f = LittleFS.open(path, "r");
+  if (!f) return;
+
+  f.seek(WAV_HEADER);  // skip WAV header, jump straight to PCM data
+
+  int16_t raw[BUF_SAMPLES];
+  size_t written;
+
+  while (f.available() >= (int)(BUF_SAMPLES * 2)) {
+    f.read((uint8_t*)raw, BUF_SAMPLES * 2);
+    for (int i = 0; i < BUF_SAMPLES; i++) {
+      int16_t s = (int16_t)(raw[i] * VOLUME);
+      i2s_buf[i * 2]     = s;
+      i2s_buf[i * 2 + 1] = s;
+    }
+    i2s_write(I2S_NUM_0, i2s_buf, BUF_SAMPLES * 4, &written, portMAX_DELAY);
+  }
+
+  f.close();
+}
+
+void setup() {
+  LittleFS.begin();
+
+  i2s_config_t cfg = {
+    .mode                 = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX),
+    .sample_rate          = SAMPLE_RATE,
+    .bits_per_sample      = I2S_BITS_PER_SAMPLE_16BIT,
+    .channel_format       = I2S_CHANNEL_FMT_RIGHT_LEFT,
+    .communication_format = I2S_COMM_FORMAT_STAND_I2S,
+    .intr_alloc_flags     = ESP_INTR_FLAG_LEVEL1,
+    .dma_buf_count        = 8,
+    .dma_buf_len          = 64,
+    .use_apll             = false,
+    .tx_desc_auto_clear   = true,
+  };
+  i2s_pin_config_t pins = {
+    .bck_io_num   = I2S_BCLK,
+    .ws_io_num    = I2S_LRCLK,
+    .data_out_num = I2S_DOUT,
+    .data_in_num  = I2S_PIN_NO_CHANGE,
+  };
+  i2s_driver_install(I2S_NUM_0, &cfg, 0, NULL);
+  i2s_set_pin(I2S_NUM_0, &pins);
+}
+
+void loop() {
+  File root = LittleFS.open("/");
+  File file = root.openNextFile();
+  while (file) {
+    String name = file.name();
+    if (!file.isDirectory() && name.endsWith(".wav")) {
+      String path = "/" + name;
+      playFile(path.c_str());
+      delay(500);
+    }
+    file = root.openNextFile();
+  }
+}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+  </div>
+
+  <!-- Troubleshooting -->
+  <div class="section" id="troubleshooting">
+    <h2>Troubleshooting</h2>
+    <div class="trouble-item">
+      <h3>No sound - sketch runs but nothing plays</h3>
+      <ul>
+        <li>The filesystem may not have been uploaded - confirm you ran the LittleFS upload step, not just the sketch upload</li>
+        <li>Check the <code>data/</code> folder exists in your sketch folder and contains <code>.wav</code> files</li>
+        <li>Serial Monitor at 115200 baud - add <code>Serial.begin(115200);</code> and <code>Serial.println(file.name());</code> inside the loop to confirm files are being found</li>
+      </ul>
+    </div>
+    <div class="trouble-item">
+      <h3>LittleFS.begin() fails</h3>
+      <ul>
+        <li>The filesystem partition has not been formatted - pass <code>true</code> to format on first use: <code>LittleFS.begin(true)</code></li>
+      </ul>
+    </div>
+    <div class="trouble-item">
+      <h3>Distorted or wrong speed audio</h3>
+      <ul>
+        <li>The <code>SAMPLE_RATE</code> in the sketch must match the <code>-ar</code> value used in ffmpeg - both should be <code>44100</code></li>
+        <li>Confirm the WAV was converted with <code>-acodec pcm_s16le</code> - other formats produce noise or silence</li>
+      </ul>
+    </div>
+    <div class="trouble-item">
+      <h3>Upload plugin not showing in Arduino IDE</h3>
+      <ul>
+        <li>Restart Arduino IDE after installing the <code>.vsix</code> plugin</li>
+        <li>Confirm the plugin was installed for the correct IDE installation if you have multiple</li>
+      </ul>
+    </div>
+  </div>
+
+</GuideLayout>
+
+<style>
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.5rem; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    min-width: 400px;
+  }
+  th {
+    background: #1a1a2e;
+    color: #fff;
+    text-align: left;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+  }
+  td {
+    padding: 0.55rem 1rem;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+  }
+  tr:nth-child(even) td { background: #fafafa; }
+  tr:last-child td { border-bottom: none; }
+</style>

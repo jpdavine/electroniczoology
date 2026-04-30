@@ -1,0 +1,120 @@
+---
+import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
+---
+<GlossaryEntry
+  category="Arduino IDE"
+  title="LittleFS Upload Plugin"
+  subtitle="How to install and use the ESP32 LittleFS filesystem uploader"
+  backTo="/guides/max98357a-littlefs#uploading"
+  backLabel="Back"
+  highlights={[
+    'The plugin adds a filesystem upload option to Arduino IDE',
+    'Files in your sketch data/ folder get uploaded to the ESP32',
+    'Arduino IDE 2.x uses a .vsix plugin installed via the command palette',
+    'Upload the filesystem separately from the sketch - they are independent',
+  ]}
+>
+  <svg slot="svg" viewBox="0 0 320 160" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:320px;display:block;margin:auto">
+    <rect x="10" y="10" width="300" height="140" rx="8" fill="#1e1e2e" stroke="#313244" stroke-width="1.5"/>
+    <rect x="10" y="10" width="300" height="24" rx="8" fill="#181825"/>
+    <rect x="10" y="24" width="300" height="10" fill="#181825"/>
+    <circle cx="28" cy="22" r="5" fill="#ff5f57"/>
+    <circle cx="44" cy="22" r="5" fill="#ffbd2e"/>
+    <circle cx="60" cy="22" r="5" fill="#28ca41"/>
+    <text x="160" y="25" fill="#6c7086" font-size="8" font-family="monospace" text-anchor="middle">Arduino IDE</text>
+    <rect x="30" y="45" width="260" height="22" rx="4" fill="#313244"/>
+    <text x="42" y="60" fill="#6c7086" font-size="8" font-family="monospace">&#x1F50D;</text>
+    <text x="56" y="60" fill="#cdd6f4" font-size="8" font-family="monospace">Upload LittleFS to Pico/ESP8266/ESP32</text>
+    <rect x="30" y="72" width="260" height="18" rx="3" fill="#45475a"/>
+    <text x="42" y="84" fill="#a6e3a1" font-size="8" font-family="monospace">&#x2713; Upload LittleFS to Pico/ESP8266/ESP32</text>
+    <rect x="30" y="94" width="260" height="18" rx="3" fill="#1e1e2e"/>
+    <text x="42" y="106" fill="#cdd6f4" font-size="8" font-family="monospace">Install plugin from VSIX file...</text>
+    <rect x="30" y="116" width="260" height="18" rx="3" fill="#1e1e2e"/>
+    <text x="42" y="128" fill="#6c7086" font-size="8" font-family="monospace">Ctrl+Shift+P to open palette</text>
+  </svg>
+
+  <Fragment slot="desc">
+    <p>Arduino IDE does not upload the <code>data/</code> folder by default. The LittleFS plugin adds that ability - it packages everything in the folder into a filesystem image and flashes it to the ESP32's filesystem partition.</p>
+
+    <h2>Arduino IDE 2.x - VSIX plugin</h2>
+
+    <h3>Step 1 - Download the plugin</h3>
+    <p>Go to the <a href="https://github.com/earlephilhower/arduino-littlefs-upload/releases" class="term-link" target="_blank" rel="noopener">arduino-littlefs-upload releases page &rarr;</a> and download the latest <code>.vsix</code> file.</p>
+
+    <h3>Step 2 - Install it</h3>
+    <ol>
+      <li>Open Arduino IDE 2.x</li>
+      <li>Open the command palette: <strong>Ctrl+Shift+P</strong></li>
+      <li>Type <strong>Install plugin from VSIX</strong> and select it</li>
+      <li>Navigate to and select the downloaded <code>.vsix</code> file</li>
+      <li>Restart Arduino IDE when prompted</li>
+    </ol>
+
+    <h3>Step 3 - Confirm it installed</h3>
+    <p>Open the command palette again (<strong>Ctrl+Shift+P</strong>) and type <strong>Upload LittleFS</strong>. If the option appears, the plugin is installed correctly.</p>
+
+
+    <h2>How to upload the filesystem</h2>
+    <ol>
+      <li>Make sure your sketch has a <code>data/</code> folder with your files in it</li>
+      <li>Connect your ESP32 via USB</li>
+      <li>Close the Serial Monitor if it is open - it locks the port</li>
+      <li>Open the command palette: <strong>Ctrl+Shift+P</strong>, type and select <strong>Upload LittleFS</strong></li>
+      <li>Wait for <strong>LittleFS upload finished</strong> in the output panel</li>
+    </ol>
+
+    <div class="callout callout-why">
+      <strong>Sketch and filesystem are uploaded separately.</strong>
+      Uploading the filesystem does not touch your sketch, and uploading the sketch does not touch the filesystem. Flash the sketch first via the normal Upload button, then upload the filesystem. After that, to swap clips out you only need to upload the filesystem again - no sketch reflash needed.
+    </div>
+  </Fragment>
+</GlossaryEntry>
+
+<style>
+  pre {
+    background: #1e1e2e;
+    color: #cdd6f4;
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    overflow-x: auto;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    margin: 0.75rem 0 1rem;
+  }
+  pre code {
+    font-family: "Fira Code", "Cascadia Code", Consolas, monospace;
+    background: none;
+    padding: 0;
+    color: inherit;
+  }
+  code {
+    font-family: "Fira Code", "Cascadia Code", Consolas, monospace;
+    background: #f0f0f0;
+    padding: 0.15em 0.4em;
+    border-radius: 3px;
+    font-size: 0.875em;
+    color: #c0392b;
+  }
+  .callout-why {
+    background: #f5f0ff;
+    border-left: 4px solid #c47a1e;
+    border-radius: 0 6px 6px 0;
+    padding: 0.9rem 1.1rem;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+  }
+  .callout-why strong { display: block; margin-bottom: 0.3rem; }
+</style>
+
+<script is:inline>
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pre = btn.closest('.code-wrap').querySelector('pre');
+      navigator.clipboard.writeText(pre.innerText).then(() => {
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+      });
+    });
+  });
+</script>
