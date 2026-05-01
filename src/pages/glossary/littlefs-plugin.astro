@@ -40,6 +40,10 @@ import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
 
     <h3>Step 1 - Download the plugin</h3>
     <p>Go to the <a href="https://github.com/earlephilhower/arduino-littlefs-upload/releases" class="term-link" target="_blank" rel="noopener">arduino-littlefs-upload releases page &rarr;</a> and download the latest <code>.vsix</code> file.</p>
+    <figure class="screenshot-wrap">
+      <img src="/images/little1.png" alt="GitHub releases page showing the arduino-littlefs-upload .vsix file to download" />
+      <figcaption>Download the .vsix from the Assets section</figcaption>
+    </figure>
 
     <h3>Step 2 - Extract and install</h3>
     <p>The <code>.vsix</code> is a zip file. Extract it - you will get a folder. That folder goes into <code>~/.arduinoIDE/plugins/</code>.</p>
@@ -55,6 +59,16 @@ import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
     <ol start="3">
       <li>Right-click the <code>.vsix</code> file and extract it - or rename it to <code>.zip</code> and extract</li>
       <li>Move the extracted folder into <code>~/.arduinoIDE/plugins/</code></li>
+    </ol>
+    <figure class="screenshot-wrap">
+      <img src="/images/little2.png" alt="File manager showing ~/.arduinoIDE/ with the plugins folder" />
+      <figcaption>The plugins folder inside ~/.arduinoIDE/</figcaption>
+    </figure>
+    <figure class="screenshot-wrap">
+      <img src="/images/little3.png" alt="File manager showing the extracted plugin folder inside ~/.arduinoIDE/plugins/" />
+      <figcaption>Extracted plugin folder placed inside plugins/</figcaption>
+    </figure>
+    <ol start="5">
       <li>Restart Arduino IDE</li>
     </ol>
     <div class="callout callout-why">
@@ -107,6 +121,24 @@ import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
     font-size: 0.875em;
     color: #c0392b;
   }
+  .screenshot-wrap {
+    margin: 1rem 0 1.5rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .screenshot-wrap img {
+    width: 100%;
+    display: block;
+  }
+  .screenshot-wrap figcaption {
+    font-size: 0.8rem;
+    color: #888;
+    padding: 0.4rem 0.75rem;
+    background: #fafafa;
+    border-top: 1px solid #e0e0e0;
+  }
+
   .callout-why {
     background: #f5f0ff;
     border-left: 4px solid #c47a1e;
