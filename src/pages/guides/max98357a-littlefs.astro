@@ -64,8 +64,8 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <p>In Steps 2 and 3, audio clips are compiled directly into the sketch as C arrays in PROGMEM. That approach is simple but every clip change requires a recompile and reflash of the full sketch - and the number of clips is limited by the app partition size.</p>
     <p>LittleFS is a small filesystem that lives in its own partition on the ESP32's flash. Audio files sit in the filesystem as plain WAV files. The sketch reads them at runtime and streams them to I2S. To change or add clips, you upload a new filesystem image - no recompile needed.</p>
     <div class="callout callout-why">
-      <strong>How much space does LittleFS get?</strong>
-      Under the default partition scheme the app gets 1MB and LittleFS gets around 1.5MB. Under Huge APP, the app gets 3MB and LittleFS gets around 1MB. Choose your partition scheme based on whether you need more sketch space or more clip space.
+      <strong>Partition scheme matters.</strong>
+      For LittleFS audio, use <strong>No OTA (2MB APP / 2MB SPIFFS)</strong> - it gives the best balance of sketch space and audio file space. Set it in Arduino IDE under <strong>Tools &rarr; Partition Scheme</strong> before flashing. <a href="/glossary/partition-scheme" class="term-link">Full partition scheme guide &rarr;</a>
     </div>
   </div>
 
@@ -100,7 +100,8 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   <!-- Preparing Clips -->
   <div class="section" id="preparing-clips">
     <h2>Preparing Your Clips</h2>
-    <p>LittleFS stores plain WAV files - no Python script, no header conversion. One ffmpeg command cuts and converts each clip directly into your sketch's <code>data/</code> folder.</p>
+    <p>Step 3 needed a Python script to convert WAV samples into a C array compiled into the sketch. LittleFS is different - the sketch reads WAV files directly from the filesystem at runtime, so the WAV file is the final product. ffmpeg just makes sure it is the right format and the sketch streams it byte by byte. No Python, no header files.</p>
+    <p>The pattern is the same as Step 3: create a staging folder, cut your clips into it one by one, then batch convert them all into the <code>data/</code> folder.</p>
 
     <h3>Create the data folder</h3>
     <p>Inside your sketch folder, create a folder called exactly <code>data</code>. This is where LittleFS picks up the files to upload.</p>
@@ -109,25 +110,66 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <pre><code>mkdir ~/Arduino/YourSketchName/data</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
-    <p>Replace <code>YourSketchName</code> with your actual sketch folder name.</p>
+    <p>Replace <code>YourSketchName</code> with your actual sketch folder name. Or do it in your file manager - open the sketch folder, right-click, and create a new folder named <code>data</code>.</p>
 
-    <h3>Cut and convert your clips</h3>
-    <p>Open the source video or audio in VLC, note the start and end timestamps, then run ffmpeg once per clip. This cuts the section and converts to the format the sketch expects in one step.</p>
+    <h3>Create a clips folder</h3>
+    <p>Create a staging folder to collect your raw clips before converting:</p>
     <p class="cmd-label">Copy and paste into terminal</p>
     <div class="code-wrap">
-      <pre><code>ffmpeg -i ~/Videos/myvideo.mp4 -ss 00:01:23 -to 00:01:27 -ar 44100 -ac 1 -acodec pcm_s16le ~/Arduino/YourSketchName/data/clip1.wav</code></pre>
+      <pre><code>mkdir ~/myclips</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
-    <p><strong>What the flags mean:</strong></p>
-    <ul class="flag-list">
-      <li><code>-ss 00:01:23</code> - start cutting at this timestamp</li>
-      <li><code>-to 00:01:27</code> - stop cutting at this timestamp</li>
-      <li><code>-ar 44100</code> - sample rate 44100 Hz</li>
-      <li><code>-ac 1</code> - mono</li>
-      <li><code>-acodec pcm_s16le</code> - 16-bit signed PCM - the format the sketch expects</li>
-      <li><code>~/Arduino/YourSketchName/data/clip1.wav</code> - output goes straight into the data folder</li>
-    </ul>
-    <p>Repeat for each clip, changing the timestamps and filename each time. Name files with numbers or simple names - the sketch plays them in filesystem order.</p>
+
+    <h3>Find your clip in a video</h3>
+    <p>Open the source video or audio in VLC or a player of your choice. Note the timestamp for where your clip starts and ends, then cut it into the staging folder:</p>
+    <div class="callout callout-tip">
+      <strong>Reading the timestamp:</strong>
+      In VLC the current position shows in the bottom left as HH:MM:SS. Pause at the start of your clip, write down the time, then do the same for the end.
+    </div>
+    <p class="cmd-label">Copy and paste into terminal</p>
+    <div class="code-wrap">
+      <pre><code>ffmpeg -i ~/Videos/myvideo.mp4 -ss 00:01:23 -to 00:01:27 ~/myclips/clip1.wav</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p><strong>Examples:</strong></p>
+    <p style="font-size:0.85rem;color:#666;margin-bottom:0.25rem;">If the source file is in your home folder:</p>
+    <p class="cmd-label">Copy and paste into terminal</p>
+    <div class="code-wrap">
+      <pre><code>ffmpeg -i ~/mysound.wav -ss 00:01:23 -to 00:01:27 ~/myclips/clip1.wav</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p style="font-size:0.85rem;color:#666;margin-bottom:0.25rem;">If the source file is in Downloads:</p>
+    <p class="cmd-label">Copy and paste into terminal</p>
+    <div class="code-wrap">
+      <pre><code>ffmpeg -i ~/Downloads/mysound.mp3 -ss 00:01:23 -to 00:01:27 ~/myclips/clip1.wav</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p style="font-size:0.85rem;color:#666;margin-bottom:0.25rem;">If the source is a video - ffmpeg extracts the audio automatically:</p>
+    <p class="cmd-label">Copy and paste into terminal</p>
+    <div class="code-wrap">
+      <pre><code>ffmpeg -i ~/Videos/myvideo.mp4 -ss 00:01:23 -to 00:01:27 ~/myclips/clip1.wav</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p style="font-size:0.85rem;color:#666;margin-bottom:0.25rem;">If the filename has spaces - wrap it in quotes:</p>
+    <p class="cmd-label">Copy and paste into terminal</p>
+    <div class="code-wrap">
+      <pre><code>ffmpeg -i "/home/j/My Audio File.wav" -ss 00:01:23 -to 00:01:27 ~/myclips/clip1.wav</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>Repeat for each clip, changing the timestamps and filename each time. Once all clips are in the folder, move on.</p>
+
+    <h3>Convert all clips</h3>
+    <p>Once all your clips are in <code>~/myclips/</code>, run this once to convert the whole batch. The converted files land next to the originals in <code>~/myclips/</code> with <code>_i2s</code> added to the name so they don't overwrite them:</p>
+    <p class="cmd-label">Copy and paste into terminal</p>
+    <div class="code-wrap">
+      <pre><code>{`for f in ~/myclips/*.wav; do
+  name=$(basename "$f" .wav)
+  ffmpeg -y -i "$f" -ar 44100 -ac 1 -acodec pcm_s16le ~/myclips/\${name}_i2s.wav
+done`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>You will now have both the originals (<code>clip1.wav</code>) and the converted versions (<code>clip1_i2s.wav</code>) side by side. Move the <code>_i2s.wav</code> files into your <code>data/</code> folder - those are the ones the sketch needs.</p>
+    <p>Unlike Step 3, LittleFS filenames do not become C variable names so there are no strict rules - <code>my-clip.wav</code> or <code>hello world.wav</code> will work. That said, sticking to letters, numbers and underscores is good practice and avoids surprises. The sketch plays files in filesystem order, so numbering them (<code>clip1.wav</code>, <code>clip2.wav</code>) gives you predictable playback.</p>
     <div class="callout callout-why">
       <strong>Why 44100 Hz?</strong>
       It is the CD standard - the lowest sample rate that captures the full range of human hearing cleanly. Drop to 22050 Hz for speech to halve the file size with no noticeable quality loss. Change <code>-ar</code> here and <code>SAMPLE_RATE</code> in the sketch to match.
@@ -153,6 +195,50 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <div class="callout callout-why">
       <strong>Flash the sketch first, then upload the filesystem.</strong>
       The filesystem upload does not touch the app partition. Flash the sketch once via USB, then upload the filesystem. After that, updating clips only requires a new filesystem upload - no sketch reflash needed.
+    </div>
+
+    <h3>Confirm the upload worked</h3>
+    <p>Flash this diagnostic sketch, open Serial Monitor at <strong>115200 baud</strong>, and it will list every file in LittleFS with its name, size, and total space used. If it shows empty, the filesystem upload did not land.</p>
+    <div class="code-wrap">
+      <pre><code>{`#include <LittleFS.h>
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+
+  if (!LittleFS.begin(true)) {
+    Serial.println("LittleFS mount failed");
+    return;
+  }
+
+  Serial.println("\\n--- LittleFS contents ---");
+  File root = LittleFS.open("/");
+  File file = root.openNextFile();
+  int count = 0;
+
+  while (file) {
+    Serial.print(file.name());
+    Serial.print("  ");
+    Serial.print(file.size());
+    Serial.println(" bytes");
+    count++;
+    file = root.openNextFile();
+  }
+
+  if (count == 0) Serial.println("(empty - no files found)");
+  Serial.print("--- ");
+  Serial.print(count);
+  Serial.println(" file(s) ---");
+
+  Serial.print("Total: ");
+  Serial.print(LittleFS.totalBytes() / 1024);
+  Serial.print("KB  Used: ");
+  Serial.print(LittleFS.usedBytes() / 1024);
+  Serial.println("KB");
+}
+
+void loop() {}`}</code></pre>
+      <button class="copy-btn">Copy</button>
     </div>
   </div>
 
@@ -181,7 +267,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
  * Wiring (ESP32-C3):
  *   BCLK -> GPIO4   LRC -> GPIO5   DIN -> GPIO6
  *
- * Partition scheme: Default (gives ~1.5MB to LittleFS)
+ * Partition scheme: No OTA (2MB APP / 2MB SPIFFS)
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage

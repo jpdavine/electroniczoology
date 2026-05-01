@@ -1,0 +1,96 @@
+---
+import GlossaryEntry from '../../layouts/GlossaryEntry.astro';
+---
+<GlossaryEntry
+  category="ESP32"
+  title="Partition Scheme"
+  subtitle="How the ESP32's flash memory is divided between the sketch, filesystem, and OTA"
+  backTo="/guides/max98357a-littlefs#uploading"
+  backLabel="Back"
+  highlights={[
+    'The ESP32 has 4MB of flash - the partition scheme decides how it is split',
+    'No OTA / 2MB SPIFFS gives the best balance for LittleFS audio',
+    'Change it in Arduino IDE under Tools → Partition Scheme',
+    'Changing the scheme requires a full reflash of the sketch',
+  ]}
+>
+  <Fragment slot="desc">
+    <p>The ESP32 has 4MB of flash memory. A partition scheme is a layout that divides that space between different uses - the compiled sketch (app), the filesystem (LittleFS/SPIFFS), OTA update storage, and a small area for settings (NVS). The scheme you choose directly affects how much space is available for audio files.</p>
+
+    <h2>How to change it</h2>
+    <p>In Arduino IDE, go to <strong>Tools &rarr; Partition Scheme</strong> and select the scheme before compiling and uploading. After changing the scheme you must reflash the sketch - the IDE will prompt you if needed.</p>
+
+    <h2>Which scheme to use for LittleFS audio</h2>
+    <p>For the MAX98357A LittleFS audio guide, the recommended scheme is <strong>No OTA (2MB APP / 2MB SPIFFS)</strong>. The I2S audio sketch is small so 2MB of app space is more than enough, and 2MB of LittleFS gives the most room for audio files.</p>
+
+    <div class="scheme-table">
+      <table>
+        <thead>
+          <tr><th>Scheme</th><th>App space</th><th>LittleFS space</th><th>OTA</th><th>Audio at 44100Hz</th></tr>
+        </thead>
+        <tbody>
+          <tr class="highlight-row"><td><strong>No OTA (2MB APP / 2MB SPIFFS)</strong></td><td>2MB</td><td>2MB</td><td>No</td><td>~22 seconds</td></tr>
+          <tr><td>Default (4MB with SPIFFS)</td><td>1.2MB</td><td>1.5MB</td><td>No</td><td>~17 seconds</td></tr>
+          <tr><td>Huge APP (3MB No OTA / 1MB SPIFFS)</td><td>3MB</td><td>1MB</td><td>No</td><td>~11 seconds</td></tr>
+          <tr><td>Minimal SPIFFS (1.9MB APP with OTA)</td><td>1.9MB</td><td>~600KB</td><td>Yes</td><td>~7 seconds</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-tip">
+      <strong>Drop to 22050Hz for speech.</strong>
+      Audio sizes above are for 44100Hz 16-bit mono. Drop to 22050Hz and every number roughly doubles - the No OTA scheme gives you around 45 seconds of clear speech audio. Change <code>-ar</code> in your ffmpeg command and <code>SAMPLE_RATE</code> in the sketch to match.
+    </div>
+
+    <h2>What OTA means</h2>
+    <p>OTA (Over The Air) update support requires a second copy of the app partition so the ESP32 can receive a new sketch over WiFi while still running the old one. That overhead costs about 1MB of flash. For LittleFS audio there is no benefit - skip OTA and get more audio space.</p>
+
+    <h2>What NVS is</h2>
+    <p>NVS (Non-Volatile Storage) is a small reserved area where the ESP32 stores settings that survive a reboot - WiFi credentials, calibration values, that sort of thing. It is always present regardless of scheme and is too small to be useful for audio.</p>
+  </Fragment>
+</GlossaryEntry>
+
+<style>
+  .scheme-table { overflow-x: auto; margin: 1rem 0 1.5rem; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    min-width: 500px;
+  }
+  th {
+    background: #1a1a2e;
+    color: #fff;
+    text-align: left;
+    padding: 0.6rem 0.85rem;
+    font-weight: 600;
+  }
+  td {
+    padding: 0.55rem 0.85rem;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+  }
+  tr:nth-child(even) td { background: #fafafa; }
+  tr:last-child td { border-bottom: none; }
+  .highlight-row td {
+    background: #f0fff4;
+    font-weight: 500;
+  }
+  .callout-tip {
+    background: #f0fff4;
+    border-left: 4px solid #2ecc71;
+    border-radius: 0 6px 6px 0;
+    padding: 0.9rem 1.1rem;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+  }
+  .callout-tip strong { display: block; margin-bottom: 0.3rem; }
+  code {
+    font-family: "Fira Code", "Cascadia Code", Consolas, monospace;
+    background: #f0f0f0;
+    padding: 0.15em 0.4em;
+    border-radius: 3px;
+    font-size: 0.875em;
+    color: #c0392b;
+  }
+</style>
