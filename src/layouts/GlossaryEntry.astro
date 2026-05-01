@@ -6,9 +6,11 @@ const { category, title, subtitle, highlights, backTo = '/guides/pam8403-esp32-a
   <div class="gloss-page">
     <a href={backTo} class="back-link" onclick="history.back(); return false;">&larr; {backLabel}</a>
     <div class="gloss-card">
-      <div class="gloss-svg">
-        <slot name="svg" />
-      </div>
+      {Astro.slots.has('svg') && (
+        <div class="gloss-svg">
+          <slot name="svg" />
+        </div>
+      )}
       <div class="gloss-content">
         <div class="category">{category}</div>
         <h1>{title}</h1>
