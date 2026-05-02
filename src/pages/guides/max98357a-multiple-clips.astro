@@ -251,6 +251,13 @@ done`}</code></pre>
 #include "clip1.h"
 #include "clip2.h"
 #include "clip3.h"
+//#include "clip4.h"
+//#include "clip5.h"
+//#include "clip6.h"
+//#include "clip7.h"
+//#include "clip8.h"
+//#include "clip9.h"
+//#include "clip10.h"
 
 // ESP32 Dev Board (38-pin)
 #define I2S_BCLK    27
@@ -273,12 +280,18 @@ struct Clip {
 };
 
 // Add or remove rows to match your clips.
-// The name here must match the var_name you used with wav_to_i2s_header.py.
 // Also update the #include lines above.
 const Clip clips[] = {
   { clip1_data, clip1_len },
   { clip2_data, clip2_len },
   { clip3_data, clip3_len },
+  //{ clip4_data, clip4_len },
+  //{ clip5_data, clip5_len },
+  //{ clip6_data, clip6_len },
+  //{ clip7_data, clip7_len },
+  //{ clip8_data, clip8_len },
+  //{ clip9_data, clip9_len },
+  //{ clip10_data, clip10_len },
 };
 const int CLIP_COUNT = sizeof(clips) / sizeof(clips[0]);
 
@@ -335,7 +348,7 @@ void loop() {
     <div class="trouble-item">
       <h3>Linker error: multiple definition of &lsquo;audio_data&rsquo;</h3>
       <ul>
-        <li>Two header files are using the same variable name. Each clip must have a unique <code>var_name</code> when you run <code>wav_to_i2s_header.py</code> - check that you passed a different third argument for each clip.</li>
+        <li>Two header files are using the same variable name. Name your clips <code>clip1.wav</code>, <code>clip2.wav</code> etc. - each must have a unique name.</li>
       </ul>
     </div>
     <div class="trouble-item">
