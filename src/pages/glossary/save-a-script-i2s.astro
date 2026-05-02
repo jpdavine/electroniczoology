@@ -77,19 +77,11 @@ print('Done: ' + str(len(samples)) + ' samples -> ' + output_file)`}</code></pre
     <p><strong>Text editor:</strong> save as <code>wav_to_i2s_header.py</code>. Make sure it saves as plain text - not a Word document or rich text file. Your home folder (<code>/home/yourname/</code>) or a project folder works well.</p>
 
     <h2>Step 4 - Run it</h2>
-    <p>The script outputs <code>clip.h</code> directly into your sketch folder - the same folder as your <code>.ino</code> file. The easiest way is to give the full path to that folder in the command.</p>
-    <p>Replace <code>/path/to/your/sketch/</code> with the actual path to your sketch folder:</p>
     <div class="code-wrap">
-      <pre><code>python3 wav_to_i2s_header.py /tmp/clip_i2s.wav /path/to/your/sketch/clip.h</code></pre>
+      <pre><code>python3 wav_to_i2s_header.py /tmp/clip_i2s.wav clip.h</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
-    <p><strong>Example</strong> - if your sketch is in <code>~/Arduino/myproject/</code>:</p>
-    <div class="code-wrap">
-      <pre><code>python3 wav_to_i2s_header.py /tmp/clip_i2s.wav ~/Arduino/myproject/clip.h</code></pre>
-      <button class="copy-btn">Copy</button>
-    </div>
-    <p>Not sure of the path? Open your sketch folder in a file manager, then drag it into the terminal - the full path will be pasted in automatically.</p>
-    <p>After running, open your sketch folder and confirm <code>clip.h</code> is there before compiling.</p>
+    <p>Place <code>clip.h</code> in your sketch folder - the same directory as your <code>.ino</code> file.</p>
   </Fragment>
 </GlossaryEntry>
 

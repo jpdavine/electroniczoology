@@ -34,11 +34,10 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <div class="card">
         <h3>Parts</h3>
         <ul>
-          <li><a href="/glossary/esp32-i2s" class="term-link">ESP32 Dev Board (38-pin)</a> or <a href="/glossary/esp32c3-i2s" class="term-link">ESP32-C3</a></li>
-          <li><a href="/glossary/max98357a" class="term-link">MAX98357A I2S amplifier module</a></li>
-          <li><a href="/glossary/speaker-i2s" class="term-link">4-8&#8486; speaker (1W or above)</a></li>
-          <li>Tactile button <em>(button mode only)</em></li>
-          <li>Jumper wires</li>
+          <li><a href="/glossary/esp32-i2s-multi" class="term-link">ESP32 Dev Board (38-pin)</a> or <a href="/glossary/esp32c3-i2s-multi" class="term-link">ESP32-C3</a></li>
+          <li><a href="/glossary/max98357a-multi" class="term-link">MAX98357A I2S amplifier module</a></li>
+          <li><a href="/glossary/speaker-i2s-multi" class="term-link">4-8&#8486; speaker (1W or above)</a></li>
+<li>Jumper wires</li>
           <li>USB-C cable for flashing</li>
         </ul>
       </div>
@@ -60,7 +59,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <p>This guide adds multiple clips. Each clip is a separate C array stored in flash via <code>PROGMEM</code> and included as a header file. The sketch works through all clips in sequence and loops forever. For button-triggered playback and custom sequence control, see <a href="/guides/max98357a-playback-modes" class="term-link">Step 4 &rarr;</a></p>
     <div class="callout callout-why">
       <strong>Flash memory budget</strong>
-      Three 2-second clips at 44100Hz 16-bit mono = ~517KB of flash. The ESP32 has around 1.2MB available under the Huge APP partition scheme. Plan your clips accordingly - drop to 22050Hz for speech to halve the size per clip.
+      Multiple clips add up fast. The ESP32 has around 1.2MB available under the Huge APP partition scheme. Lower sample rates mean smaller files - run your own tests to find what sounds acceptable for your speaker and use case.
     </div>
   </div>
 
@@ -83,7 +82,6 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
         </tbody>
       </table>
     </div>
-    <p>Button wiring is covered in the Button Mode section below - it is only needed for that mode.</p>
   </div>
 
   <!-- Before You Start -->
@@ -112,7 +110,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <pre><code>mkdir ~/myclips</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
-    <p>Name each WAV file using a valid C identifier - letters, numbers, and underscores only, and it cannot start with a number. <code>clip1.wav</code>, <code>beep_short.wav</code>, and <code>alarm2.wav</code> are fine. <code>my clip.wav</code>, <code>hello-world.wav</code>, and <code>1beep.wav</code> are not - the filename becomes the variable name in the sketch, and an invalid name will generate broken C code that won't compile.</p>
+    <p>Name your files <code>clip1.wav</code>, <code>clip2.wav</code>, <code>clip3.wav</code> and so on. The sketch is already set up for these names - use them and it works without any editing.</p>
 
     <h3>Find your clip in a video</h3>
     <p>Open the video in a media player such as VLC. Play through until you find the section you want. Note the timestamp at the bottom of the player for where your clip starts and where it ends.</p>
@@ -131,7 +129,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <li><code>-i ~/Videos/myvideo.mp4</code> - your input file. Not sure of the path? Drag the file into a terminal and the full path pastes in automatically.</li>
       <li><code>-ss 00:01:23</code> - start cutting at this timestamp</li>
       <li><code>-to 00:01:27</code> - stop cutting at this timestamp</li>
-      <li><code>~/myclips/clip1.wav</code> - output, saved directly into your clips folder. The filename becomes the variable name in the sketch - follow the naming rules above.</li>
+      <li><code>~/myclips/<strong>clip1</strong>.wav</code> - the output filename. Name your clips <code>clip1.wav</code>, <code>clip2.wav</code>, <code>clip3.wav</code> etc. and the sketch works without any changes.</li>
     </ul>
     <p><strong>Examples:</strong></p>
     <p style="font-size:0.85rem;color:#666;margin-bottom:0.25rem;">If the source file is in your home folder:</p>
@@ -199,15 +197,15 @@ print('Done: ' + str(len(samples)) + ' samples -> ' + output_file)`}</code></pre
     <div class="code-wrap">
       <pre><code>{`for f in ~/myclips/*.wav; do
   name=$(basename "$f" .wav)
-  ffmpeg -y -i "$f" -ar 44100 -ac 1 -acodec pcm_s16le "/tmp/\${name}_i2s.wav"
+  ffmpeg -y -i "$f" -ar 22050 -ac 1 -acodec pcm_s16le "/tmp/\${name}_i2s.wav"
   python3 ~/wav_to_i2s_header_multi.py "/tmp/\${name}_i2s.wav" "\${name}.h" "$name"
 done`}</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
     <p>The <code>.h</code> files land in your current directory - move them all into your <a href="/glossary/sketch-folder" class="term-link">sketch folder</a> alongside the <code>.ino</code> file.</p>
-    <div class="callout callout-why">
-      <strong>Why 44100 Hz?</strong>
-      It is the CD standard - the lowest sample rate that captures the full range of human hearing cleanly. At 44100 Hz 16-bit mono, one second of audio = ~88KB of flash. With multiple clips that adds up fast - three 2-second clips is around 517KB. For speech, drop to 22050 Hz to halve the size per clip with no noticeable quality loss. Change the <code>-ar</code> value in the batch loop and update <code>SAMPLE_RATE</code> in the sketch to match.
+    <div class="callout callout-tip">
+      <strong>What sample rate should I use?</strong>
+      Run your own tests - what sounds acceptable depends on your speaker and use case. 22050 is a reasonable starting point. 8000 works well on many speakers and produces much smaller files. Whatever value you use here must match <code>SAMPLE_RATE</code> in the sketch, or clips will play at the wrong speed.
     </div>
     <div class="callout callout-tip">
       <strong>MP3, M4A, video files?</strong>
@@ -221,6 +219,9 @@ done`}</code></pre>
   <div class="section" id="the-sketch">
     <h2>The Sketch</h2>
     <p>Plays every clip in order, repeating forever.</p>
+    <div class="callout callout-tip">
+      <strong>Adding or removing clips:</strong> add <code>clip4.wav</code>, <code>clip5.wav</code> etc. to your clips folder. Then add a matching <code>#include</code> line and a matching entry in the <code>clips[]</code> array - one line in each per clip.
+    </div>
     <div class="code-wrap">
       <pre><code>{`/*
  * We stand on the shoulders of giants when we build
@@ -260,7 +261,7 @@ done`}</code></pre>
 //#define I2S_LRCLK   5
 //#define I2S_DOUT    6
 
-#define SAMPLE_RATE 44100
+#define SAMPLE_RATE 22050  // must match -ar value used in ffmpeg conversion
 #define VOLUME      0.8f
 #define BUF_SAMPLES 256
 
@@ -287,7 +288,7 @@ void playClip(const Clip& c) {
   for (size_t pos = 0; pos < total; pos += BUF_SAMPLES) {
     size_t count = min((size_t)BUF_SAMPLES, total - pos);
     for (size_t i = 0; i < count; i++) {
-      int16_t s = (int16_t)((int16_t)pgm_read_word(&c.data[pos + i]) * VOLUME);
+      int16_t s = (int16_t)(c.data[pos + i] * VOLUME);
       i2s_buf[i * 2]     = s;
       i2s_buf[i * 2 + 1] = s;
     }
@@ -341,8 +342,8 @@ void loop() {
       <h3>Sketch too large - won&rsquo;t fit in flash</h3>
       <ul>
         <li>Switch to the Huge APP partition scheme in Arduino IDE under Tools &rarr; Partition Scheme. This gives around 1.2MB for your sketch and clips combined.</li>
-        <li>Drop the sample rate: re-convert your clips with <code>-ar 22050</code> in ffmpeg and update <code>SAMPLE_RATE</code> in the sketch. Speech stays clear at 22050Hz and clips are half the size.</li>
-        <li>Trim clips shorter - every second at 44100Hz 16-bit mono is ~86KB.</li>
+        <li>Drop the sample rate: re-convert your clips with a lower <code>-ar</code> value in ffmpeg and update <code>SAMPLE_RATE</code> in the sketch to match. Lower rates produce smaller files.</li>
+        <li>Trim clips shorter.</li>
       </ul>
     </div>
     <div class="trouble-item">

@@ -168,19 +168,19 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <p>The MAX98357A expects 16-bit signed PCM. Convert your clip to the right format:</p>
     <p class="cmd-label">Copy and paste into terminal</p>
     <div class="code-wrap">
-      <pre><code>ffmpeg -y -i /tmp/myclip.wav -ar 44100 -ac 1 -acodec pcm_s16le /tmp/clip_i2s.wav</code></pre>
+      <pre><code>ffmpeg -y -i /tmp/myclip.wav -ar 22050 -ac 1 -acodec pcm_s16le /tmp/clip_i2s.wav</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
     <p><strong>What the flags mean:</strong></p>
     <ul class="flag-list">
       <li><code>-y</code> - overwrite the output file without prompting if it already exists</li>
-      <li><code>-ar 44100</code> - sample rate 44100 Hz (CD quality)</li>
+      <li><code>-ar 22050</code> - sample rate in Hz - this value must match <code>SAMPLE_RATE</code> in the sketch</li>
       <li><code>-ac 1</code> - mono</li>
       <li><code>-acodec pcm_s16le</code> - 16-bit signed PCM, little-endian - the format I2S and the MAX98357A expect</li>
     </ul>
-    <div class="callout callout-why">
-      <strong>Why 44100 Hz?</strong>
-      It is the CD standard - the lowest sample rate that captures the full range of human hearing cleanly. A 1-second clip at 44100 Hz 16-bit mono = ~88KB. The ESP32 has 400KB RAM and the sketch needs some of that, so keep clips to 2-3 seconds. For longer audio, use LittleFS or an SD card instead.
+    <div class="callout callout-tip">
+      <strong>What sample rate should I use?</strong>
+      Run your own tests - what sounds acceptable depends on your speaker and use case. 22050 is a reasonable starting point. 8000 works well on many speakers and produces much smaller files. Whatever value you use here must match <code>SAMPLE_RATE</code> in the sketch, or the clip will play at the wrong speed.
     </div>
   </div>
 
@@ -368,7 +368,7 @@ void loop() {
 //#define I2S_LRCLK  5
 //#define I2S_DOUT   6
 
-#define SAMPLE_RATE 44100  // 44100=CD quality, 22050=half size, 16000=speech only
+#define SAMPLE_RATE 22050  // must match -ar value used in ffmpeg conversion
 #define VOLUME      0.8f   // 0.0 = silent, 1.0 = max
 
 #define BUF_SAMPLES 256
@@ -406,7 +406,7 @@ void loop() {
   for (size_t pos = 0; pos < total; pos += BUF_SAMPLES) {
     size_t count = min((size_t)BUF_SAMPLES, total - pos);
     for (size_t i = 0; i < count; i++) {
-      int16_t sample = (int16_t)((int16_t)pgm_read_word(&audio_data[pos + i]) * VOLUME);
+      int16_t sample = (int16_t)(audio_data[pos + i] * VOLUME);
       i2s_buf[i * 2]     = sample; // left
       i2s_buf[i * 2 + 1] = sample; // right
     }
@@ -421,8 +421,8 @@ void loop() {
       The <code>PROGMEM</code> keyword in <code>clip.h</code> stores the audio array in flash memory instead of RAM. A 2-second clip at 44100 Hz 16-bit is ~176KB - far too large to hold in RAM. With PROGMEM, it lives in flash. <code>pgm_read_word()</code> reads it back one sample at a time into the buffer before writing to I2S.
     </div>
     <div class="callout callout-tip">
-      <strong>Fit more audio in flash by dropping the <a href="/glossary/sample-rate-i2s" class="term-link">sample rate</a>.</strong>
-      Change <code>SAMPLE_RATE</code> in the sketch and use the same value in your ffmpeg <code>-ar</code> conversion. At 22050 Hz you get double the audio in the same space - speech stays clear. At 16000 Hz you get nearly triple - still fully intelligible for voice. Music needs 44100 to sound right.
+      <strong>Tuning the <a href="/glossary/sample-rate-i2s" class="term-link">sample rate</a>.</strong>
+      Lower rates mean smaller files and less flash used. 8000 Hz works well on many speakers. Run your own tests - what sounds acceptable depends on your speaker and use case. Whatever you set here must match the <code>-ar</code> value in your ffmpeg conversion command.
     </div>
     <div class="callout callout-tip">
       <strong>Volume control:</strong>
@@ -451,7 +451,7 @@ void loop() {
     <div class="trouble-item">
       <h3>Distorted, wrong speed, or wrong pitch</h3>
       <ul>
-        <li>The sketch sample rate (44100) must match the WAV file - recheck your ffmpeg <code>-ar</code> value</li>
+        <li>The sketch <code>SAMPLE_RATE</code> must match the WAV file - recheck your ffmpeg <code>-ar</code> value</li>
         <li>Confirm the WAV is 16-bit signed PCM (<code>pcm_s16le</code>) - other formats produce noise or silence</li>
       </ul>
     </div>
@@ -473,7 +473,7 @@ void loop() {
       <ul>
         <li>Trim the clip shorter with ffmpeg - reduce the <code>-to</code> timestamp</li>
         <li>Drop the sample rate: <code>-ar 22050</code> halves the file size with minimal quality loss for speech</li>
-        <li>For longer audio, store clips in LittleFS or on an SD card instead of PROGMEM</li>
+        <li>For longer audio, lower the sample rate or use an SD card</li>
       </ul>
     </div>
   </div>
