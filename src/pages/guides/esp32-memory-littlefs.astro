@@ -1,0 +1,135 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+---
+<GuideLayout
+  title="ESP32 LittleFS"
+  description="What LittleFS is on the ESP32, what to store in it, how to upload files, and how to check your filesystem at runtime."
+  toc={[
+    {href: '#what-is-littlefs', label: 'What Is LittleFS'},
+    {href: '#what-lives-in-littlefs', label: 'What Lives In LittleFS'},
+    {href: '#uploading-files', label: 'Uploading Files'},
+    {href: '#littlefs-vs-spiffs', label: 'LittleFS vs SPIFFS'},
+    {href: '#checking-filesystem', label: 'Checking Your Filesystem'},
+  ]}
+>
+
+  <div class="hero">
+    <div class="category">Memory &bull; ESP32</div>
+    <h1>ESP32 LittleFS<br>A Filing System Inside the Cabinet</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board or ESP32-C3</div>
+      <div class="meta-item"><strong>Topic:</strong> LittleFS, filesystem, file upload</div>
+    </div>
+    <div class="series-step">ESP32 Memory Series - Step 7 of 9</div>
+    <div class="badge badge-untested">&#9888; Untested</div>
+  </div>
+
+  <div class="terminal-note">
+    Part of the <a href="/guides/esp32-memory-intro" class="term-link">ESP32 Memory series &rarr;</a>
+  </div>
+
+  <!-- What Is LittleFS -->
+  <div class="section" id="what-is-littlefs">
+    <h2>What Is LittleFS</h2>
+    <p>You already know that flash is the filing cabinet. LittleFS is the filing system inside that cabinet. Without it you have a drawer full of loose bytes with no way to find anything. With it you have folders, file names, and a way to open, read, and write files like you would on any computer.</p>
+    <div class="code-wrap">
+      <pre><code>{`#include <LittleFS.h>
+
+LittleFS.begin();
+
+File f = LittleFS.open("/image.bmp", "r");
+// read from f
+f.close();`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>A file sitting in flash, opened by name, read like any other file.</p>
+  </div>
+
+  <!-- What Lives In LittleFS -->
+  <div class="section" id="what-lives-in-littlefs">
+    <h2>What Lives In LittleFS</h2>
+    <p>LittleFS is the right place for anything that needs to persist across reboots but is not your sketch code. Common uses:</p>
+    <ul>
+      <li>Images and bitmaps for displays</li>
+      <li>HTML, CSS, and JavaScript for a web interface served from the ESP32</li>
+      <li>Config files storing settings that survive a power cycle</li>
+      <li>Audio files for playback</li>
+    </ul>
+    <div class="callout callout-why">
+      <strong>PROGMEM vs LittleFS:</strong>
+      PROGMEM is for data baked into your sketch at compile time - you cannot change it without reflashing. LittleFS is for files that can be updated independently of your sketch, uploaded in bulk, or written to at runtime. Use PROGMEM for fixed assets that are part of your program. Use LittleFS for files you want to manage separately.
+    </div>
+  </div>
+
+  <!-- Uploading Files -->
+  <div class="section" id="uploading-files">
+    <h2>Uploading Files</h2>
+    <p>Files are placed in a folder called <code>data</code> inside your sketch folder and uploaded separately from your sketch using a tool in the Arduino IDE.</p>
+    <div class="code-wrap">
+      <pre><code>{`MySketch/
+├── MySketch.ino
+└── data/
+    ├── image.bmp
+    └── index.html`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>In Arduino IDE 1.x this is the ESP32 Sketch Data Upload plugin. In Arduino IDE 2.x it is the LittleFS Uploader plugin. The upload is a separate step from flashing your sketch and wipes the existing filesystem partition before writing the new one.</p>
+    <div class="callout callout-tip">
+      <strong>Upload order matters:</strong>
+      Flash your sketch first, then upload the filesystem. Uploading the filesystem does not touch the sketch partition and vice versa, but it is good practice to have both steps done in a known order when setting up a new board.
+    </div>
+  </div>
+
+  <!-- LittleFS vs SPIFFS -->
+  <div class="section" id="littlefs-vs-spiffs">
+    <h2>LittleFS vs SPIFFS</h2>
+    <p>You may see SPIFFS mentioned in older guides. LittleFS replaced it. SPIFFS is deprecated and LittleFS is faster, more reliable, and handles power loss during writes more gracefully. Use LittleFS.</p>
+  </div>
+
+  <!-- Checking Filesystem -->
+  <div class="section" id="checking-filesystem">
+    <h2>Checking Your Filesystem</h2>
+    <p>Upload this sketch and open the serial monitor at 115200 baud to see how much space your LittleFS partition has and how much is used.</p>
+    <div class="code-wrap">
+      <pre><code>{`#include <LittleFS.h>
+
+void setup() {
+    Serial.begin(115200);
+    delay(1000);
+
+    if (!LittleFS.begin()) {
+        Serial.println("LittleFS mount failed");
+        return;
+    }
+
+    Serial.println("--- LittleFS Report ---");
+    Serial.printf("Total space:  %u bytes\\n", LittleFS.totalBytes());
+    Serial.printf("Used space:   %u bytes\\n", LittleFS.usedBytes());
+    Serial.printf("Free space:   %u bytes\\n", LittleFS.totalBytes() - LittleFS.usedBytes());
+}
+
+void loop() {}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <div class="callout callout-tip">
+      <strong>Mount failed?</strong>
+      If LittleFS fails to mount, the filesystem partition either has not been formatted yet or is empty. Upload a data folder (even with a placeholder file) using the LittleFS Uploader to initialise it.
+    </div>
+  </div>
+
+  <div class="terminal-note">
+    <a href="/guides/esp32-memory-intro" class="term-link">&larr; Back to series</a>
+  </div>
+
+</GuideLayout>
+
+<style>
+  .terminal-note {
+    background: #1a1a2e;
+    color: #aaa;
+    font-size: 0.82rem;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 2rem;
+  }
+</style>

@@ -1,0 +1,141 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+---
+<GuideLayout
+  title="ESP32 Flash Memory"
+  description="What flash memory is on the ESP32, how to check it at runtime, and how to choose a partition scheme."
+  toc={[
+    {href: '#what-is-flash', label: 'What Is Flash'},
+    {href: '#checking-flash', label: 'Checking Your Flash'},
+    {href: '#partition-scheme', label: 'Partition Scheme'},
+  ]}
+>
+
+  <div class="hero">
+    <div class="category">Memory &bull; ESP32</div>
+    <h1>ESP32 Flash Memory<br>The Filing Cabinet</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board or ESP32-C3</div>
+      <div class="meta-item"><strong>Topic:</strong> Flash storage</div>
+    </div>
+    <div class="series-step">ESP32 Memory Series - Step 1 of 9</div>
+    <div class="badge badge-untested">&#9888; Untested</div>
+  </div>
+
+  <div class="terminal-note">
+    Part of the <a href="/guides/esp32-memory-intro" class="term-link">ESP32 Memory series &rarr;</a>
+  </div>
+
+  <!-- What Is Flash -->
+  <div class="section" id="what-is-flash">
+    <h2>What Is Flash</h2>
+    <p>Your ESP32 has a flash memory chip that acts as permanent storage. When you upload your sketch, everything goes here.</p>
+    <p>Flash is non-volatile, meaning it persists beyond reboots and power cycles. This is where your program lives permanently.</p>
+    <p>Flash is slow to read compared to RAM and PSRAM. You cannot freely write to it at runtime, Think of it as the filing cabinet. You do not do your actual work in the filing cabinet. You go to it, grab what you need, bring it to your workbench (RAM, PSRAM), work on it there, and when you are done it goes back.</p>
+    <p>On most ESP32 modules the flash chip is 4MB. That is your total budget for everything: your sketch code, your images, your web files, all of it. How you divide that 4MB is up to you - that is covered in the partition scheme section.</p>
+    <p>The key thing to understand about flash is that it is permanent storage, not working memory. It is where things live, not where things happen.</p>
+  </div>
+
+  <!-- Checking Flash -->
+  <div class="section" id="checking-flash">
+    <h2>Checking Your Flash</h2>
+    <p>You can ask the ESP32 to report on its own flash at runtime. Upload this sketch and open the serial monitor at 115200 baud.</p>
+    <div class="code-wrap">
+      <pre><code>{`void setup() {
+    Serial.begin(115200);
+    delay(1000);
+
+    Serial.println("--- Flash Report ---");
+    Serial.printf("Flash chip size:      %u bytes\\n", ESP.getFlashChipSize());
+    Serial.printf("Flash chip speed:     %u Hz\\n", ESP.getFlashChipSpeed());
+    Serial.printf("Sketch size:          %u bytes\\n", ESP.getSketchSize());
+    Serial.printf("Free sketch space:    %u bytes\\n", ESP.getFreeSketchSpace());
+}
+
+void loop() {}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+
+    <h3>What each line tells you</h3>
+    <ul class="flag-list">
+      <li><code>Flash chip size</code> - the total capacity of your flash chip. Typically 4194304 bytes (4MB).</li>
+      <li><code>Flash chip speed</code> - how fast the ESP32 talks to the flash over SPI. Usually 80000000 Hz (80MHz).</li>
+      <li><code>Sketch size</code> - how many bytes your compiled code is actually using.</li>
+      <li><code>Free sketch space</code> - how much room is left in the sketch partition for your code to grow into.</li>
+    </ul>
+
+    <div class="callout callout-tip">
+      <strong>One thing the ESP32 cannot report:</strong>
+      How many erase cycles the flash chip has seen or its current health. The hardware simply does not track or expose it.
+    </div>
+  </div>
+
+  <!-- Partition Scheme -->
+  <div class="section" id="partition-scheme">
+    <h2>Partition Scheme</h2>
+    <p>In the Arduino IDE under <strong>Tools</strong> you will find a <strong>Partition Scheme</strong> dropdown. This controls how your 4MB of flash is carved up.</p>
+    <p>From the generic options available, <strong>Huge App</strong> gives you the most sketch space - 3MB. If you need a large filesystem instead, <strong>No OTA (1MB APP/3MB SPIFFS)</strong> flips that around and gives you 3MB for files. The tradeoff is only 1MB for your sketch code.</p>
+
+    <div class="screenshot-wrap">
+      <figure>
+        <img src="/images/esp32-memory/partition-huge-app.png" alt="Arduino IDE partition scheme dropdown with Huge APP selected" />
+        <figcaption>Huge APP - 3MB sketch, 1MB filesystem</figcaption>
+      </figure>
+      <figure>
+        <img src="/images/esp32-memory/partition-huge-app-flash.png" alt="Serial monitor showing 3145728 bytes free sketch space with Huge APP partition" />
+        <figcaption>3,145,728 bytes free sketch space</figcaption>
+      </figure>
+      <figure>
+        <img src="/images/esp32-memory/partition-max-spiffs.png" alt="Arduino IDE partition scheme dropdown with No OTA 1MB APP 3MB SPIFFS selected" />
+        <figcaption>No OTA (1MB APP/3MB SPIFFS) - 1MB sketch, 3MB filesystem</figcaption>
+      </figure>
+      <figure>
+        <img src="/images/esp32-memory/partition-max-spiffs-flash.png" alt="Serial monitor showing 1048576 bytes free sketch space with Max SPIFFS partition" />
+        <figcaption>1,048,576 bytes free sketch space</figcaption>
+      </figure>
+    </div>
+
+    <p>The partition options shown here are for a standard 4MB ESP32. The options available in the dropdown change depending on your board's flash size - a 2MB chip has fewer choices, while an 8MB or 16MB chip unlocks larger splits. If an option you expect is missing, check your board's flash size first. If nothing fits, you can write a custom partition table to divide flash exactly how you need it.</p>
+
+    <div class="callout callout-why">
+      <strong>Need the full 4MB or a custom split?</strong>
+      A custom partition table gives you full control over how flash is divided between app, OTA, SPIFFS, and LittleFS partitions. That is covered in a separate guide.
+    </div>
+  </div>
+
+  <div class="terminal-note">
+    <a href="/guides/esp32-memory-intro" class="term-link">&larr; Back to series</a>
+  </div>
+
+</GuideLayout>
+
+<style>
+  .terminal-note {
+    background: #1a1a2e;
+    color: #aaa;
+    font-size: 0.82rem;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 2rem;
+  }
+  .flag-list {
+    margin: 0.5rem 0 1rem 1.2rem;
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+  .flag-list li { margin-bottom: 0.4rem; }
+  .screenshot-wrap figure {
+    margin: 0 0 1rem;
+  }
+  .screenshot-wrap img {
+    width: 100%;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+  }
+  .screenshot-wrap figcaption {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 0.4rem;
+    text-align: center;
+  }
+</style>

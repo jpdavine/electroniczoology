@@ -1,0 +1,147 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+---
+<GuideLayout
+  title="ESP32 NVS - The Notepad That Endures"
+  description="What NVS is on the ESP32, how to use the Preferences library to save settings, boot counters, and config that persists across power cycles and reflashing."
+  toc={[
+    {href: '#what-is-nvs', label: 'What Is NVS'},
+    {href: '#when-to-use-it', label: 'When To Use It'},
+    {href: '#the-sketch', label: 'The Sketch'},
+    {href: '#namespaces', label: 'Namespaces'},
+    {href: '#data-types', label: 'Available Data Types'},
+    {href: '#flash-budget', label: 'NVS and the Flash Budget'},
+  ]}
+>
+
+  <div class="hero">
+    <div class="category">Memory &bull; ESP32</div>
+    <h1>ESP32 NVS<br>The Notepad That Endures</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board or ESP32-C3</div>
+      <div class="meta-item"><strong>Topic:</strong> NVS, Preferences library, persistent storage</div>
+    </div>
+    <div class="series-step">ESP32 Memory Series - Step 5 of 9</div>
+    <div class="badge badge-untested">&#9888; Untested</div>
+  </div>
+
+  <div class="terminal-note">
+    Part of the <a href="/guides/esp32-memory-intro" class="term-link">ESP32 Memory series &rarr;</a>
+  </div>
+
+  <!-- What Is NVS -->
+  <div class="section" id="what-is-nvs">
+    <h2>What Is NVS</h2>
+    <p>Flash is permanent storage. But writing raw data to flash yourself is complicated and error prone. The ESP32 has a built in system for saving small values to flash without any of that complexity. It is called NVS, Non-Volatile Storage, and the Preferences library is how you use it from Arduino, simplified.</p>
+    <p>Think of NVS as a small notepad that lives in flash. You write a value to it by name, and it is still there the next time the board boots. Power off, reflash a new sketch, it does not matter. The notepad persists.</p>
+  </div>
+
+  <!-- When To Use It -->
+  <div class="section" id="when-to-use-it">
+    <h2>When To Use It</h2>
+    <p>NVS is the right tool for small persistent values:</p>
+    <ul class="flag-list">
+      <li>Settings and configuration that survive a power cycle</li>
+      <li>Calibration values set once and kept forever</li>
+      <li>A boot counter tracking how many times the board has started</li>
+      <li>The last known state of something before power was lost</li>
+    </ul>
+    <p>It is not the right tool for large data or files. For those, LittleFS is covered in the next guide.</p>
+  </div>
+
+  <!-- The Sketch -->
+  <div class="section" id="the-sketch">
+    <h2>The Sketch</h2>
+    <p>Upload this and open the serial monitor at 115200 baud. Watch the boot count increment every time you reset the board. Power it off and back on and the count continues from where it left off.</p>
+    <div class="code-wrap">
+      <pre><code>{`#include <Preferences.h>
+Preferences prefs;
+
+void setup() {
+    Serial.begin(115200);
+    delay(1000);
+
+    // Open a namespace called "myapp" in read/write mode
+    prefs.begin("myapp", false);
+
+    // Read a value, with a default if it does not exist yet
+    uint32_t boots = prefs.getUInt("boots", 0);
+
+    // Increment and save it back
+    boots++;
+    prefs.putUInt("boots", boots);
+
+    Serial.printf("Boot count: %lu\\n", (unsigned long)boots);
+
+    // Close the namespace when done
+    prefs.end();
+}
+
+void loop() {}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+  </div>
+
+  <!-- Namespaces -->
+  <div class="section" id="namespaces">
+    <h2>Namespaces</h2>
+    <p>NVS organises values into namespaces - a label that groups related values together. Different sketches or different parts of your code can use different namespaces without stepping on each other.</p>
+    <p>Because NVS persists across reflashing, if two sketches use the same namespace and the same key name the second sketch will pick up the value left by the first. This is usually fine and occasionally very useful, but worth knowing. If you want a clean slate for a new project, use a different namespace name or explicitly clear the old one:</p>
+    <div class="code-wrap">
+      <pre><code>{`prefs.begin("myapp", false);
+prefs.clear(); // wipes everything in this namespace
+prefs.end();`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+  </div>
+
+  <!-- Data Types -->
+  <div class="section" id="data-types">
+    <h2>Available Data Types</h2>
+    <p>The Preferences library supports most common types. The second argument to each get function is the default returned if the key does not exist yet.</p>
+    <div class="code-wrap">
+      <pre><code>{`prefs.putBool("flag", true);
+prefs.putInt("count", 42);
+prefs.putFloat("temp", 23.5);
+prefs.putString("name", "myboard");
+
+bool flag   = prefs.getBool("flag", false);
+int count   = prefs.getInt("count", 0);
+float temp  = prefs.getFloat("temp", 0.0);
+String name = prefs.getString("name", "unknown");`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+  </div>
+
+  <!-- Flash Budget -->
+  <div class="section" id="flash-budget">
+    <h2>NVS and the Flash Budget</h2>
+    <p>NVS lives in its own dedicated partition in flash, separate from your sketch partition and your LittleFS partition. It is small by design - typically 20KB in most partition schemes - because it is only meant for small values. Do not try to store large data in NVS. That is what LittleFS is for.</p>
+    <div class="terminal-note" style="margin-top:1rem;">
+      Want to build on this further? The <a href="/guides/esp32-memory-board-health" class="term-link">next guide</a> uses NVS to track lifetime boot count, uptime, and project history across every sketch you ever flash to a board.
+    </div>
+  </div>
+
+  <div class="terminal-note">
+    <a href="/guides/esp32-memory-intro" class="term-link">&larr; Back to series</a>
+  </div>
+
+</GuideLayout>
+
+<style>
+  .terminal-note {
+    background: #1a1a2e;
+    color: #aaa;
+    font-size: 0.82rem;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 2rem;
+  }
+  .terminal-note a { color: var(--amber); }
+  .flag-list {
+    margin: 0.5rem 0 1rem 1.2rem;
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+  .flag-list li { margin-bottom: 0.4rem; }
+</style>

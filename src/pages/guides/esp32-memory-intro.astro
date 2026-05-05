@@ -1,0 +1,105 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+---
+<GuideLayout
+  title="ESP32 Memory: Making the Most of What You Have"
+  description="A short series on ESP32 memory - flash, RAM, PSRAM, PROGMEM, LittleFS, and compression. What each one is, how to check it, and how to use it well."
+  toc={[
+    {href: '#what-this-covers', label: 'What This Covers'},
+    {href: '#the-three-types', label: 'The Series'},
+    {href: '#reading-order', label: 'Reading Order'},
+  ]}
+>
+
+  <div class="hero">
+    <div class="category">Memory &bull; ESP32</div>
+    <h1>ESP32 Memory<br>Making the Most of What You Have</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board or ESP32-C3</div>
+      <div class="meta-item"><strong>Topic:</strong> Flash, RAM, PSRAM, PROGMEM, LittleFS, Compression</div>
+    </div>
+    <div class="series-step">ESP32 Memory Series - Introduction</div>
+    <div class="badge badge-untested">&#9888; Untested</div>
+  </div>
+
+  <!-- What This Covers -->
+  <div class="section" id="what-this-covers">
+    <h2>What This Covers</h2>
+    <p>Most people will never need to think about memory on a microcontroller. But if you are here, you are asking that tiny chip to earn its keep.</p>
+    <p>This series breaks it down into small standalone pieces that build knowledge with each guide. Reading them in order is recommended, but if you know what you need feel free to teleport.</p>
+    <p>By the end you will understand the difference between flash, RAM, and PSRAM, why PROGMEM is AVR legacy you can skip on ESP32, how NVS lets you save small values that survive reflashing, how LittleFS gives you a real filing system, and how compression gives your chip the Tardis treatment.</p>
+  </div>
+
+  <!-- The Three Types -->
+  <div class="section" id="the-three-types">
+    <h2>The Series</h2>
+    <div class="two-col">
+      <div class="card">
+        <h3>Flash</h3>
+        <p>Permanent storage. Your sketch lives here. Non-volatile - survives power loss. Slow to read, limited write cycles. Think filing cabinet.</p>
+      </div>
+      <div class="card">
+        <h3>RAM</h3>
+        <p>Working memory. Your variables live here at runtime. Fast, flexible, but tiny (around 300KB) and wiped at power-off. Think workbench.</p>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h3>The core constraint</h3>
+        <p>Flash is large but slow and permanent. RAM is fast and flexible but tiny and temporary. Everything you write is a negotiation between the two. When later guides talk about keeping large data in flash, or spilling things out to PSRAM, it is always in service of the same goal: keeping your workbench clear enough to actually work.</p>
+      </div>
+      <div class="card">
+        <h3>PSRAM</h3>
+        <p>A second, much larger workbench. An extra chip bolted on - 4 to 8MB on supported modules. Volatile like RAM but big enough for framebuffers, audio buffers, and large data structures.</p>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h3>PROGMEM</h3>
+        <p>An AVR legacy keyword that does nothing on ESP32. <code>const</code> arrays are already kept in flash by the compiler - no hint needed. This guide explains where PROGMEM came from and why you can skip it for ESP32-only projects.</p>
+      </div>
+      <div class="card">
+        <h3>NVS</h3>
+        <p>A small notepad that lives in flash. Write a value by name and it survives power-off, power-on, and reflashing. The right tool for settings, calibration values, boot counters, and any small persistent state.</p>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h3>Board Health</h3>
+        <p>Build on NVS to track total boot count, last project name, and accumulated uptime across every sketch ever flashed to a board. Pull up any board and immediately know its history.</p>
+      </div>
+      <div class="card">
+        <h3>LittleFS</h3>
+        <p>A filing system inside the filing cabinet. Gives you named files, folders, and the ability to read and write at runtime. The right place for images, web files, and config that needs to survive a reboot.</p>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="card">
+        <h3>Compression</h3>
+        <p>Store your data compressed in flash, decompress in small chunks into RAM as you need it. The Tardis treatment - smaller on the outside. No PSRAM required.</p>
+      </div>
+      <div class="card">
+        <h3>Compression with PSRAM</h3>
+        <p>Decompress everything into PSRAM at boot and access it freely with a normal pointer. No chunking, no decompressor state. The next dimension.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reading Order -->
+  <div class="section" id="reading-order">
+    <h2>Reading Order</h2>
+    <ol>
+      <li><a href="/guides/esp32-memory-flash" class="term-link">Flash - the filing cabinet</a></li>
+      <li><a href="/guides/esp32-memory-ram" class="term-link">RAM - the workbench</a></li>
+      <li><a href="/guides/esp32-memory-psram" class="term-link">PSRAM - the bigger workbench</a></li>
+      <li><a href="/guides/esp32-memory-progmem" class="term-link">PROGMEM - why you probably don&apos;t need it</a></li>
+      <li><a href="/guides/esp32-memory-nvs" class="term-link">NVS - the notepad that endures</a></li>
+      <li><a href="/guides/esp32-memory-board-health" class="term-link">Board health - lifetime tracking with NVS</a></li>
+      <li><a href="/guides/esp32-memory-littlefs" class="term-link">LittleFS - a filing system inside the cabinet</a></li>
+      <li><a href="/guides/esp32-memory-compression" class="term-link">Compression - the Tardis treatment</a></li>
+      <li><a href="/guides/esp32-memory-compression-psram" class="term-link">Compression with PSRAM - the next dimension</a></li>
+    </ol>
+    <p>Each guide is self-contained. For Jedi we have enabled teleportation.</p>
+  </div>
+
+</GuideLayout>

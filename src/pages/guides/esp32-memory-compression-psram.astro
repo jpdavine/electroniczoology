@@ -1,0 +1,147 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+---
+<GuideLayout
+  title="ESP32 Compression with PSRAM"
+  description="Decompress data from flash into PSRAM at boot and access it freely with a normal pointer. No chunking, no decompressor state."
+  toc={[
+    {href: '#the-approach', label: 'The Approach'},
+    {href: '#compress-on-computer', label: 'Compress On Your Computer'},
+    {href: '#decompress-into-psram', label: 'Decompress Into PSRAM'},
+    {href: '#what-is-happening', label: 'What Is Happening'},
+  ]}
+>
+
+  <div class="hero">
+    <div class="category">Memory &bull; ESP32</div>
+    <h1>Compression with PSRAM<br>Decompress Once, Access Freely</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Board:</strong> ESP32 with PSRAM (AI Thinker, WROVER, S3)</div>
+      <div class="meta-item"><strong>Library:</strong> miniz</div>
+      <div class="meta-item"><strong>PSRAM required:</strong> Yes</div>
+    </div>
+    <div class="series-step">ESP32 Memory Series - Step 9 of 9</div>
+    <div class="badge badge-untested">&#9888; Untested</div>
+  </div>
+
+  <div class="terminal-note">
+    Part of the <a href="/guides/esp32-memory-intro" class="term-link">ESP32 Memory series &rarr;</a> &bull; No PSRAM? See <a href="/guides/esp32-memory-compression" class="term-link">Step 6: Compression without PSRAM &rarr;</a>
+  </div>
+
+  <!-- The Approach -->
+  <div class="section" id="the-approach">
+    <h2>The Approach</h2>
+    <p>The previous guide covered compressing data in flash and decompressing it chunk by chunk into internal RAM. That works on any ESP32 but adds complexity - you have to process your data in pieces rather than having it all available at once.</p>
+    <p>If your board has PSRAM, you can do something much cleaner. Decompress everything into PSRAM at boot and access it freely for the rest of your program. No chunking, no decompressor state to manage - just a pointer to your data sitting ready in that big extra workbench.</p>
+  </div>
+
+  <!-- Compress On Computer -->
+  <div class="section" id="compress-on-computer">
+    <h2>Compress On Your Computer</h2>
+    <p>The compression step is identical to the previous guide. Use the same Python script to compress your data and generate a PROGMEM header file.</p>
+    <div class="code-wrap">
+      <pre><code>{`import zlib, sys
+
+with open(sys.argv[1], 'rb') as f:
+    data = f.read()
+
+compressed = zlib.compress(data, level=9)
+
+print(f"// Original size: {len(data)} bytes")
+print(f"// Compressed size: {len(compressed)} bytes")
+print(f"const uint32_t originalSize = {len(data)};")
+print(f"const uint32_t compressedSize = {len(compressed)};")
+print("const uint8_t compressedData[] PROGMEM = {")
+print(', '.join(f'0x{b:02x}' for b in compressed))
+print("}")`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p class="cmd-label">Run it like this:</p>
+    <div class="code-wrap">
+      <pre><code>python3 compress.py myimage.bmp > image_data.h</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+  </div>
+
+  <!-- Decompress Into PSRAM -->
+  <div class="section" id="decompress-into-psram">
+    <h2>Decompress Into PSRAM at Boot</h2>
+    <div class="code-wrap">
+      <pre><code>{`#include <miniz.h>
+#include "image_data.h"
+
+uint8_t* imageBuffer = nullptr;
+
+void setup() {
+    Serial.begin(115200);
+    delay(1000);
+
+    if (!psramFound()) {
+        Serial.println("No PSRAM found. Use the non-PSRAM version of this guide.");
+        return;
+    }
+
+    // Allocate space in PSRAM for the decompressed data
+    imageBuffer = (uint8_t*) ps_malloc(originalSize);
+    if (imageBuffer == nullptr) {
+        Serial.println("PSRAM allocation failed.");
+        return;
+    }
+
+    // Copy compressed data from PROGMEM into a temporary internal RAM buffer
+    uint8_t* compBuf = (uint8_t*) malloc(compressedSize);
+    memcpy_P(compBuf, compressedData, compressedSize);
+
+    // Decompress directly into PSRAM
+    mz_ulong destLen = originalSize;
+    int result = mz_uncompress(imageBuffer, &destLen, compBuf, compressedSize);
+
+    free(compBuf);
+
+    if (result != MZ_OK) {
+        Serial.println("Decompression failed.");
+        return;
+    }
+
+    Serial.println("Decompression complete.");
+    Serial.printf("Free heap after decompression:  %u bytes\\n", ESP.getFreeHeap());
+    Serial.printf("Free PSRAM after decompression: %u bytes\\n", ESP.getFreePsram());
+
+    // imageBuffer is now a normal pointer to your full decompressed data in PSRAM
+    Serial.printf("First byte: 0x%02x\\n", imageBuffer[0]);
+}
+
+void loop() {
+    // Access imageBuffer freely anywhere in your code
+}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+  </div>
+
+  <!-- What Is Happening -->
+  <div class="section" id="what-is-happening">
+    <h2>What Is Happening</h2>
+    <p>At boot the compressed data is copied from PROGMEM into a small temporary internal RAM buffer just long enough to run the decompressor. The decompressor writes the full output directly into PSRAM. The temporary buffer is freed immediately after.</p>
+    <p>From that point on <code>imageBuffer</code> is just a normal pointer and you can read from it anywhere in your code without any chunking or decompressor overhead.</p>
+    <div class="callout callout-tip">
+      <strong>The result:</strong>
+      Your flash budget stays small because the data is stored compressed. Your internal RAM stays free because the decompressed data lives in PSRAM. Your code stays simple because you have direct access to the whole dataset at once. Smaller on the outside, bigger on the inside.
+    </div>
+  </div>
+
+  <div class="terminal-note">
+    <a href="/guides/esp32-memory-intro" class="term-link">&larr; Back to series</a>
+  </div>
+
+</GuideLayout>
+
+<style>
+  .terminal-note {
+    background: #1a1a2e;
+    color: #aaa;
+    font-size: 0.82rem;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 2rem;
+  }
+</style>

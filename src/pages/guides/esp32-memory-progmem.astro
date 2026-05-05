@@ -1,0 +1,91 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+---
+<GuideLayout
+  title="PROGMEM on ESP32 - Why You Probably Don't Need It"
+  description="What PROGMEM is, where it came from, and why on an ESP32 you can mostly ignore it. const is enough."
+  toc={[
+    {href: '#where-it-came-from', label: 'Where It Came From'},
+    {href: '#why-it-keeps-showing-up', label: 'Why It Keeps Showing Up'},
+    {href: '#what-happens-on-esp32', label: 'What Happens on an ESP32'},
+    {href: '#what-to-do', label: 'What To Do'},
+    {href: '#the-exception', label: 'The One Exception'},
+  ]}
+>
+
+  <div class="hero">
+    <div class="category">Memory &bull; ESP32</div>
+    <h1>PROGMEM on ESP32<br>You Probably Don&apos;t Need It</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board or ESP32-C3</div>
+      <div class="meta-item"><strong>Topic:</strong> PROGMEM, flash storage, AVR legacy</div>
+    </div>
+    <div class="series-step">ESP32 Memory Series - Step 4 of 9</div>
+    <div class="badge badge-untested">&#9888; Untested</div>
+  </div>
+
+  <div class="terminal-note">
+    Part of the <a href="/guides/esp32-memory-intro" class="term-link">ESP32 Memory series &rarr;</a>
+  </div>
+
+  <!-- Where It Came From -->
+  <div class="section" id="where-it-came-from">
+    <h2>Where It Came From</h2>
+    <p>PROGMEM is an AVR thing. On older Arduino boards like the Uno and Pro Mini, the microcontroller has completely separate address spaces for flash and RAM. The CPU physically cannot read from flash like normal memory. If you declared a large array without PROGMEM, it had no choice but to live in RAM, eating into the tiny 2KB you had to work with. PROGMEM was the only way to keep data in flash and out of RAM on those chips.</p>
+  </div>
+
+  <!-- Why It Keeps Showing Up -->
+  <div class="section" id="why-it-keeps-showing-up">
+    <h2>Why It Keeps Showing Up</h2>
+    <p>A huge amount of Arduino tutorial content was written for AVR boards and then carried forward unchanged into the ESP32 world. PROGMEM came with it. Nobody stopped to check whether it was still necessary.</p>
+  </div>
+
+  <!-- What Happens on an ESP32 -->
+  <div class="section" id="what-happens-on-esp32">
+    <h2>What Happens on an ESP32</h2>
+    <p>The ESP32 is not AVR. It can access flash transparently through a cache. When you declare a <code>const</code> array the compiler keeps it in flash without needing any hint from you. PROGMEM does not move the needle.</p>
+    <div class="code-wrap">
+      <pre><code>{`// These behave the same on ESP32
+const uint8_t myArray[] = { 0x01, 0x02, 0x03 };
+const uint8_t myArray[] PROGMEM = { 0x01, 0x02, 0x03 };`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>After testing with large arrays on real hardware - measuring free heap with and without PROGMEM - there was no measurable difference in RAM usage either way. The compiler was already doing the right thing.</p>
+  </div>
+
+  <!-- What To Do -->
+  <div class="section" id="what-to-do">
+    <h2>What To Do</h2>
+    <p>Declare your read-only arrays as <code>const</code> and let the compiler handle the rest. You can add <code>PROGMEM</code> if you want - it makes no difference on ESP32, it will not break anything. Same with <code>pgm_read_byte()</code>. Just use the array like normal either way.</p>
+    <div class="code-wrap">
+      <pre><code>{`const uint8_t myImage[] = { 0xFF, 0x00, 0x3A ... };
+
+// Access it normally
+uint8_t pixel = myImage[i];`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+  </div>
+
+  <!-- The One Exception -->
+  <div class="section" id="the-exception">
+    <h2>The One Exception</h2>
+    <p>If you are writing code that needs to run on both AVR and ESP32, PROGMEM and <code>pgm_read_byte()</code> are still the portable way to handle it. On ESP32 they do nothing harmful, and on AVR they are essential. In that specific case, keep them in.</p>
+    <p>For ESP32-only projects, leave them out.</p>
+  </div>
+
+  <div class="terminal-note">
+    <a href="/guides/esp32-memory-intro" class="term-link">&larr; Back to series</a>
+  </div>
+
+</GuideLayout>
+
+<style>
+  .terminal-note {
+    background: #1a1a2e;
+    color: #aaa;
+    font-size: 0.82rem;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 2rem;
+  }
+</style>

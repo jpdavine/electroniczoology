@@ -1,0 +1,154 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+---
+<GuideLayout
+  title="ESP32 Compression: The Tardis Treatment"
+  description="Store data compressed in flash, decompress chunk by chunk into RAM at runtime. No PSRAM required - works on any ESP32."
+  toc={[
+    {href: '#the-problem', label: 'The Problem'},
+    {href: '#the-library', label: 'The Library'},
+    {href: '#compress-on-computer', label: 'Compress On Your Computer'},
+    {href: '#decompress-at-runtime', label: 'Decompress At Runtime'},
+    {href: '#what-is-happening', label: 'What Is Happening'},
+  ]}
+>
+
+  <div class="hero">
+    <div class="category">Memory &bull; ESP32</div>
+    <h1>Compression<br>The Tardis Treatment</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Board:</strong> Any ESP32</div>
+      <div class="meta-item"><strong>Library:</strong> miniz</div>
+      <div class="meta-item"><strong>PSRAM required:</strong> No</div>
+    </div>
+    <div class="series-step">ESP32 Memory Series - Step 8 of 9</div>
+    <div class="badge badge-untested">&#9888; Untested</div>
+  </div>
+
+  <div class="terminal-note">
+    Part of the <a href="/guides/esp32-memory-intro" class="term-link">ESP32 Memory series &rarr;</a> &bull; If your board has PSRAM, see <a href="/guides/esp32-memory-compression-psram" class="term-link">Step 7: Compression with PSRAM &rarr;</a>
+  </div>
+
+  <!-- The Problem -->
+  <div class="section" id="the-problem">
+    <h2>The Problem</h2>
+    <p>You have more data than you have room for, or you want to squeeze more into your flash budget. Store your data compressed in flash, decompress it in small chunks into RAM as you need it, use it, then discard it.</p>
+    <p>No PSRAM required. This works on any ESP32. Typical image and bitmap data compresses to 30 to 60 percent of its original size depending on content.</p>
+  </div>
+
+  <!-- The Library -->
+  <div class="section" id="the-library">
+    <h2>The Library</h2>
+    <p>The easiest compression library for this purpose is <strong>miniz</strong>. It is small, well supported, and straightforward to use on the ESP32. Add it to your project via the Arduino Library Manager - search for <code>miniz</code>.</p>
+  </div>
+
+  <!-- Compress On Computer -->
+  <div class="section" id="compress-on-computer">
+    <h2>Compress On Your Computer</h2>
+    <p>Use this Python script to compress your data file and output it as a C array ready to paste into a header file.</p>
+    <div class="code-wrap">
+      <pre><code>{`import zlib, sys
+
+with open(sys.argv[1], 'rb') as f:
+    data = f.read()
+
+compressed = zlib.compress(data, level=9)
+
+print(f"// Original size: {len(data)} bytes")
+print(f"// Compressed size: {len(compressed)} bytes")
+print(f"const uint32_t originalSize = {len(data)};")
+print(f"const uint32_t compressedSize = {len(compressed)};")
+print("const uint8_t compressedData[] PROGMEM = {")
+print(', '.join(f'0x{b:02x}' for b in compressed))
+print("}")`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p class="cmd-label">Run it like this:</p>
+    <div class="code-wrap">
+      <pre><code>python3 compress.py myimage.bmp > image_data.h</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>This gives you a header file with your compressed data stored in PROGMEM, sitting in flash taking up as little space as possible.</p>
+  </div>
+
+  <!-- Decompress At Runtime -->
+  <div class="section" id="decompress-at-runtime">
+    <h2>Decompress At Runtime</h2>
+    <p>Place <code>image_data.h</code> in your sketch folder, then use this sketch as a starting point.</p>
+    <div class="code-wrap">
+      <pre><code>{`#include <miniz.h>
+#include "image_data.h"
+
+#define CHUNK_SIZE 256
+
+void setup() {
+    Serial.begin(115200);
+    delay(1000);
+
+    // Copy compressed data from PROGMEM into a RAM buffer
+    uint8_t* compBuf = (uint8_t*) malloc(compressedSize);
+    memcpy_P(compBuf, compressedData, compressedSize);
+
+    // Set up the decompressor
+    tinfl_decompressor decomp;
+    tinfl_init(&decomp);
+
+    uint8_t outChunk[CHUNK_SIZE];
+    size_t inPos = 0;
+    tinfl_status status;
+
+    do {
+        size_t inBytes = compressedSize - inPos;
+        size_t outBytes = CHUNK_SIZE;
+
+        status = tinfl_decompress(
+            &decomp,
+            compBuf + inPos, &inBytes,
+            outChunk, outChunk, &outBytes,
+            TINFL_FLAG_USING_NON_WRAPPING_OUTPUT_BUF
+        );
+
+        inPos += inBytes;
+
+        // outChunk now contains outBytes of decompressed data
+        // process it here: send to display, write to serial, whatever you need
+        Serial.write(outChunk, outBytes);
+
+    } while (status == TINFL_STATUS_HAS_MORE_OUTPUT);
+
+    free(compBuf);
+    Serial.println("\\nDone.");
+}
+
+void loop() {}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+  </div>
+
+  <!-- What Is Happening -->
+  <div class="section" id="what-is-happening">
+    <h2>What Is Happening</h2>
+    <p>The compressed data lives in PROGMEM in flash. At runtime you copy it into a small RAM buffer, run the decompressor over it in chunks, and process each chunk as it comes out. Only one chunk exists in RAM at any moment. The rest stays compressed in flash until needed.</p>
+    <p>This is slower than having everything decompressed and ready to go, but on most projects the decompression is fast enough that it is not noticeable. The flash savings are the point.</p>
+    <div class="callout callout-why">
+      <strong>Have PSRAM?</strong>
+      You can remove the chunk-by-chunk complexity entirely - decompress everything into PSRAM at boot and access it freely with a normal pointer. <a href="/guides/esp32-memory-compression-psram" class="term-link">See Step 7: Compression with PSRAM &rarr;</a>
+    </div>
+  </div>
+
+  <div class="terminal-note">
+    <a href="/guides/esp32-memory-intro" class="term-link">&larr; Back to series</a>
+  </div>
+
+</GuideLayout>
+
+<style>
+  .terminal-note {
+    background: #1a1a2e;
+    color: #aaa;
+    font-size: 0.82rem;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 2rem;
+  }
+</style>

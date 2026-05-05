@@ -1,0 +1,144 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+---
+<GuideLayout
+  title="ESP32 PSRAM"
+  description="What PSRAM is on the ESP32, which modules have it, how to check for it, and when to use it."
+  toc={[
+    {href: '#what-is-psram', label: 'What Is PSRAM'},
+    {href: '#when-to-use-it', label: 'When To Use It'},
+    {href: '#checking-psram', label: 'Checking Your PSRAM'},
+    {href: '#allocating', label: 'Allocating into PSRAM'},
+    {href: '#real-world', label: 'A Real World Example'},
+  ]}
+>
+
+  <div class="hero">
+    <div class="category">Memory &bull; ESP32</div>
+    <h1>ESP32 PSRAM<br>The Bigger Workbench</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Board:</strong> ESP32 modules with PSRAM (AI Thinker, WROVER, S3)</div>
+      <div class="meta-item"><strong>Topic:</strong> PSRAM, ps_malloc, heap_caps</div>
+    </div>
+    <div class="series-step">ESP32 Memory Series - Step 3 of 9</div>
+    <div class="badge badge-untested">&#9888; Untested</div>
+  </div>
+
+  <div class="terminal-note">
+    Part of the <a href="/guides/esp32-memory-intro" class="term-link">ESP32 Memory series &rarr;</a>
+  </div>
+
+  <!-- What Is PSRAM -->
+  <div class="section" id="what-is-psram">
+    <h2>What Is PSRAM</h2>
+    <p>You already know about the filing cabinet (flash) and the workbench (RAM). PSRAM is a second, much bigger workbench that some ESP32 modules have bolted on the side - it is a whole extra chip.</p>
+    <p>It is fast enough to work from directly, volatile like regular RAM (wiped at power-off), and typically 4 to 8MB in size. That is a significant chunk of space compared to the roughly 300KB of internal RAM your standard boards ship with. If you have it, use it.</p>
+    <p>Not all ESP32 modules include PSRAM. The AI Thinker ESP32-CAM, the ESP32 WROVER, and most ESP32-S3 modules have it. The standard ESP32 Dev Board (38-pin WROOM module) does not.</p>
+  </div>
+
+  <!-- When To Use It -->
+  <div class="section" id="when-to-use-it">
+    <h2>When To Use It</h2>
+    <p>PSRAM is ideal for things that are too large to fit in internal RAM but need to be actively worked on at runtime.</p>
+    <ul>
+      <li>A full display framebuffer</li>
+      <li>Camera frames (the ESP32-CAM uses it for this automatically)</li>
+      <li>Large audio buffers</li>
+      <li>JSON documents being parsed</li>
+      <li>Bitmap or image data being processed before display</li>
+    </ul>
+    <p>Things that exist temporarily while your program is doing something with them, then get discarded.</p>
+    <div class="callout callout-why">
+      <strong>The typical pattern:</strong>
+      Load something large from flash into PSRAM at boot, then pull small chunks of it into internal RAM as needed to process or display. This keeps your internal heap free for everything else your code is doing.
+    </div>
+  </div>
+
+  <!-- Allocating into PSRAM -->
+  <div class="section" id="allocating">
+    <h2>Allocating into PSRAM</h2>
+    <p>Use <code>ps_malloc()</code> instead of <code>malloc()</code> to explicitly allocate in PSRAM.</p>
+    <div class="code-wrap">
+      <pre><code>uint8_t* buffer = (uint8_t*) ps_malloc(500000); // 500KB from PSRAM</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>Or use <code>heap_caps_malloc()</code> for the same result with more explicit control:</p>
+    <div class="code-wrap">
+      <pre><code>uint8_t* buffer = (uint8_t*) heap_caps_malloc(500000, MALLOC_CAP_SPIRAM);</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>Both do the same thing. <code>ps_malloc()</code> is the shorthand. <code>heap_caps_malloc()</code> makes the intent obvious when reading the code. Always check the result before using the pointer:</p>
+    <div class="code-wrap">
+      <pre><code>{`if (buffer == NULL) {
+    // allocation failed - PSRAM may not be available or may be full
+    return;
+}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <div class="callout callout-tip">
+      <strong>What about automatic PSRAM for large malloc() calls?</strong>
+      The Arduino framework can be configured to include PSRAM in the scope of regular <code>malloc()</code> automatically via <code>CONFIG_SPIRAM_USE_MALLOC</code>. In newer versions of the core it is already enabled by default - but it gets reset when you update the Arduino core. Do not rely on it. If you want something in PSRAM, use <code>ps_malloc()</code> explicitly and you always know where it ended up.
+    </div>
+  </div>
+
+  <!-- Checking PSRAM -->
+  <div class="section" id="checking-psram">
+    <h2>Checking Your PSRAM</h2>
+    <p>Upload this sketch and open the serial monitor at 115200 baud.</p>
+    <div class="code-wrap">
+      <pre><code>{`void setup() {
+    Serial.begin(115200);
+    delay(1000);
+
+    Serial.println("--- PSRAM Report ---");
+
+    if (psramFound()) {
+        Serial.println("PSRAM found.");
+        Serial.printf("PSRAM size:      %u bytes\\n", ESP.getPsramSize());
+        Serial.printf("Free PSRAM:      %u bytes\\n", ESP.getFreePsram());
+    } else {
+        Serial.println("No PSRAM found on this module.");
+    }
+}
+
+void loop() {}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+
+    <div class="callout callout-tip">
+      <strong>PSRAM not showing up on a module that should have it?</strong>
+      Check that PSRAM is enabled under <strong>Tools</strong> in the Arduino IDE. There is a dedicated PSRAM option in the board settings - it is disabled by default on some board definitions.
+    </div>
+  </div>
+
+  <!-- Real World Example -->
+  <div class="section" id="real-world">
+    <h2>A Real World Example</h2>
+    <p>The ESP32-CAM is the clearest example of why PSRAM exists.</p>
+    <p>When the camera captures a frame it needs somewhere to put a full JPEG. A VGA frame at 640x480 can be 50 to 100KB depending on quality settings. Internal RAM is already mostly consumed by the WiFi stack before the camera even starts. There is simply nowhere to hold a full frame without PSRAM.</p>
+    <p>The camera library allocates the frame buffer directly into PSRAM using <code>ps_malloc()</code> under the hood. You do not have to do it yourself - the library handles it - but without PSRAM available the allocation fails and the camera cannot function at all.</p>
+    <p>That is why the AI Thinker ESP32-CAM ships with 4MB of PSRAM as standard. It is not optional for that use case.</p>
+  </div>
+
+  <div class="terminal-note">
+    <a href="/guides/esp32-memory-intro" class="term-link">&larr; Back to series</a>
+  </div>
+
+</GuideLayout>
+
+<style>
+  .terminal-note {
+    background: #1a1a2e;
+    color: #aaa;
+    font-size: 0.82rem;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 2rem;
+  }
+  .flag-list {
+    margin: 0.5rem 0 1rem 1.2rem;
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+  .flag-list li { margin-bottom: 0.4rem; }
+</style>
