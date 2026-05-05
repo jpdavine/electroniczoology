@@ -134,8 +134,7 @@ def convert(img_path, varname):
     with open(out_path, "w") as f:
         f.write(f"// {Path(img_path).name} -> 240x240 RGB565\\n")
         f.write(f"#pragma once\\n")
-        f.write(f"#include <pgmspace.h>\\n\\n")
-        f.write(f"const uint16_t {varname}[57600] PROGMEM = {{\\n  ")
+        f.write(f"const uint16_t {varname}[57600] = {{\\n  ")
 
         for i, (r, g, b) in enumerate(pixels):
             val = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
@@ -180,7 +179,7 @@ if __name__ == "__main__":
       <p>The script uses the name for two things:</p>
       <ol style="margin:0.5rem 0 0.5rem 1.2rem;">
         <li>The output filename - <code>thomas1</code> becomes <code>thomas1.h</code></li>
-        <li>The variable name declared inside that file - <code>const uint16_t thomas1[57600] PROGMEM = &lbrace;...&rbrace;</code></li>
+        <li>The variable name declared inside that file - <code>const uint16_t thomas1[57600] = &lbrace;...&rbrace;</code></li>
       </ol>
       <p>Call it whatever makes sense for your image. No spaces, no special characters.</p>
     </div>
@@ -278,8 +277,8 @@ void loop() {}`}</code></pre>
     <div class="trouble-item">
       <h3>Compile error - array too large / out of memory</h3>
       <ul>
-        <li>Make sure <code>PROGMEM</code> is in the header - without it the 115KB array goes into RAM and overflows</li>
-        <li>Check the generated <code>.h</code> file contains <code>PROGMEM</code> after the array declaration</li>
+        <li>On ESP32, <code>const</code> arrays are automatically stored in flash by the compiler - the 115KB array will not overflow RAM</li>
+        <li>If you see this error, confirm your board is set to an ESP32 variant in Arduino IDE - AVR boards (Uno, Nano) do not have this behaviour and would need <code>PROGMEM</code></li>
       </ul>
     </div>
     <div class="trouble-item">

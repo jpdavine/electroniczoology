@@ -204,8 +204,7 @@ samples = struct.unpack('<' + str(len(raw)//2) + 'h', raw)
 
 lines = [
     '#pragma once',
-    '#include <pgmspace.h>',
-    'const int16_t audio_data[] PROGMEM = {',
+    'const int16_t audio_data[] = {',
 ]
 chunks = [str(s) for s in samples]
 for i in range(0, len(chunks), 16):
@@ -335,7 +334,7 @@ void loop() {
  *
  * MAX98357A I2S Amplifier - ESP32 Dev Board
  * ------------------------------------------
- * Plays a 16-bit PCM audio clip stored in PROGMEM
+ * Plays a 16-bit PCM audio clip stored in flash
  * via I2S to a MAX98357A amplifier and speaker.
  *
  * Board:   ESP32 Dev Board (38-pin) or ESP32-C3
@@ -417,8 +416,8 @@ void loop() {
       <button class="copy-btn">Copy</button>
     </div>
     <div class="callout callout-why">
-      <strong>PROGMEM</strong>
-      The <code>PROGMEM</code> keyword in <code>clip.h</code> stores the audio array in flash memory instead of RAM. A 2-second clip at 44100 Hz 16-bit is ~176KB - far too large to hold in RAM. With PROGMEM, it lives in flash. <code>pgm_read_word()</code> reads it back one sample at a time into the buffer before writing to I2S.
+      <strong>Why not PROGMEM?</strong>
+      On ESP32, <code>const</code> arrays are stored in flash automatically by the compiler - no <code>PROGMEM</code> keyword needed. <code>PROGMEM</code> is an AVR legacy keyword; on ESP32 it does nothing. The array lives in flash either way, and you can read it directly without <code>pgm_read_word()</code>. A 2-second clip at 44100 Hz 16-bit is ~176KB - flash handles it, RAM does not.
     </div>
     <div class="callout callout-tip">
       <strong>Tuning the <a href="/glossary/sample-rate-i2s" class="term-link">sample rate</a>.</strong>

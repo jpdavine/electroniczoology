@@ -15,6 +15,10 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   ]}
 >
 
+  <div class="back-link">
+    &larr; <a href="/guides">All guides</a>
+  </div>
+
   <div class="hero">
     <div class="category">Display &bull; ESP32</div>
     <h1>TFT_eSPI by Bodmer<br>One Library for All SPI Displays</h1>
@@ -411,6 +415,10 @@ void printProcessorName(void) {
 </GuideLayout>
 
 <style>
+  .back-link { margin-bottom: 2rem; font-size: 0.9rem; }
+  .back-link a { color: var(--amber); text-decoration: none; border-bottom: 1px dashed var(--amber); }
+  .back-link a:hover { opacity: 0.8; }
+
   .lotr-quote {
     font-style: italic;
     color: #6b21a8;
