@@ -32,7 +32,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   <!-- What Is NVS -->
   <div class="section" id="what-is-nvs">
     <h2>What Is NVS</h2>
-    <p>Flash is permanent storage. But writing raw data to flash yourself is complicated and error prone. The ESP32 has a built in system for saving small values to flash without any of that complexity. It is called NVS, Non-Volatile Storage, and the Preferences library is how you use it from Arduino, simplified.</p>
+    <p>Flash is permanent storage. But writing raw data to flash yourself is complicated and error prone. The ESP32 has a built in system for saving small values to flash without any of that complexity. It is called NVS, Non-Volatile Storage, and the Preferences library is how you use it from Arduino IDE, simplified.</p>
     <p>Think of NVS as a small notepad that lives in flash. You write a value to it by name, and it is still there the next time the board boots. Power off, reflash a new sketch, it does not matter. The notepad persists.</p>
   </div>
 
@@ -52,7 +52,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   <!-- The Sketch -->
   <div class="section" id="the-sketch">
     <h2>The Sketch</h2>
-    <p>Upload this and open the serial monitor at 115200 baud. Watch the boot count increment every time you reset the board. Power it off and back on and the count continues from where it left off.</p>
+    <p>A great use case for the NVS partition is a boot counter. The Preferences library ships with the ESP32 Arduino core - no install needed. Upload this and open the serial monitor at 115200 baud. Watch the boot count increment every time you reset the board. Power it off and back on and the count continues from where it left off.</p>
     <div class="code-wrap">
       <pre><code>{`#include <Preferences.h>
 Preferences prefs;
@@ -80,6 +80,7 @@ void setup() {
 void loop() {}`}</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
+    <p>For the counter to keep incrementing across different projects, this code needs to be included in every sketch you flash to the board. If you flash a sketch that does not read and write the <code>boots</code> key, the counter just sits frozen in NVS until a sketch that includes it runs again.</p>
   </div>
 
   <!-- Namespaces -->
@@ -118,7 +119,7 @@ String name = prefs.getString("name", "unknown");`}</code></pre>
     <h2>NVS and the Flash Budget</h2>
     <p>NVS lives in its own dedicated partition in flash, separate from your sketch partition and your LittleFS partition. It is small by design - typically 20KB in most partition schemes - because it is only meant for small values. Do not try to store large data in NVS. That is what LittleFS is for.</p>
     <div class="terminal-note" style="margin-top:1rem;">
-      Want to build on this further? The <a href="/guides/esp32-memory-board-health" class="term-link">next guide</a> uses NVS to track lifetime boot count, uptime, and project history across every sketch you ever flash to a board.
+      Want to build on this further? The <a href="/guides/esp32-memory-board-health" class="term-link">next guide</a> uses NVS to keep a permanent record of a board's entire history - total uptime, every project ever flashed, surviving every reflash. One namespace, every board, forever.
     </div>
   </div>
 
