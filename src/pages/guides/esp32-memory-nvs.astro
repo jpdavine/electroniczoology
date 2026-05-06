@@ -8,6 +8,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     {href: '#what-is-nvs', label: 'What Is NVS'},
     {href: '#when-to-use-it', label: 'When To Use It'},
     {href: '#the-sketch', label: 'The Sketch'},
+    {href: '#adding-to-your-sketch', label: 'Adding to Your Sketch'},
     {href: '#namespaces', label: 'Namespaces'},
     {href: '#data-types', label: 'Available Data Types'},
     {href: '#flash-budget', label: 'NVS and the Flash Budget'},
@@ -54,7 +55,26 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <h2>The Sketch</h2>
     <p>A great use case for the NVS partition is a boot counter. The Preferences library ships with the ESP32 Arduino core - no install needed. Upload this and open the serial monitor at 115200 baud. Watch the boot count increment every time you reset the board. Power it off and back on and the count continues from where it left off.</p>
     <div class="code-wrap">
-      <pre><code>{`#include <Preferences.h>
+      <pre><code>{`/*
+ * We stand on the shoulders of giants when we build
+ * with knowledge gained from others' efforts.
+ * That doesn't make us giants. Be humble.
+ * Create with care. Open source is the way.
+ *
+ * NVS Boot Counter
+ * ----------------
+ * Save and increment a boot count using NVS and the Preferences library.
+ * The value survives power-off and reflashing.
+ *
+ * Board:   ESP32 Dev Board
+ * Library: Preferences (built-in to ESP32 Arduino core)
+ *
+ * Open source - MIT Licence
+ * Electronic Zoology - field notes from the garage
+ * https://electroniczoology.com/guides/esp32-memory-nvs
+ */
+
+#include <Preferences.h>
 Preferences prefs;
 
 void setup() {
@@ -80,7 +100,226 @@ void setup() {
 void loop() {}`}</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
+    <div class="screenshot-wrap">
+      <figure>
+        <img src="/images/esp32-memory/nvs-serial-output.png" alt="Arduino IDE serial monitor showing Boot count: 7" />
+        <figcaption>Boot count in the serial monitor - increments every reset, persists through power-off and reflashing</figcaption>
+      </figure>
+    </div>
     <p>For the counter to keep incrementing across different projects, this code needs to be included in every sketch you flash to the board. If you flash a sketch that does not read and write the <code>boots</code> key, the counter just sits frozen in NVS until a sketch that includes it runs again.</p>
+  </div>
+
+  <!-- Adding to Your Sketch -->
+  <div class="section" id="adding-to-your-sketch">
+    <h2>Adding to Your Sketch</h2>
+    <p>The boot counter is five lines in setup. Here is the starfield sketch before and after adding it.</p>
+
+    <h4>Before</h4>
+    <div class="code-wrap">
+      <pre><code>{`/*
+ * We stand on the shoulders of giants when we build
+ * with knowledge gained from others' efforts.
+ * That doesn't make us giants. Be humble.
+ * Create with care. Open source is the way.
+ *
+ * GC9A01 Round TFT Display - Starfield
+ * -------------------------------------
+ * Renders a 150-star warp speed starfield on a
+ * GC9A01 240x240 round IPS TFT display via SPI.
+ *
+ * Board:   ESP32 Dev Board
+ * Library: Arduino_GFX_Library by Moon On Our Nation
+ *
+ * Wiring (ESP32 Dev Board):
+ *   VCC -> 3.3V    GND -> GND
+ *   SCL -> GPIO18  SDA -> GPIO23
+ *   DC  -> GPIO27  CS  -> GPIO5
+ *   RST -> GPIO4
+ *
+ * Open source - MIT Licence
+ * Electronic Zoology - field notes from the garage
+ * https://electroniczoology.com/guides/esp32-memory-nvs
+ */
+
+#include <Arduino_GFX_Library.h>
+
+// ESP32 Dev Board pins
+#define TFT_DC  27
+#define TFT_CS   5
+#define TFT_RST  4
+#define TFT_SCK 18
+#define TFT_MOSI 23
+
+Arduino_DataBus *bus = new Arduino_HWSPI(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI);
+Arduino_GFX *gfx = new Arduino_GC9A01(bus, TFT_RST, 0, true);
+
+#define CX        120
+#define CY        120
+#define NUM_STARS 150
+#define SPEED     3.5f
+
+struct Star { float x, y, z; int px, py; };
+Star stars[NUM_STARS];
+
+void resetStar(Star &s) {
+  s.x = random(-120, 120);
+  s.y = random(-120, 120);
+  s.z = random(60, 240);
+  s.px = -1; s.py = -1;
+}
+
+uint16_t grey(uint8_t v) {
+  return ((v >> 3) << 11) | ((v >> 2) << 5) | (v >> 3);
+}
+
+void drawTitle() {
+  gfx->setTextColor(0xFFFF);
+  gfx->setTextSize(2);
+  gfx->setCursor(60, 100); gfx->print("Electronic");
+  gfx->setCursor(54, 122); gfx->print("Zoology.com");
+}
+
+void setup() {
+  pinMode(4, OUTPUT);
+  digitalWrite(4, LOW);
+  Serial.begin(115200);
+  randomSeed(analogRead(0));
+  gfx->begin();
+  gfx->fillScreen(0x0000);
+  for (int i = 0; i < NUM_STARS; i++) {
+    resetStar(stars[i]);
+    stars[i].z = random(1, 240);
+  }
+}
+
+void loop() {
+  for (int i = 0; i < NUM_STARS; i++) {
+    Star &s = stars[i];
+    if (s.px >= 0) gfx->fillCircle(s.px, s.py, s.z > 120 ? 1 : 2, 0x0000);
+    s.z -= SPEED;
+    if (s.z <= 1) { resetStar(s); continue; }
+    int sx = CX + (int)(s.x * 120.0f / s.z);
+    int sy = CY + (int)(s.y * 120.0f / s.z);
+    if (sx < 0 || sx >= 240 || sy < 0 || sy >= 240) { resetStar(s); continue; }
+    uint8_t brightness = (uint8_t)((1.0f - s.z / 240.0f) * 220 + 35);
+    int radius = s.z < 80 ? 2 : 1;
+    gfx->fillCircle(sx, sy, radius, grey(brightness));
+    s.px = sx; s.py = sy;
+  }
+  drawTitle();
+}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+
+    <h4>After - boot counter added</h4>
+    <div class="code-wrap">
+      <pre><code>{`/*
+ * We stand on the shoulders of giants when we build
+ * with knowledge gained from others' efforts.
+ * That doesn't make us giants. Be humble.
+ * Create with care. Open source is the way.
+ *
+ * GC9A01 Round TFT Display - Starfield with Boot Counter
+ * -------------------------------------------------------
+ * Starfield animation with an NVS boot counter added.
+ * The count survives power-off and reflashing.
+ *
+ * Board:   ESP32 Dev Board
+ * Library: Arduino_GFX_Library by Moon On Our Nation
+ *          Preferences (built into ESP32 Arduino core)
+ *
+ * Wiring (ESP32 Dev Board):
+ *   VCC -> 3.3V    GND -> GND
+ *   SCL -> GPIO18  SDA -> GPIO23
+ *   DC  -> GPIO27  CS  -> GPIO5
+ *   RST -> GPIO4
+ *
+ * Open source - MIT Licence
+ * Electronic Zoology - field notes from the garage
+ * https://electroniczoology.com/guides/esp32-memory-nvs
+ */
+
+#include <Arduino_GFX_Library.h>
+#include <Preferences.h>
+
+// ESP32 Dev Board pins
+#define TFT_DC  27
+#define TFT_CS   5
+#define TFT_RST  4
+#define TFT_SCK 18
+#define TFT_MOSI 23
+
+Arduino_DataBus *bus = new Arduino_HWSPI(TFT_DC, TFT_CS, TFT_SCK, TFT_MOSI);
+Arduino_GFX *gfx = new Arduino_GC9A01(bus, TFT_RST, 0, true);
+
+#define CX        120
+#define CY        120
+#define NUM_STARS 150
+#define SPEED     3.5f
+
+struct Star { float x, y, z; int px, py; };
+Star stars[NUM_STARS];
+
+void resetStar(Star &s) {
+  s.x = random(-120, 120);
+  s.y = random(-120, 120);
+  s.z = random(60, 240);
+  s.px = -1; s.py = -1;
+}
+
+uint16_t grey(uint8_t v) {
+  return ((v >> 3) << 11) | ((v >> 2) << 5) | (v >> 3);
+}
+
+void drawTitle() {
+  gfx->setTextColor(0xFFFF);
+  gfx->setTextSize(2);
+  gfx->setCursor(60, 100); gfx->print("Electronic");
+  gfx->setCursor(54, 122); gfx->print("Zoology.com");
+}
+
+void setup() {
+  pinMode(4, OUTPUT);
+  digitalWrite(4, LOW);
+  Serial.begin(115200);
+  delay(1000);
+
+  Preferences prefs;
+  prefs.begin("myapp", false);
+  uint32_t boots = prefs.getUInt("boots", 0);
+  boots++;
+  prefs.putUInt("boots", boots);
+  Serial.printf("Boot count: %lu\\n", (unsigned long)boots);
+  prefs.end();
+
+  randomSeed(analogRead(0));
+  gfx->begin();
+  gfx->fillScreen(0x0000);
+  for (int i = 0; i < NUM_STARS; i++) {
+    resetStar(stars[i]);
+    stars[i].z = random(1, 240);
+  }
+}
+
+void loop() {
+  for (int i = 0; i < NUM_STARS; i++) {
+    Star &s = stars[i];
+    if (s.px >= 0) gfx->fillCircle(s.px, s.py, s.z > 120 ? 1 : 2, 0x0000);
+    s.z -= SPEED;
+    if (s.z <= 1) { resetStar(s); continue; }
+    int sx = CX + (int)(s.x * 120.0f / s.z);
+    int sy = CY + (int)(s.y * 120.0f / s.z);
+    if (sx < 0 || sx >= 240 || sy < 0 || sy >= 240) { resetStar(s); continue; }
+    uint8_t brightness = (uint8_t)((1.0f - s.z / 240.0f) * 220 + 35);
+    int radius = s.z < 80 ? 2 : 1;
+    gfx->fillCircle(sx, sy, radius, grey(brightness));
+    s.px = sx; s.py = sy;
+  }
+  drawTitle();
+}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>The count prints to the serial monitor on every boot and survives every power cycle and reflash. For fuller tracking - total uptime, a history of every project ever flashed to the board - see the <a href="/guides/esp32-memory-board-health">Board Health guide</a>.</p>
   </div>
 
   <!-- Namespaces -->
@@ -144,5 +383,8 @@ String name = prefs.getString("name", "unknown");`}</code></pre>
     font-size: 0.9rem;
     line-height: 1.7;
   }
+  .screenshot-wrap figure { margin: 1rem 0; }
+  .screenshot-wrap img { width: 100%; border-radius: 6px; border: 1px solid #e0e0e0; }
+  .screenshot-wrap figcaption { font-size: 0.8rem; color: #888; margin-top: 0.4rem; text-align: center; }
   .flag-list li { margin-bottom: 0.4rem; }
 </style>
