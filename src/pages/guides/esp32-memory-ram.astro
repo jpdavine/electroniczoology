@@ -7,6 +7,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   toc={[
     {href: '#what-is-ram', label: 'What Is RAM'},
     {href: '#checking-ram', label: 'Checking Your RAM'},
+    {href: '#adding-to-sketch', label: 'Adding to Your Sketch', sub: true},
     {href: '#real-project-cost', label: 'What a Real Project Costs'},
   ]}
 >
@@ -78,7 +79,7 @@ void loop() {}`}</code></pre>
       </figure>
     </div>
 
-    <h3>Adding RAM monitoring to your existing sketch</h3>
+    <h3 id="adding-to-sketch">Adding RAM monitoring to your existing sketch</h3>
     <p>You do not need a dedicated sketch to check RAM. The more useful approach is adding the report calls directly into a sketch that is already doing something - so you can see what RAM looks like under real load. Here is the starfield sketch from the GC9A01 guide, before and after adding RAM monitoring.</p>
 
     <h4>Before</h4>
@@ -820,6 +821,8 @@ void loop() {
 
   <div class="terminal-note">
     <a href="/guides/esp32-memory-intro" class="term-link">&larr; Back to series</a>
+    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+    <a href="/guides/esp32-memory-flash" class="term-link">Next: Flash &rarr;</a>
   </div>
 
 </GuideLayout>

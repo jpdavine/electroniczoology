@@ -10,8 +10,8 @@ const { title, description, toc = [] } = Astro.props;
     <nav class="toc">
       <h3>Contents</h3>
       <ol>
-        {toc.map((item: {href: string, label: string}) => (
-          <li><a href={item.href}>{item.label}</a></li>
+        {toc.map((item: {href: string, label: string, sub?: boolean}) => (
+          <li class={item.sub ? 'toc-sub' : ''}><a href={item.href}>{item.label}</a></li>
         ))}
       </ol>
     </nav>
@@ -69,6 +69,16 @@ const { title, description, toc = [] } = Astro.props;
     color: var(--amber);
     font-weight: 700;
     font-size: 0.85rem;
+  }
+  .toc ol li.toc-sub {
+    counter-increment: none;
+    padding-left: 1.1rem;
+    margin-bottom: 0.25rem;
+  }
+  .toc ol li.toc-sub::before {
+    content: "- ";
+    color: #aaa;
+    font-weight: 400;
   }
   .toc a {
     color: #444;
