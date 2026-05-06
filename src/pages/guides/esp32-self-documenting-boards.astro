@@ -1,0 +1,130 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+---
+<GuideLayout
+  title="Self-Documenting ESP32 Boards with LittleFS"
+  description="Store a copy of your sketch on the board itself using LittleFS. Plug it in months later, ask the board what it is, and it tells you."
+  toc={[
+    {href: '#the-setup', label: 'The Setup'},
+    {href: '#reading-it-back', label: 'Reading It Back'},
+    {href: '#the-point', label: 'The Point'},
+  ]}
+>
+
+  <div class="hero">
+    <div class="category">LittleFS &bull; ESP32</div>
+    <h1>Self-Documenting Boards<br>with LittleFS</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Board:</strong> Any ESP32</div>
+      <div class="meta-item"><strong>Topic:</strong> LittleFS, self-documentation</div>
+    </div>
+    <div class="badge badge-untested">&#9888; Untested</div>
+  </div>
+
+  <div class="terminal-note">
+    Requires <a href="/guides/esp32-memory-littlefs" class="term-link">LittleFS on ESP32 &rarr;</a>
+  </div>
+
+  <p class="guide-intro">You pick up a board off the shelf. It is wired to something, half-built, and you cannot remember what. You wrote this six months ago and the source is in a folder somewhere, on a laptop somewhere, or nowhere at all. The fix is to put a copy of the sketch on the board itself. Plug it in, ask the board what it is, and the board tells you.</p>
+
+  <!-- The Setup -->
+  <div class="section" id="the-setup">
+    <h2>The Setup</h2>
+    <p>Make a <code>data</code> folder next to your sketch and put the .ino inside it as <code>sketch.ino</code>:</p>
+    <div class="code-wrap">
+      <pre><code>{`starfield/
+├── starfield.ino
+└── data/
+    └── sketch.ino`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>Two files in two places means one of them goes stale the moment you edit the other. On Linux a symlink fixes this. The signpost points at the real file, so editing the original is enough:</p>
+    <div class="code-wrap">
+      <pre><code>{`cd starfield/
+ln -s ../starfield.ino data/sketch.ino`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>Verify with <code>ls -l data/</code>. You should see <code>sketch.ino -> ../starfield.ino</code>.</p>
+    <div class="callout callout-why">
+      <strong>Relative path matters:</strong>
+      <code>../starfield.ino</code> keeps working if you rename or move the project folder. An absolute path breaks the moment anything moves.
+    </div>
+    <p>On Windows symlinks exist but are awkward. Easier to just copy the file and remember to copy it again before each upload, or write a one-line batch file.</p>
+    <p>Then run the LittleFS Uploader plugin from the IDE. The board now has its own source code.</p>
+  </div>
+
+  <!-- Reading It Back -->
+  <div class="section" id="reading-it-back">
+    <h2>Reading It Back</h2>
+    <p>A few lines in your loop give you a serial command. Type <code>src</code> in the serial monitor and the board prints its own source.</p>
+    <div class="code-wrap">
+      <pre><code>{`/*
+ * We stand on the shoulders of giants when we build
+ * with knowledge gained from others' efforts.
+ * That doesn't make us giants. Be humble.
+ * Create with care. Open source is the way.
+ *
+ * ESP32 Self-Documenting Board
+ * -----------------------------
+ * Type "src" in the serial monitor and the board
+ * prints its own sketch source from LittleFS.
+ *
+ * Board:   Any ESP32
+ * Library: LittleFS (built into ESP32 Arduino core)
+ *
+ * Open source - MIT Licence
+ * Electronic Zoology - field notes from the garage
+ * https://electroniczoology.com/guides/esp32-self-documenting-boards
+ */
+
+#include <LittleFS.h>
+
+void setup() {
+  Serial.begin(115200);
+  LittleFS.begin();
+}
+
+void loop() {
+  if (Serial.available()) {
+    String cmd = Serial.readStringUntil('\\n');
+    cmd.trim();
+    if (cmd == "src") {
+      File f = LittleFS.open("/sketch.ino", "r");
+      while (f.available()) Serial.write(f.read());
+      f.close();
+    }
+  }
+
+  // rest of your loop
+}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>That is the whole feature. Plug in USB, type <code>src</code>, and the board tells you what it is.</p>
+  </div>
+
+  <!-- The Point -->
+  <div class="section" id="the-point">
+    <h2>The Point</h2>
+    <p>A board on a shelf is a question. What was this for? Why is it wired like that? Which version of the library did I land on? Without an answer the board is dead weight, half a project you might restart and probably will not.</p>
+    <p>Putting the sketch on the board itself turns it back into a question that has an answer. The answer is on the device, attached to the hardware, impossible to lose track of as long as the board exists.</p>
+    <p>The shelf full of half-finished projects gets less mysterious. That is worth the partition space all by itself.</p>
+  </div>
+
+  <div class="terminal-note">
+    <a href="/guides/esp32-memory-littlefs" class="term-link">&larr; Back to LittleFS</a>
+  </div>
+
+</GuideLayout>
+
+<style>
+  .guide-intro { font-size: 1.05rem; color: #444; line-height: 1.7; margin: 1.5rem 0 2rem; }
+  .terminal-note {
+    background: #1a1a2e;
+    color: #aaa;
+    font-size: 0.82rem;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 2rem;
+  }
+  .terminal-note a { color: var(--amber); }
+</style>
