@@ -18,7 +18,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <div class="meta-item"><strong>Board:</strong> Any ESP32</div>
       <div class="meta-item"><strong>Topic:</strong> LittleFS, self-documentation</div>
     </div>
-    <div class="badge badge-untested">&#9888; Untested</div>
+    <div class="badge badge-confirmed">&#10003; Confirmed</div>
   </div>
 
   <div class="terminal-note">
@@ -31,16 +31,11 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   <div class="section" id="the-setup">
     <h2>The Setup</h2>
     <p>Make a <code>data</code> folder next to your sketch and put the .ino inside it as <code>sketch.ino</code>:</p>
-    <div class="code-wrap">
-      <pre><code>{`starfield/
-├── starfield.ino
-└── data/
-    └── sketch.ino`}</code></pre>
-      <button class="copy-btn">Copy</button>
-    </div>
+    <img src="/images/littlefs/data-folder.png" alt="Sketch folder showing the data folder alongside the .ino file" class="guide-img" />
     <p>Two files in two places means one of them goes stale the moment you edit the other. On Linux a symlink fixes this. The signpost points at the real file, so editing the original is enough:</p>
+    <p>You need to be inside the sketch folder first. Arduino sketches live in <code>~/Arduino/</code> by default, so the full path is:</p>
     <div class="code-wrap">
-      <pre><code>{`cd starfield/
+      <pre><code>{`cd ~/Arduino/starfield
 ln -s ../starfield.ino data/sketch.ino`}</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
@@ -50,13 +45,13 @@ ln -s ../starfield.ino data/sketch.ino`}</code></pre>
       <code>../starfield.ino</code> keeps working if you rename or move the project folder. An absolute path breaks the moment anything moves.
     </div>
     <p>On Windows symlinks exist but are awkward. Easier to just copy the file and remember to copy it again before each upload, or write a one-line batch file.</p>
-    <p>Then run the LittleFS Uploader plugin from the IDE. The board now has its own source code.</p>
+    <p>The symlink keeps the file in sync automatically - you only need to edit <code>starfield.ino</code> as normal. Whenever you want to push a fresh copy to the board, open the command palette (<code>Ctrl+Shift+P</code>) and run <strong>Upload LittleFS to Pico/ESP8266/ESP32</strong>. The board now has its own source code.</p>
   </div>
 
   <!-- Reading It Back -->
   <div class="section" id="reading-it-back">
     <h2>Reading It Back</h2>
-    <p>A few lines in your loop give you a serial command. Type <code>src</code> in the serial monitor and the board prints its own source.</p>
+    <p>A few lines in your loop give you a serial command. Type <code>src</code> in the serial monitor and the board prints its own source. The command can be anything you like - <code>src</code> is just the example used here. You could use <code>readMeBob</code>, <code>whoami</code>, or whatever makes sense for your project.</p>
     <div class="code-wrap">
       <pre><code>{`/*
  * We stand on the shoulders of giants when we build
@@ -99,7 +94,7 @@ void loop() {
 }`}</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
-    <p>That is the whole feature. Plug in USB, type <code>src</code>, and the board tells you what it is.</p>
+    <p>That is the whole feature. Plug in USB, type <code>src</code> (or <code>readMeBob</code>, or whatever you chose), and the board prints out its own sketch.</p>
   </div>
 
   <!-- The Point -->
@@ -127,4 +122,12 @@ void loop() {
     margin-bottom: 2rem;
   }
   .terminal-note a { color: var(--amber); }
+  .guide-img {
+    display: block;
+    width: 100%;
+    max-width: 700px;
+    border-radius: 6px;
+    margin: 0.75rem 0 0.25rem;
+    border: 1px solid #333;
+  }
 </style>
