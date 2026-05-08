@@ -1,0 +1,93 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+---
+<GuideLayout
+  title="Installing the LittleFS Plugin"
+  description="Step-by-step guide to installing the Arduino LittleFS Uploader plugin for Arduino IDE 2.x on Linux, Mac, and Windows."
+  toc={[
+    {href: '#installing-the-plugin', label: 'Installing the Plugin'},
+  ]}
+>
+
+  <div class="hero">
+    <div class="category">Memory &bull; ESP32</div>
+    <h1>Installing the LittleFS Plugin</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Board:</strong> Any ESP32</div>
+      <div class="meta-item"><strong>Topic:</strong> LittleFS, plugin, Arduino IDE 2.x</div>
+    </div>
+  </div>
+
+  <div class="terminal-note">
+    Part of the <a href="/guides/esp32-memory-littlefs" class="term-link">&larr; ESP32 LittleFS guide</a>
+  </div>
+
+  <!-- Installing the Plugin -->
+  <div class="section" id="installing-the-plugin">
+    <h2>Installing the Plugin</h2>
+    <p>To get files from your computer onto the board you need the LittleFS Uploader plugin for Arduino IDE 2.x. Install it once:</p>
+    <ol class="step-list">
+      <li>
+        Go to <a href="https://github.com/earlephilhower/arduino-littlefs-upload" class="term-link" target="_blank">github.com/earlephilhower/arduino-littlefs-upload</a>. Scroll down until you see the Installation section and click it to jump straight there.
+        <img src="/images/littlefs/plugin-github-install.png" alt="GitHub README showing the Installation section with an arrow pointing to it" class="guide-img" />
+        <p class="img-caption">GitHub can be overwhelming if this is your first visit.</p>
+      </li>
+      <li>
+        Scroll down until you see this and click to download.
+        <img src="/images/littlefs/plugin-releases-vsix.png" alt="GitHub releases page showing the .vsix file in the Assets section" class="guide-img" />
+      </li>
+      <li>
+        You should see a zipped folder in your Downloads.
+        <img src="/images/littlefs/plugin-downloaded-vsix.png" alt="Downloads folder showing the downloaded .vsix file" class="guide-img" />
+      </li>
+      <li>
+        Unzip it - a folder will appear alongside the zipped folder.
+        <img src="/images/littlefs/plugin-unzipped.png" alt="Downloads folder showing the unzipped folder alongside the .vsix file" class="guide-img" />
+      </li>
+      <li>
+        Navigate to your home folder. You need to find the <code>.arduinoIDE</code> folder - you may need to show hidden folders first (<code>Ctrl+H</code> on Linux). Inside it, create a <code>plugins</code> folder if it does not exist.
+        <img src="/images/littlefs/plugin-home-arduinoide.png" alt="Home folder showing the .arduinoIDE folder" class="guide-img" />
+        <img src="/images/littlefs/plugin-arduinoide-plugins.png" alt=".arduinoIDE folder contents showing the plugins folder" class="guide-img" />
+      </li>
+      <li>
+        Copy the <code>.vsix</code> file into the <code>plugins</code> folder. Restart Arduino IDE.
+      </li>
+    </ol>
+  </div>
+
+  <div class="terminal-note">
+    <a href="/guides/esp32-memory-littlefs" class="term-link">&larr; Back to LittleFS guide</a>
+  </div>
+
+</GuideLayout>
+
+<style>
+  .terminal-note {
+    background: #1a1a2e;
+    color: #aaa;
+    font-size: 0.82rem;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    margin-bottom: 2rem;
+  }
+  .terminal-note a { color: var(--amber); }
+  .step-list {
+    margin: 0.75rem 0 1rem 1.2rem;
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+  .step-list li { margin-bottom: 0.5rem; }
+  .guide-img {
+    display: block;
+    width: 100%;
+    max-width: 700px;
+    border-radius: 6px;
+    margin: 0.75rem 0 0.25rem;
+    border: 1px solid #333;
+  }
+  .img-caption {
+    font-size: 0.8rem;
+    color: #888;
+    margin: 0.25rem 0 0.75rem;
+  }
+</style>

@@ -5,12 +5,11 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   title="ESP32 LittleFS"
   description="What LittleFS is on the ESP32, how to read and write files, how to upload files from the IDE, and how to check your filesystem at runtime."
   toc={[
-    {href: '#installing-the-plugin', label: 'Installing the Plugin'},
     {href: '#adding-files-to-the-board', label: 'Adding Files to the Board'},
-    {href: '#reading-a-file', label: 'Reading a File'},
     {href: '#writing-a-file', label: 'Writing a File'},
-    {href: '#spiffs', label: 'SPIFFS'},
     {href: '#checking-the-filesystem', label: 'Checking the Filesystem'},
+    {href: '#reading-a-file', label: 'Reading a File'},
+    {href: '#spiffs', label: 'SPIFFS'},
     {href: '#where-this-is-useful', label: 'Where This Is Useful'},
   ]}
 >
@@ -35,109 +34,29 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   <!-- Installing the Plugin -->
   <div class="section" id="installing-the-plugin">
     <h2>Installing the Plugin</h2>
-    <p>To get files from your computer onto the board you need the LittleFS Uploader plugin for Arduino IDE 2.x. Install it once:</p>
-    <ol class="step-list">
-      <li>
-        Go to <a href="https://github.com/earlephilhower/arduino-littlefs-upload" class="term-link" target="_blank">github.com/earlephilhower/arduino-littlefs-upload</a>. The README shows the official install method - copy the <code>.vsix</code> file directly into the <code>plugins</code> folder.
-        <img src="/images/littlefs/plugin-github-readme.png" alt="GitHub README showing the installation instructions" class="guide-img" />
-      </li>
-      <li>
-        Click <strong>Releases</strong> and download the latest <code>.vsix</code> file.
-        <img src="/images/littlefs/plugin-releases.png" alt="GitHub releases page showing the .vsix download" class="guide-img" />
-      </li>
-      <li>
-        The file lands in your Downloads folder.
-        <img src="/images/littlefs/plugin-downloaded.png" alt="Downloads folder showing the downloaded .vsix file" class="guide-img" />
-      </li>
-      <li>
-        You may see a folder appear alongside the <code>.vsix</code> - ignore it. You only need the <code>.vsix</code> file.
-        <img src="/images/littlefs/plugin-downloads-both.png" alt="Downloads folder showing the .vsix and an extracted folder" class="guide-img" />
-      </li>
-      <li>
-        Open your file manager and navigate to your home folder. Open the <code>.arduinoIDE</code> folder. You may need to show hidden folders first (<code>Ctrl+H</code> on Linux).
-        <img src="/images/littlefs/plugin-home-folder.png" alt="Home folder showing the .arduinoIDE folder" class="guide-img" />
-      </li>
-      <li>
-        Open the <code>plugins</code> folder inside <code>.arduinoIDE</code>. Create it if it does not exist.
-        <img src="/images/littlefs/plugin-arduinoide-folder.png" alt=".arduinoIDE folder contents showing the plugins folder" class="guide-img" />
-      </li>
-      <li>
-        Copy the <code>.vsix</code> file into the <code>plugins</code> folder. Restart Arduino IDE.
-        <img src="/images/littlefs/plugin-plugins-folder.png" alt="plugins folder with the plugin installed" class="guide-img" />
-      </li>
-    </ol>
+    <p>To upload files from your computer to the board you need the LittleFS Uploader plugin for Arduino IDE 2.x. It is a one-time install - full steps with screenshots are on the <a href="/guides/esp32-littlefs-plugin-install" class="term-link">plugin install page &rarr;</a></p>
   </div>
 
   <!-- Adding Files to the Board -->
   <div class="section" id="adding-files-to-the-board">
     <h2>Adding Files to the Board</h2>
-    <p>Put your files in a folder called <code>data</code> next to your sketch:</p>
-    <div class="code-wrap">
-      <pre><code>{`mysketch/
-├── mysketch.ino
-└── data/
-    └── notes.txt`}</code></pre>
-      <button class="copy-btn">Copy</button>
-    </div>
-    <p>With your sketch open, open the command palette (<code>Ctrl+Shift+P</code>) and run <strong>Upload LittleFS to Pico/ESP8266/ESP32</strong>. The upload wipes the filesystem partition before writing the new one, so anything your code wrote at runtime goes with it.</p>
+    <p>Inside your sketch folder, create a new folder called <code>data</code>. This is where you put the files you want to upload to the board. The folder must be named exactly <code>data</code> and must sit in the same folder as your <code>.ino</code> file:</p>
+    <img src="/images/littlefs/data-folder.png" alt="Sketch folder showing the data folder alongside the .ino file" class="guide-img" />
+    <p>Once you have made the <code>data</code> folder you can put whatever you want into it. For this example a text file is used - make sure you include the <code>.txt</code> extension.</p>
+    <img src="/images/littlefs/data-folder-contents.png" alt="data folder open showing a text file inside, with the file contents visible in a text editor" class="guide-img" />
+    <p>Make sure the Serial Monitor is closed before uploading. With your sketch open, press <code>Ctrl+Shift+P</code> to open the command palette and select <strong>Upload LittleFS to Pico/ESP8266/ESP32</strong>.</p>
+    <img src="/images/littlefs/upload-command-palette.png" alt="Arduino IDE command palette showing the Upload LittleFS command" class="guide-img" />
+    <p>The upload wipes the filesystem partition before writing the new one, so anything your code wrote at runtime goes with it.</p>
     <p>When it finishes you will see the output in the console and a notification confirming the upload.</p>
-    <img src="/images/littlefs/upload-complete-1.png" alt="Arduino IDE console showing LittleFS upload output" class="guide-img" />
-    <img src="/images/littlefs/upload-complete-2.png" alt="Arduino IDE showing LittleFS upload completed notification" class="guide-img" />
+    <img src="/images/littlefs/upload-complete-1.png" alt="Arduino IDE console showing LittleFS upload complete" class="guide-img" />
     <p>The size of the LittleFS partition depends on the <strong>Partition Scheme</strong> selected under Tools in Arduino IDE. On a standard 4MB ESP32 the default scheme gives you about 1.5MB. If you need more space, switch to <strong>No OTA (2MB APP/2MB SPIFFS)</strong>. If you need a bigger app and less file space, use <strong>Minimal SPIFFS</strong>. The <a href="#checking-the-filesystem" class="term-link">Filesystem Check sketch</a> below will report exactly how much you have.</p>
   </div>
 
   <!-- Reading a File -->
-  <div class="section" id="reading-a-file">
-    <h2>Reading a File</h2>
-    <div class="code-wrap">
-      <pre><code>{`/*
- * We stand on the shoulders of giants when we build
- * with knowledge gained from others' efforts.
- * That doesn't make us giants. Be humble.
- * Create with care. Open source is the way.
- *
- * ESP32 LittleFS - Reading a File
- * --------------------------------
- * Opens and reads a file from LittleFS flash storage.
- *
- * Board:   Any ESP32
- * Library: LittleFS (built into ESP32 Arduino core)
- *
- * Open source - MIT Licence
- * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/esp32-memory-littlefs
- */
-
-#include <LittleFS.h>
-
-void setup() {
-  Serial.begin(115200);
-
-  if (!LittleFS.begin()) {
-    Serial.println("FS mount failed");
-    return;
-  }
-
-  File f = LittleFS.open("/notes.txt", "r");
-  if (!f) {
-    Serial.println("file not found");
-    return;
-  }
-
-  while (f.available()) Serial.write(f.read());
-  f.close();
-}
-
-void loop() {}`}</code></pre>
-      <button class="copy-btn">Copy</button>
-    </div>
-    <p>A file sitting in flash, opened by name, read like any other file.</p>
-  </div>
-
   <!-- Writing a File -->
   <div class="section" id="writing-a-file">
     <h2>Writing a File</h2>
-    <p>Your sketch can also create and write files directly at runtime - no upload needed.</p>
+    <p>Your sketch can also create and write files directly at runtime - no upload needed and no <code>data</code> folder required.</p>
     <div class="code-wrap">
       <pre><code>{`/*
  * We stand on the shoulders of giants when we build
@@ -164,20 +83,14 @@ void setup() {
   LittleFS.begin(true);
 
   File f = LittleFS.open("/notes.txt", "w");
-  f.println("hello from the board");
+  f.println("bazzzinga");
   f.close();
 }
 
 void loop() {}`}</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
-    <p>The <code>"w"</code> mode creates the file if it does not exist and overwrites it if it does. Use <code>"a"</code> to append instead. The <code>true</code> passed to <code>begin()</code> formats the partition on the first run, when nothing is there to mount yet.</p>
-  </div>
-
-  <!-- SPIFFS -->
-  <div class="section" id="spiffs">
-    <h2>SPIFFS</h2>
-    <p>You will see SPIFFS mentioned in older guides. LittleFS replaced it. SPIFFS is deprecated, slower, and less reliable when power is cut mid-write. Use LittleFS.</p>
+    <p>The <code>"w"</code> mode creates the file if it does not exist and overwrites it if it does - every write starts fresh, wiping whatever was there before. Use <code>"a"</code> to append instead, which keeps the existing content and adds new data to the end. The <code>true</code> passed to <code>begin()</code> formats the partition on the first run, when nothing is there to mount yet.</p>
   </div>
 
   <!-- Checking the Filesystem -->
@@ -228,6 +141,106 @@ void setup() {
 void loop() {}`}</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
+    <p>Open the Serial Monitor at 115200 baud and you will see your partition size and every file on the filesystem.</p>
+    <img src="/images/littlefs/filesystem-check-serial.png" alt="Serial Monitor showing LittleFS partition size and file listing" class="guide-img" />
+  </div>
+
+  <div class="section" id="reading-a-file">
+    <h2>Reading a File</h2>
+    <p>Once a file exists on the filesystem you can access it in different ways - via a web server so a browser can fetch it, or directly from the serial monitor. Here we will show two examples of reading from serial. Both can be dropped into any sketch that already uses LittleFS.</p>
+    <div class="code-wrap">
+      <pre><code>{`/*
+ * We stand on the shoulders of giants when we build
+ * with knowledge gained from others' efforts.
+ * That doesn't make us giants. Be humble.
+ * Create with care. Open source is the way.
+ *
+ * ESP32 LittleFS - Reading a File
+ * --------------------------------
+ * Opens and reads a file from LittleFS flash storage.
+ *
+ * Board:   Any ESP32
+ * Library: LittleFS (built into ESP32 Arduino core)
+ *
+ * Open source - MIT Licence
+ * Electronic Zoology - field notes from the garage
+ * https://electroniczoology.com/guides/esp32-memory-littlefs
+ */
+
+#include <LittleFS.h>
+
+void setup() {
+  Serial.begin(115200);
+
+  if (!LittleFS.begin()) {
+    Serial.println("FS mount failed");
+    return;
+  }
+
+  File f = LittleFS.open("/notes.txt", "r");
+  if (!f) {
+    Serial.println("file not found");
+    return;
+  }
+
+  while (f.available()) Serial.write(f.read());
+  f.close();
+}
+
+void loop() {}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>The filename in <code>LittleFS.open()</code> must match exactly what you named the file in your <code>data</code> folder - including the extension. If your file is called <code>notes.txt</code>, the path must be <code>"/notes.txt"</code>. If your file is called <code>config.json</code>, the path must be <code>"/config.json"</code>. Get it wrong and you will hit the "file not found" branch.</p>
+    <p>This second example reads on demand - type a command into the Serial Monitor and the board dumps the file back. Useful when the board is running and you want to check what is stored without reflashing.</p>
+    <div class="code-wrap">
+      <pre><code>{`/*
+ * We stand on the shoulders of giants when we build
+ * with knowledge gained from others' efforts.
+ * That doesn't make us giants. Be humble.
+ * Create with care. Open source is the way.
+ *
+ * ESP32 LittleFS - Read File on Serial Command
+ * ---------------------------------------------
+ * Waits for a serial command, then dumps the file contents back.
+ *
+ * Board:   Any ESP32
+ * Library: LittleFS (built into ESP32 Arduino core)
+ *
+ * Open source - MIT Licence
+ * Electronic Zoology - field notes from the garage
+ * https://electroniczoology.com/guides/esp32-memory-littlefs
+ */
+
+#include <LittleFS.h>
+
+void setup() {
+  Serial.begin(115200);
+  LittleFS.begin();
+}
+
+void loop() {
+  if (Serial.available()) {
+    String cmd = Serial.readStringUntil('\\n');
+    cmd.trim();
+    if (cmd == "OpenThePodBayDoors") {
+      File f = LittleFS.open("/ElectronicZoologyLittleFsTest.txt", "r");
+      while (f.available()) Serial.write(f.read());
+      f.close();
+    }
+  }
+
+  // rest of your loop
+}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <img src="/images/littlefs/serial-command-read.png" alt="Arduino IDE showing the serial command typed into the Serial Monitor input" class="guide-img" />
+    <p class="img-caption">Type the command into the Serial Monitor input and hit Enter to trigger the file read.</p>
+  </div>
+
+  <!-- SPIFFS -->
+  <div class="section" id="spiffs">
+    <h2>SPIFFS</h2>
+    <p>You will see SPIFFS mentioned in older guides. LittleFS replaced it. SPIFFS is deprecated, slower, and less reliable when power is cut mid-write. Use LittleFS.</p>
   </div>
 
   <!-- Where This Is Useful -->
@@ -281,5 +294,10 @@ void loop() {}`}</code></pre>
     border-radius: 6px;
     margin: 0.75rem 0 0.25rem;
     border: 1px solid #333;
+  }
+  .img-caption {
+    font-size: 0.8rem;
+    color: #888;
+    margin: 0.25rem 0 0.75rem;
   }
 </style>
