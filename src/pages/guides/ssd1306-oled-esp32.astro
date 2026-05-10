@@ -1,0 +1,352 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+---
+<GuideLayout
+  title="SSD1306 OLED with ESP32 - 4-Pin I2C"
+  description="How to wire and drive a 4-pin I2C SSD1306 OLED with an ESP32 using the Adafruit SSD1306 library. Covers wiring, I2C address scanning, and a confirmed working test sketch."
+  toc={[
+    {href: '#what-you-need', label: 'What You Need'},
+    {href: '#how-it-works', label: 'How It Works'},
+    {href: '#wiring', label: 'Wiring'},
+    {href: '#i2c-scanner', label: 'Find Your I2C Address'},
+    {href: '#sketch', label: 'Test Sketch'},
+    {href: '#troubleshooting', label: 'Troubleshooting'},
+  ]}
+>
+
+  <div class="hero">
+    <div class="category">Display &bull; ESP32</div>
+    <h1>SSD1306 OLED with ESP32<br>4-Pin I2C</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Display:</strong> SSD1306 128x64 OLED (4-pin I2C)</div>
+      <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin)</div>
+      <div class="meta-item"><strong>Library:</strong> Adafruit SSD1306 + Adafruit GFX</div>
+      <div class="meta-item"><strong>Interface:</strong> I2C</div>
+    </div>
+    <div class="badge badge-confirmed">&#10003; Confirmed Working</div>
+  </div>
+
+  <!-- Why This Display -->
+  <div class="section" id="why">
+    <p>The 4-pin SSD1306 OLED needs only two signal wires - SDA and SCL. No chip select, no data/command pin, no SPI bus to share. It runs on 3.3V, draws very little power, and is readable in direct light without a backlight. It works well for status readouts, sensor values, and debug output in any project where colour is not needed.</p>
+    <p>This guide covers the 0.96 inch 128x64 module. The 0.91 inch 128x32 variant works with the same library and wiring - just change <code>SCREEN_HEIGHT</code> to 32.</p>
+  </div>
+
+  <!-- What You Need -->
+  <div class="section" id="what-you-need">
+    <h2>What You Need</h2>
+    <div class="two-col">
+      <div class="card">
+        <h3>Parts</h3>
+        <ul>
+          <li>ESP32 Dev Board (38-pin)</li>
+          <li>SSD1306 128x64 OLED (4-pin I2C)</li>
+          <li>Jumper wires</li>
+          <li>USB data cable for flashing</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Software</h3>
+        <ul>
+          <li>Arduino IDE with ESP32 board support</li>
+          <li><code>Adafruit SSD1306</code> by Adafruit</li>
+          <li><code>Adafruit GFX Library</code> by Adafruit (dependency)</li>
+        </ul>
+        <p style="margin-top:1rem;font-size:0.85rem;color:#666;">Install via Arduino IDE Library Manager. When prompted to install dependencies, click <strong>Install All</strong>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- How It Works -->
+  <div class="section" id="how-it-works">
+    <h2>How It Works</h2>
+    <p>The Adafruit SSD1306 library keeps a copy of the entire display in a 1KB frame buffer in the ESP32's RAM. Drawing calls write into that buffer. Nothing appears on screen until you call <code>display.display()</code>, which pushes the full buffer over I2C.</p>
+    <p>The workflow for every frame is always the same:</p>
+    <pre style="background:#f4f4f4;padding:0.75rem 1rem;border-radius:6px;font-size:0.9rem;margin:1rem 0;">clearDisplay() &rarr; draw everything &rarr; display()</pre>
+    <p>Skipping <code>clearDisplay()</code> leaves old content underneath new content. Skipping <code>display()</code> means nothing appears on screen. These two are the source of most first-run confusion.</p>
+  </div>
+
+  <!-- Wiring -->
+  <div class="section" id="wiring">
+    <h2>Wiring</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>OLED Pin</th><th>ESP32 Pin</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>VCC</td><td>3.3V</td><td>Some modules accept 5V - check your module. When in doubt use 3.3V.</td></tr>
+          <tr><td>GND</td><td>GND</td><td></td></tr>
+          <tr><td>SCL</td><td>GPIO 22</td><td>I2C clock - hardware default</td></tr>
+          <tr><td>SDA</td><td>GPIO 21</td><td>I2C data - hardware default</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Find Your I2C Address -->
+  <div class="section" id="i2c-scanner">
+    <h2>Find Your I2C Address</h2>
+    <p>The SSD1306 is almost always <code>0x3C</code>, but some modules ship as <code>0x3D</code>. Flash this scanner to confirm before going further - it also verifies your wiring is correct.</p>
+    <p>Open Serial Monitor at <strong>115200 baud</strong> after flashing. If nothing is found, check wiring - SDA and SCL swapped is the most common cause.</p>
+    <div class="code-wrap">
+      <pre><code>{`/*
+ * We stand on the shoulders of giants when we build
+ * with knowledge gained from others' efforts.
+ * That doesn't make us giants. Be humble.
+ * Create with care. Open source is the way.
+ *
+ * I2C Address Scanner
+ * --------------------
+ * Reports all devices found on the I2C bus to Serial Monitor.
+ * Open Serial Monitor at 115200 baud.
+ *
+ * Board:  ESP32 Dev Board (38-pin)
+ * SDA:    GPIO 21
+ * SCL:    GPIO 22
+ *
+ * Open source - MIT Licence
+ * Electronic Zoology - field notes from the garage
+ * https://electroniczoology.com/guides/ssd1306-oled-esp32
+ */
+
+#include <Wire.h>
+
+void setup() {
+  Serial.begin(115200);
+  Wire.begin(21, 22);
+  delay(1000);
+  Serial.println("Scanning I2C bus...");
+  Serial.println();
+}
+
+void loop() {
+  int found = 0;
+
+  for (byte addr = 1; addr < 127; addr++) {
+    Wire.beginTransmission(addr);
+    byte error = Wire.endTransmission();
+
+    if (error == 0) {
+      Serial.print("Device found at 0x");
+      if (addr < 16) Serial.print("0");
+      Serial.println(addr, HEX);
+      found++;
+    }
+  }
+
+  if (found == 0) {
+    Serial.println("No devices found. Check wiring.");
+  } else {
+    Serial.print(found);
+    Serial.println(found == 1 ? " device found." : " devices found.");
+  }
+
+  Serial.println("---");
+  delay(3000);
+}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>Note the address the scanner reports - you will need it in the next step.</p>
+  </div>
+
+  <!-- Test Sketch -->
+  <div class="section" id="sketch">
+    <h2>Test Sketch</h2>
+    <p>Update <code>SCREEN_ADDRESS</code> to match what the scanner found. Flash and open Serial Monitor at 115200 baud - the sketch prints a confirmation if the display is not found.</p>
+    <p>The sketch flashes the screen white twice as a pixel test, then runs an 80-star warp speed starfield with the site name overlaid.</p>
+    <div class="code-wrap">
+      <pre><code>{`/*
+ * We stand on the shoulders of giants when we build
+ * with knowledge gained from others' efforts.
+ * That doesn't make us giants. Be humble.
+ * Create with care. Open source is the way.
+ *
+ * SSD1306 OLED - Display Test Sketch
+ * ------------------------------------
+ * Flashes white twice as a pixel test, then an
+ * 80-star warp speed starfield with site name.
+ *
+ * Board:   ESP32 Dev Board (38-pin)
+ * Display: SSD1306 128x64 OLED (4-pin I2C)
+ * Library: Adafruit SSD1306 + Adafruit GFX
+ *
+ * Wiring:
+ *   VCC -> 3.3V    GND -> GND
+ *   SDA -> GPIO 21  SCL -> GPIO 22
+ *
+ * Update SCREEN_ADDRESS to match your module (0x3C or 0x3D).
+ * Run the I2C scanner above if unsure.
+ *
+ * Open source - MIT Licence
+ * Electronic Zoology - field notes from the garage
+ * https://electroniczoology.com/guides/ssd1306-oled-esp32
+ */
+
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#define SCREEN_WIDTH   128
+#define SCREEN_HEIGHT  64
+#define OLED_RESET     -1
+#define SCREEN_ADDRESS 0x3C     // Change to 0x3D if the scanner found that
+
+#define NUM_STARS 80
+#define SPEED     3.5f
+
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
+struct Star { float x, y, z; };
+Star stars[NUM_STARS];
+
+int CX, CY;
+
+void resetStar(Star &s) {
+  s.x = random(-CX, CX);
+  s.y = random(-CY, CY);
+  s.z = 240;
+}
+
+void printCentered(const char* text, int y, int textSize) {
+  int textWidth = strlen(text) * 6 * textSize;
+  display.setTextSize(textSize);
+  display.setCursor((SCREEN_WIDTH - textWidth) / 2, y);
+  display.print(text);
+}
+
+void drawTitle() {
+  display.setTextColor(SSD1306_WHITE);
+  printCentered("Electronic", CY - 18, 2);
+  printCentered("Zoology",    CY + 2,  2);
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  Wire.begin(21, 22);
+  Wire.setClock(400000);
+
+  if (!display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS)) {
+    Serial.println("SSD1306 not found. Check wiring and SCREEN_ADDRESS.");
+    while (true) delay(1000);
+  }
+
+  Serial.println("SSD1306 found. Running test.");
+
+  CX = SCREEN_WIDTH  / 2;
+  CY = SCREEN_HEIGHT / 2;
+
+  randomSeed(analogRead(0));
+
+  // Pixel test - flash white twice
+  for (int i = 0; i < 2; i++) {
+    display.fillScreen(SSD1306_WHITE);
+    display.display();
+    delay(2000);
+    display.fillScreen(SSD1306_BLACK);
+    display.display();
+    delay(400);
+  }
+
+  // Seed stars at random depths so the field is full from the start
+  for (int i = 0; i < NUM_STARS; i++) {
+    resetStar(stars[i]);
+    stars[i].z = random(1, 240);
+  }
+}
+
+void loop() {
+  display.clearDisplay();
+
+  for (int i = 0; i < NUM_STARS; i++) {
+    Star &s = stars[i];
+
+    s.z -= SPEED;
+    if (s.z <= 1) { resetStar(s); continue; }
+
+    int sx = CX + (int)(s.x * (float)CX / s.z);
+    int sy = CY + (int)(s.y * (float)CY / s.z);
+
+    if (sx < 0 || sx >= SCREEN_WIDTH || sy < 0 || sy >= SCREEN_HEIGHT) {
+      resetStar(s); continue;
+    }
+
+    if (s.z < 60) {
+      display.fillCircle(sx, sy, 1, SSD1306_WHITE);
+    } else {
+      display.drawPixel(sx, sy, SSD1306_WHITE);
+    }
+  }
+
+  drawTitle();
+  display.display();
+  delay(1);
+}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+  </div>
+
+  <!-- Troubleshooting -->
+  <div class="section" id="troubleshooting">
+    <h2>Troubleshooting</h2>
+    <div class="trouble-item">
+      <h3>Nothing on screen - display stays black</h3>
+      <ul>
+        <li>Run the scanner from the step above first. If it finds nothing, the problem is wiring - SDA and SCL swapped is the most common cause.</li>
+        <li>If the scanner finds a device but the display stays black, check that <code>SCREEN_ADDRESS</code> matches what the scanner reported.</li>
+      </ul>
+    </div>
+    <div class="trouble-item">
+      <h3>Serial Monitor shows "SSD1306 not found"</h3>
+      <ul>
+        <li><code>display.begin()</code> failed. Either the address is wrong or the display is not responding on the bus.</li>
+        <li>Run the scanner, confirm the address, and check both signal wires are seated.</li>
+      </ul>
+    </div>
+    <div class="trouble-item">
+      <h3>Garbled or partial display</h3>
+      <ul>
+        <li>Check that Adafruit GFX is installed alongside Adafruit SSD1306.</li>
+        <li>A missing GFX dependency can cause partial rendering without a compile error.</li>
+      </ul>
+    </div>
+    <div class="trouble-item">
+      <h3>Display works but is slow or flickers</h3>
+      <ul>
+        <li>Add <code>Wire.setClock(400000)</code> after <code>Wire.begin()</code> to switch to 400kHz fast mode.</li>
+        <li>The default 100kHz pushes a full 128x64 frame noticeably slower.</li>
+      </ul>
+    </div>
+    <div class="trouble-item">
+      <h3>Sketch compiled fine but nothing appears</h3>
+      <ul>
+        <li>Confirm <code>display.display()</code> is being called after your drawing code. Nothing reaches the screen until that call is made.</li>
+      </ul>
+    </div>
+  </div>
+
+</GuideLayout>
+
+<style>
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.5rem; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    min-width: 400px;
+  }
+  th {
+    background: #1a1a2e;
+    color: #fff;
+    text-align: left;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+  }
+  td {
+    padding: 0.55rem 1rem;
+    border-bottom: 1px solid #eee;
+  }
+  tr:nth-child(even) td { background: #fafafa; }
+  tr:last-child td { border-bottom: none; }
+</style>
