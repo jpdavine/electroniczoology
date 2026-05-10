@@ -46,7 +46,24 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <h2>Checking Your RAM</h2>
     <p>Upload this sketch and open the serial monitor at 115200 baud.</p>
     <div class="code-wrap">
-      <pre><code>{`void setup() {
+      <pre><code>{`/*
+ * We stand on the shoulders of giants when we build
+ * with knowledge gained from others' efforts.
+ * That doesn't make us giants. Be humble.
+ * Create with care. Open source is the way.
+ *
+ * ESP32 RAM Report
+ * ----------------
+ * Report free heap, minimum heap, and largest free block.
+ *
+ * Board:   Any ESP32
+ *
+ * Open source - MIT Licence
+ * Electronic Zoology - field notes from the garage
+ * https://electroniczoology.com/guides/esp32-memory-ram
+ */
+
+void setup() {
     Serial.begin(115200);
     delay(1000);
 

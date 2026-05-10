@@ -1,0 +1,140 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+---
+<GuideLayout
+  title="New ESP32 Board Checklist"
+  description="What to check when a new ESP32 arrives. Physical inspection, Arduino IDE board setup, and diagnostic sketches to confirm what you actually have."
+  toc={[
+    {href: '#physical-inspection', label: 'Physical Inspection'},
+    {href: '#arduino-ide-setup', label: 'Arduino IDE Setup'},
+    {href: '#chip-info', label: 'Chip Info'},
+    {href: '#flash-ram-psram', label: 'Flash, RAM & PSRAM'},
+  ]}
+>
+
+  <div class="hero">
+    <div class="category">Diagnostics &bull; ESP32</div>
+    <h1>New ESP32 Board Checklist<br>First Steps</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Board:</strong> Any ESP32</div>
+      <div class="meta-item"><strong>Topic:</strong> Diagnostics, chip info, board verification</div>
+    </div>
+    <div class="badge badge-confirmed">&#10003; Confirmed</div>
+  </div>
+
+  <p>I bought a batch of five ESP32 boards, a good deal off AliExpress. They arrived and sat for three months before I got around to using them. The first one I powered on ran hot immediately. If it is too hot to touch comfortably, bin it. So I tested the batch. Two out of the five were dead. By that point the AliExpress dispute window had long closed and my cheap deal was a loss. Now I open and check every board within 24 hours of it arriving, whether I need it or not.</p>
+
+  <p>This guide assumes it is not your first day on the farm. Your IDE is already set up for ESP32 work. A dedicated guide for setting up the Arduino IDE for ESP32 is coming, so keep an eye out for it.</p>
+
+  <p>Here are the sketches I run on every new board. They tell you more than just that she is alive and has a pulse.</p>
+
+  <!-- Physical Inspection -->
+  <div class="section" id="physical-inspection">
+    <h2>Physical Inspection</h2>
+    <p>Before plugging anything in, look at the board.</p>
+    <ul class="check-list">
+      <li><strong>Check the pins.</strong> Bent pins on a header strip are easy to miss and easy to fix with tweezers before they cause intermittent connections that waste your time later.</li>
+      <li><strong>Check the USB port.</strong> Give it a gentle wiggle. A port that moves is a port that will eventually fail.</li>
+      <li><strong>Check the module label.</strong> The variant is printed on the module itself - N8, N8R2, N8R8 and so on. Write it down. The diagnostic sketches will confirm it, but knowing what to expect before you run them means you can spot a mislabelled module.</li>
+      <li><strong>Check for obvious damage.</strong> Burn marks, missing components, cracked substrate. Rare with new boards but worth ten seconds.</li>
+    </ul>
+  </div>
+
+  <!-- Arduino IDE Setup -->
+  <div class="section" id="arduino-ide-setup">
+    <h2>Arduino IDE Setup</h2>
+    <p>Select the right board under Tools. For an ESP32-S3 use <strong>ESP32S3 Dev Module</strong>. For a C3 use <strong>ESP32C3 Dev Module</strong>. The generic ESP32 option is for the original WROOM and WROVER modules and will not work correctly with S3 or C3 hardware.</p>
+    <p>Set the PSRAM option to match your module variant. If your module has R8 in the name, set PSRAM to <strong>OPI PSRAM</strong>. If it has R2, set it to <strong>QSPI PSRAM</strong>. No R in the name means no PSRAM - leave it disabled. The PSRAM sketch in the memory series will confirm whether this is correct.</p>
+    <p>Set the baud rate to 115200. All sketches in this guide and the linked memory guides use this.</p>
+  </div>
+
+  <!-- Chip Info -->
+  <div class="section" id="chip-info">
+    <h2>Chip Info</h2>
+    <p>Upload this sketch first. It confirms the chip model, silicon revision, clock speed, and core count.</p>
+    <div class="code-wrap">
+      <pre><code>{`/*
+ * We stand on the shoulders of giants when we build
+ * with knowledge gained from others' efforts.
+ * That doesn't make us giants. Be humble.
+ * Create with care. Open source is the way.
+ *
+ * ESP32 Chip Info
+ * ---------------
+ * Report chip model, revision, CPU frequency, and core count.
+ *
+ * Board:   Any ESP32
+ *
+ * Open source - MIT Licence
+ * Electronic Zoology - field notes from the garage
+ * https://electroniczoology.com/guides/esp32-new-board-checklist
+ */
+
+void setup() {
+    Serial.begin(115200);
+    delay(1000);                                                    // give the serial monitor time to connect
+
+    Serial.printf("Chip model:    %s\\n", ESP.getChipModel());      // ESP32, ESP32-S3, ESP32-C3, ESP32-S2, etc.
+    Serial.printf("Chip revision: %d\\n", ESP.getChipRevision());   // silicon revision - affects some errata
+    Serial.printf("CPU freq:      %d MHz\\n", ESP.getCpuFreqMHz()); // typically 240MHz, 160MHz, or 80MHz depending on variant
+    Serial.printf("Cores:         %d\\n", ESP.getChipCores());      // original and S3 have 2, C3 and S2 have 1
+}
+void loop() {}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+
+    <h3>What each line tells you</h3>
+    <ul class="flag-list">
+      <li><code>Chip model</code> - confirms you have the variant you think you have. Useful when boards arrive unlabelled or with vague silk screen.</li>
+      <li><code>Chip revision</code> - the silicon revision. Early revisions of some ESP32 variants have known bugs baked into the hardware. If a peripheral behaves strangely, check the Espressif documentation for your revision number before you blame your code.</li>
+      <li><code>CPU freq</code> - what clock speed the board manager defaulted to. Affects timing-sensitive code and power consumption.</li>
+      <li><code>Cores</code> - matters when you start looking at FreeRTOS task pinning. Code written assuming two cores will behave differently on a single-core variant like the C3.</li>
+    </ul>
+
+    <div class="screenshot-wrap">
+      <figure>
+        <img src="/images/esp32-new-board-checklist/chip-info-serial-output.png" alt="Arduino IDE serial monitor showing chip info output - ESP32-S3, revision 2, 240MHz, 2 cores" />
+        <figcaption>Chip info output on an ESP32-S3 - revision 2, 240MHz, 2 cores</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <!-- Flash, RAM, and PSRAM -->
+  <div class="section" id="flash-ram-psram">
+    <h2>Flash, RAM, and PSRAM</h2>
+    <p>These three sketches are covered in full in the memory series, including what each line reports and what the numbers mean for your project.</p>
+    <ul class="link-list">
+      <li><a href="/guides/esp32-memory-flash">Flash - chip size, speed, and sketch space</a></li>
+      <li><a href="/guides/esp32-memory-ram">RAM - free heap, minimum heap, and largest free block</a></li>
+      <li><a href="/guides/esp32-memory-psram">PSRAM - whether it is present and how much</a></li>
+    </ul>
+    <p>Run them in order. By the end you will know exactly what the board has and how much of it is available before your sketch does anything.</p>
+  </div>
+
+</GuideLayout>
+
+<style>
+  .screenshot-wrap figure { margin: 1rem 0; }
+  .screenshot-wrap img { width: 100%; border-radius: 6px; border: 1px solid #e0e0e0; }
+  .screenshot-wrap figcaption { font-size: 0.8rem; color: #888; margin-top: 0.4rem; text-align: center; }
+  .check-list {
+    margin: 0.75rem 0 1rem 1.2rem;
+    font-size: 0.9rem;
+    line-height: 1.8;
+  }
+  .check-list li { margin-bottom: 0.5rem; }
+  .flag-list {
+    margin: 0.5rem 0 1rem 1.2rem;
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+  .flag-list li { margin-bottom: 0.4rem; }
+  .link-list {
+    margin: 0.5rem 0 1rem 1.2rem;
+    font-size: 0.9rem;
+    line-height: 1.8;
+  }
+  .link-list li { margin-bottom: 0.3rem; }
+  .link-list a { color: #a855f7; text-decoration: none; }
+  .link-list a:hover { text-decoration: underline; }
+</style>

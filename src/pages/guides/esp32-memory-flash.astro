@@ -41,7 +41,24 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <h2>Checking Your Flash</h2>
     <p>You can ask the ESP32 to report on its own flash at runtime. Upload this sketch and open the serial monitor at 115200 baud.</p>
     <div class="code-wrap">
-      <pre><code>{`void setup() {
+      <pre><code>{`/*
+ * We stand on the shoulders of giants when we build
+ * with knowledge gained from others' efforts.
+ * That doesn't make us giants. Be humble.
+ * Create with care. Open source is the way.
+ *
+ * ESP32 Flash Report
+ * ------------------
+ * Report flash chip size, speed, sketch size, and free sketch space.
+ *
+ * Board:   Any ESP32
+ *
+ * Open source - MIT Licence
+ * Electronic Zoology - field notes from the garage
+ * https://electroniczoology.com/guides/esp32-memory-flash
+ */
+
+void setup() {
     Serial.begin(115200);
     delay(1000);
 
@@ -82,8 +99,8 @@ void loop() {}`}</code></pre>
         <figcaption>Huge APP - 3MB sketch, 1MB filesystem</figcaption>
       </figure>
       <figure>
-        <img src="/images/esp32-memory/partition-huge-app-flash.png" alt="Serial monitor showing 3145728 bytes free sketch space with Huge APP partition" />
-        <figcaption>3,145,728 bytes free sketch space</figcaption>
+        <img src="/images/esp32-memory/flash-report-serial-output.png" alt="Arduino IDE serial monitor showing flash report output - chip size, speed, sketch size, and free sketch space" />
+        <figcaption>Flash report serial output - chip size, speed, sketch size, and free sketch space</figcaption>
       </figure>
       <figure>
         <img src="/images/esp32-memory/partition-max-spiffs.png" alt="Arduino IDE partition scheme dropdown with No OTA 1MB APP 3MB SPIFFS selected" />

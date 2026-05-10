@@ -86,7 +86,24 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <h2>Checking Your PSRAM</h2>
     <p>Upload this sketch and open the serial monitor at 115200 baud.</p>
     <div class="code-wrap">
-      <pre><code>{`void setup() {
+      <pre><code>{`/*
+ * We stand on the shoulders of giants when we build
+ * with knowledge gained from others' efforts.
+ * That doesn't make us giants. Be humble.
+ * Create with care. Open source is the way.
+ *
+ * ESP32 PSRAM Report
+ * ------------------
+ * Detect PSRAM and report size and free bytes.
+ *
+ * Board:   ESP32 modules with PSRAM (AI Thinker, WROVER, S3)
+ *
+ * Open source - MIT Licence
+ * Electronic Zoology - field notes from the garage
+ * https://electroniczoology.com/guides/esp32-memory-psram
+ */
+
+void setup() {
     Serial.begin(115200);
     delay(1000);
 
@@ -103,6 +120,13 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
 
 void loop() {}`}</code></pre>
       <button class="copy-btn">Copy</button>
+    </div>
+
+    <div class="screenshot-wrap">
+      <figure>
+        <img src="/images/esp32-memory/psram-report-serial-output.png" alt="Arduino IDE serial monitor showing PSRAM report output - PSRAM found, 8MB size, free PSRAM on ESP32-S3" />
+        <figcaption>PSRAM report on an ESP32-S3 - 8MB present, nearly all free at startup</figcaption>
+      </figure>
     </div>
 
     <div class="callout callout-tip">
@@ -141,4 +165,7 @@ void loop() {}`}</code></pre>
     line-height: 1.7;
   }
   .flag-list li { margin-bottom: 0.4rem; }
+  .screenshot-wrap figure { margin: 1rem 0; }
+  .screenshot-wrap img { width: 100%; border-radius: 6px; border: 1px solid #e0e0e0; }
+  .screenshot-wrap figcaption { font-size: 0.8rem; color: #888; margin-top: 0.4rem; text-align: center; }
 </style>
