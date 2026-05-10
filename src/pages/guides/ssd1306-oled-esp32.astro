@@ -82,12 +82,22 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
         </tbody>
       </table>
     </div>
+    <div class="module-photos">
+      <figure>
+        <img src="/images/ssd1306/ssd1306-front.jpg" alt="SSD1306 128x64 OLED module front face with GND VCC SCL SDA pin labels visible" />
+        <figcaption>Front - pin order is GND VCC SCL SDA left to right</figcaption>
+      </figure>
+      <figure>
+        <img src="/images/ssd1306/ssd1306-back.jpg" alt="SSD1306 OLED module back showing IIC address select jumper resistors for 0x78 and 0x79" />
+        <figcaption>Back - IIC address select jumper. Default is 0x3C (0x78 in 8-bit notation)</figcaption>
+      </figure>
+    </div>
   </div>
 
   <!-- Find Your I2C Address -->
   <div class="section" id="i2c-scanner">
     <h2>Find Your I2C Address</h2>
-    <p>The SSD1306 is almost always <code>0x3C</code>, but some modules ship as <code>0x3D</code>. Flash this scanner to confirm before going further - it also verifies your wiring is correct.</p>
+    <p>The SSD1306 is almost always <code>0x3C</code>, but some modules ship as <code>0x3D</code>. The address select jumper on the back of the module controls this - but flash the scanner below to confirm before going further. It also verifies your wiring is correct.</p>
     <p>Open Serial Monitor at <strong>115200 baud</strong> after flashing. If nothing is found, check wiring - SDA and SCL swapped is the most common cause.</p>
     <div class="code-wrap">
       <pre><code>{`/*
@@ -329,6 +339,17 @@ void loop() {
 </GuideLayout>
 
 <style>
+  .module-photos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1.25rem 0 0;
+  }
+  .module-photos figure { margin: 0; }
+  .module-photos img { width: 100%; border-radius: 6px; border: 1px solid #e0e0e0; display: block; }
+  .module-photos figcaption { font-size: 0.8rem; color: #888; margin-top: 0.4rem; text-align: center; }
+  @media (max-width: 540px) { .module-photos { grid-template-columns: 1fr; } }
+
   .table-wrap { overflow-x: auto; margin: 1rem 0 1.5rem; }
   table {
     width: 100%;
