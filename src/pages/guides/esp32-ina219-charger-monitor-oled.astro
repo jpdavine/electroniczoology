@@ -90,6 +90,9 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <strong>I2C addresses:</strong> INA219 defaults to <code>0x40</code>. SSD1306 defaults to <code>0x3C</code>. They do not conflict. If you are unsure of your OLED's address, flash the <a href="/guides/ssd1306-oled-esp32#i2c-scanner">I2C scanner from the SSD1306 guide</a> first - it will report both devices on the bus.
     </div>
     <img src="/images/ina219/oledIna.png" alt="Fritzing breadboard diagram showing ESP32, INA219, SSD1306 OLED, TP4056 charger and 18650 cell wired together" class="guide-img" />
+    <div class="callout">
+      <strong>Power supply options.</strong> The TP4056 and ESP32 can be powered from USB or from an external 5V supply, either works but ensure amps meet the requirements. If you use an external supply for the TP4056, keep it fully isolated from the other components supply. The two power domains should not share a rail. The only connection between them is through the INA219: VIN+, VIN-.
+    </div>
   </div>
 
   <!-- The Sketch -->
@@ -100,7 +103,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <li><strong>Adafruit INA219</strong> by Adafruit</li>
       <li><strong>Adafruit SSD1306</strong> by Adafruit (installs Adafruit GFX as a dependency - click Install All when prompted)</li>
     </ul>
-    <p>Voltage and current are shown numerically on the top line. Below that, a scrolling bar graph plots current over the last 25 seconds - 128 samples at 200ms each, newest on the right. You can watch the CC phase hold flat, then see the graph slope down as the charger transitions to CV.</p>
+    <p>The top line shows live voltage and current, updating five times a second. Below that, two views rotate every 5 seconds. The live view shows the last 25 seconds of current - 128 samples at 200ms, newest on the right. The charge view shows up to 2 hours of history - 128 samples at 60s - so you can watch the full CC/CV curve build across a whole charge. LIVE or CHARGE appears top-centre so you always know which view you are on. The charge view is empty for the first minute; it fills in as the charge progresses.</p>
     <div class="code-wrap">
       <pre><code>{`/*
  * We stand on the shoulders of giants when we build
@@ -111,15 +114,22 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
  * INA219 Monitor - Scrolling Graph Edition
  * -----------------------------------------
  * Reads voltage and current from an INA219 and displays both
- * numerically and as a scrolling 128-point graph on an SSD1306 OLED.
+ * numerically and as a scrolling graph on an SSD1306 OLED.
  *
- * Use it to watch a TP4056 charge an 18650 cell and see the CC/CV
- * curve build up in real time.
+ * Two views rotate automatically every VIEW_ROTATE_MS milliseconds:
  *
- * Layout:
- *   Top line: voltage (left)  current in mA (right)
- *   Below:    scrolling graph, 0-1200mA, newest sample on the right
- *             128 samples at 200ms = ~25 seconds of history
+ *   Live view:   128 samples at 200ms = ~25 seconds of history
+ *                Shows real-time behaviour, ripple, spikes.
+ *
+ *   Charge view: 128 samples at 60s = ~2 hours of history
+ *                Shows the full CC/CV curve as a charge progresses.
+ *                Resets on boot. Empty until the first minute passes.
+ *
+ * Both views share the same numeric top line (live voltage and current).
+ * The view label (LIVE / CHARGE) appears top-centre during rotation.
+ *
+ * Use it to watch a TP4056 charge an 18650, or to watch an ESP32
+ * sleep and wake during RTO testing. Same sketch, same wiring.
  *
  * Board:   ESP32 Dev Board (38-pin)
  * Library: Adafruit INA219 by Adafruit
@@ -140,29 +150,67 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
-#define SCREEN_WIDTH   128
-#define SCREEN_HEIGHT  64
-#define OLED_RESET     -1
-#define OLED_ADDRESS   0x3C    // Change to 0x3D if needed
+#define SCREEN_WIDTH     128
+#define SCREEN_HEIGHT    64
+#define OLED_RESET       -1
+#define OLED_ADDRESS     0x3C    // Change to 0x3D if needed
 
-#define SAMPLE_MS      200     // 5 samples per second, 128 samples = ~25s history
-#define GRAPH_MAX_MA   1200.0f
+#define GRAPH_MAX_MA     1200.0f
 
-#define GRAPH_Y        10
-#define GRAPH_H        (SCREEN_HEIGHT - GRAPH_Y)   // 54px
-#define BUF_SIZE       SCREEN_WIDTH                // 128 points, one per pixel column
+#define LIVE_SAMPLE_MS   200     // 5 samples/sec, 128 samples = ~25s
+#define CHARGE_SAMPLE_MS 60000   // 1 sample/min, 128 samples = ~2hr
+
+#define VIEW_ROTATE_MS   5000    // how long each view shows before flipping
+
+#define GRAPH_Y          10
+#define GRAPH_H          (SCREEN_HEIGHT - GRAPH_Y)   // 54px
+#define BUF_SIZE         SCREEN_WIDTH                // 128 points
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 Adafruit_INA219   ina219;
 
-float   graphBuf[BUF_SIZE];
-uint8_t bufHead = 0;
-bool    bufFull = false;
+// Live buffer
+float   liveBuf[BUF_SIZE];
+uint8_t liveHead = 0;
+bool    liveFull = false;
 
-void addSample(float mA) {
-  graphBuf[bufHead] = mA;
-  bufHead = (bufHead + 1) % BUF_SIZE;
-  if (bufHead == 0) bufFull = true;
+// Charge buffer
+float   chargeBuf[BUF_SIZE];
+uint8_t chargeHead = 0;
+bool    chargeFull = false;
+
+bool showLive = true;   // which view is currently displayed
+
+void addToLive(float mA) {
+  liveBuf[liveHead] = mA;
+  liveHead = (liveHead + 1) % BUF_SIZE;
+  if (liveHead == 0) liveFull = true;
+}
+
+void addToCharge(float mA) {
+  chargeBuf[chargeHead] = mA;
+  chargeHead = (chargeHead + 1) % BUF_SIZE;
+  if (chargeHead == 0) chargeFull = true;
+}
+
+void drawGraph(float* buf, uint8_t head, bool full) {
+  uint8_t count    = full ? BUF_SIZE : head;
+  uint8_t startIdx = full ? head     : 0;
+
+  for (uint8_t i = 0; i < count; i++) {
+    uint8_t idx    = (startIdx + i) % BUF_SIZE;
+    float   sample = buf[idx];
+
+    if (sample < 0)            sample = 0;
+    if (sample > GRAPH_MAX_MA) sample = GRAPH_MAX_MA;
+
+    int barH = (int)((sample / GRAPH_MAX_MA) * (float)(GRAPH_H - 1));
+    if (barH < 1 && sample >= 1.0f) barH = 1;
+
+    int x = i;
+    int y = GRAPH_Y + (GRAPH_H - 1) - barH;
+    display.drawFastVLine(x, y, barH, SSD1306_WHITE);
+  }
 }
 
 void drawDisplay(float volts, float mA) {
@@ -175,6 +223,13 @@ void drawDisplay(float volts, float mA) {
   display.print(volts, 2);
   display.print("V");
 
+  // View label centred
+  const char* label = showLive ? "LIVE" : "CHARGE";
+  int labelW = strlen(label) * 6;
+  display.setCursor((SCREEN_WIDTH - labelW) / 2, 0);
+  display.print(label);
+
+  // mA right-aligned
   char maBuf[10];
   if (mA < 1.0f) {
     snprintf(maBuf, sizeof(maBuf), "<1mA");
@@ -188,23 +243,18 @@ void drawDisplay(float volts, float mA) {
   // --- Divider ---
   display.drawFastHLine(0, GRAPH_Y - 1, SCREEN_WIDTH, SSD1306_WHITE);
 
-  // --- Scrolling graph ---
-  uint8_t count    = bufFull ? BUF_SIZE : bufHead;
-  uint8_t startIdx = bufFull ? bufHead  : 0;
-
-  for (uint8_t i = 0; i < count; i++) {
-    uint8_t idx    = (startIdx + i) % BUF_SIZE;
-    float   sample = graphBuf[idx];
-
-    if (sample < 0)            sample = 0;
-    if (sample > GRAPH_MAX_MA) sample = GRAPH_MAX_MA;
-
-    int barH = (int)((sample / GRAPH_MAX_MA) * (float)(GRAPH_H - 1));
-    if (barH < 1 && sample >= 1.0f) barH = 1;
-
-    int x = i;
-    int y = GRAPH_Y + (GRAPH_H - 1) - barH;
-    display.drawFastVLine(x, y, barH, SSD1306_WHITE);
+  // --- Graph ---
+  if (showLive) {
+    drawGraph(liveBuf, liveHead, liveFull);
+  } else {
+    if (chargeHead == 0 && !chargeFull) {
+      // Charge buffer empty - let the reader know
+      display.setTextSize(1);
+      display.setCursor(10, GRAPH_Y + 18);
+      display.print("< 1 min of data");
+    } else {
+      drawGraph(chargeBuf, chargeHead, chargeFull);
+    }
   }
 
   display.display();
@@ -213,7 +263,8 @@ void drawDisplay(float volts, float mA) {
 void setup() {
   Serial.begin(115200);
 
-  memset(graphBuf, 0, sizeof(graphBuf));
+  memset(liveBuf,   0, sizeof(liveBuf));
+  memset(chargeBuf, 0, sizeof(chargeBuf));
 
   Wire.begin(21, 22);
   Wire.setClock(400000);
@@ -241,18 +292,36 @@ void setup() {
 }
 
 void loop() {
-  static uint32_t lastSample = 0;
+  static uint32_t lastLive   = 0;
+  static uint32_t lastCharge = 0;
+  static uint32_t lastRotate = 0;
 
-  if (millis() - lastSample >= SAMPLE_MS) {
-    lastSample = millis();
+  uint32_t now = millis();
+
+  // Live sample
+  if (now - lastLive >= LIVE_SAMPLE_MS) {
+    lastLive = now;
 
     float busVoltage = ina219.getBusVoltage_V();
     float current_mA = max(0.0f, ina219.getCurrent_mA());
 
     Serial.printf("V: %.3f  I: %.1f mA\\n", busVoltage, current_mA);
 
-    addSample(current_mA);
+    addToLive(current_mA);
+
+    // Charge sample on its own timer
+    if (now - lastCharge >= CHARGE_SAMPLE_MS) {
+      lastCharge = now;
+      addToCharge(current_mA);
+    }
+
     drawDisplay(busVoltage, current_mA);
+  }
+
+  // Rotate view
+  if (now - lastRotate >= VIEW_ROTATE_MS) {
+    lastRotate = now;
+    showLive = !showLive;
   }
 }`}</code></pre>
       <button class="copy-btn">Copy</button>
@@ -262,9 +331,9 @@ void loop() {
   <!-- What You Will See -->
   <div class="section" id="what-youll-see">
     <h2>What You Will See</h2>
-    <p>Plug a flat 18650 into the holder. The TP4056 starts charging. Within seconds the display shows voltage on the top line and current below it, updating five times a second.</p>
-    <p>A flat cell, freshly connected, reads something like 3.05V and 800-1000mA. Watch for a few minutes and the voltage climbs slowly while the current holds steady. This is the constant current phase.</p>
-    <p>After 1 to 2 hours, the voltage reaches 4.2V - longer if the cell was fully flat, shorter if it still had some charge. At this moment the charger transitions to constant voltage. The current starts shrinking - 800mA, then 400mA, then 200mA, then 100mA over maybe another half hour. When the current drops to near zero the TP4056's LED switches from red to blue and charging is done.</p>
+    <p>Plug a flat 18650 into the holder. The TP4056 starts charging. Within seconds the display shows voltage on the top line and current below it, updating five times a second. The screen rotates between two views every 5 seconds - LIVE and CHARGE, labelled top-centre.</p>
+    <p>A flat cell, freshly connected, reads something like 3.05V and 800-1000mA. The LIVE view shows the last 25 seconds as a scrolling bar graph - you can watch the CC phase draw a flat line across the screen, steady and consistent. The CHARGE view is empty for the first minute, then starts building a slower picture - one sample per minute, up to 2 hours of history.</p>
+    <p>After 1 to 2 hours the voltage reaches 4.2V - longer if the cell was fully flat, shorter if it still had some charge. At this moment the charger transitions to constant voltage. The current starts shrinking - 800mA, then 400mA, then 200mA, then 100mA over maybe another half hour. In the CHARGE view you can watch the entire CC/CV curve build from left to right across the screen. When the current drops to near zero the TP4056's LED switches from red to blue and charging is done.</p>
     <p>That entire sequence is the lithium charge profile in plain sight. Memorise the shape. Once you have seen it, you can spot a misbehaving charger immediately because it does not look like that.</p>
   </div>
 
@@ -313,6 +382,10 @@ void loop() {
     <div class="trouble-item">
       <h3>Remote display</h3>
       <p>Send readings over ESP-NOW to a second ESP32 so the meter sits next to the charger while the display is across the room.</p>
+    </div>
+    <div class="trouble-item">
+      <h3>Web dashboard</h3>
+      <p>Put the ESP32 on your local network and serve a small web page from it. The page can show live voltage and current. No OLED required - your phone becomes the display.</p>
     </div>
   </div>
 
