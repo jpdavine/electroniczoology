@@ -31,7 +31,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   <!-- What You Will Learn -->
   <div class="section" id="what-youll-learn">
     <h2>What You Will Learn</h2>
-    <p>If you are charging lithium cells, you should be watching what the charger is actually doing. Bad modules cook batteries. Counterfeit protection ICs lie. Salvaged cells from old laptop packs accept current in ways that depend on their history, and you cannot tell a tired cell from a healthy one without measuring. None of this is paranoia. It is just the cost of working with chemistry that wants to release its energy all at once if something goes wrong.</p>
+    <p>If you are charging lithium cells, you need to know what is going on. Dodgy modules can cook batteries. Counterfeit protection ICs lie. Salvaged cells from old laptop packs accept current in ways that depend on their history, and you cannot tell a tired cell from a healthy one without measuring. None of this is paranoia. It is just the cost of working with chemistry that might just want to give you a bad day. A red LED tells you nothing. Amps and volts tell you everything.</p>
     <p>This guide builds the simplest possible answer to "what is actually happening on this charger." An INA219 sits inline between a TP4056 charger module and a single 18650 cell. An ESP32 reads voltage and current from the INA219 and shows both on an SSD1306 OLED. The meter sits next to the charger, watching, all the way from a flat cell to a full one. You see the entire charge curve unfold on the screen.</p>
     <p>The INA219 is a high-side current sensor with an I2C interface. It measures the voltage drop across a small shunt resistor in the power line and converts that to current using Ohm's law internally. It also measures the bus voltage on the load side. Two readings, one chip, two signal wires. The SSD1306 OLED is also I2C - so the entire display side of this build shares the same SDA and SCL lines as the sensor. Four wires total for sensor and display combined.</p>
     <p>You will also learn what a healthy charge cycle looks like. The current starts high and stays roughly constant. The voltage climbs slowly. Then the voltage hits 4.2V, the current starts tapering, and the cell sips the last few percent until the charger calls it done. That shape is called CC/CV - constant current, then constant voltage. Once you have watched it happen on your own bench you will recognise the shape forever.</p>
@@ -100,7 +100,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <li><strong>Adafruit INA219</strong> by Adafruit</li>
       <li><strong>Adafruit SSD1306</strong> by Adafruit (installs Adafruit GFX as a dependency - click Install All when prompted)</li>
     </ul>
-    <p>The display shows voltage on the top half and current on the bottom half, updating five times per second. If no cell is connected the screen shows "No cell" - the charger output still appears on the bus pin at ~4V so the sketch relies on current being near zero rather than voltage to detect this.</p>
+    <p>Voltage and current are shown numerically on the top line. Below that, a scrolling bar graph plots current over the last 25 seconds - 128 samples at 200ms each, newest on the right. You can watch the CC phase hold flat, then see the graph slope down as the charger transitions to CV.</p>
     <div class="code-wrap">
       <pre><code>{`/*
  * We stand on the shoulders of giants when we build
@@ -108,12 +108,18 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
  * That doesn't make us giants. Be humble.
  * Create with care. Open source is the way.
  *
- * INA219 Battery Charger Monitor - OLED Edition
- * -----------------------------------------------
- * Reads voltage and current from a TP4056 charging an 18650 cell.
- * Displays readings on a 4-pin SSD1306 128x64 OLED.
- * Wire INA219 inline between TP4056 B+ and battery positive.
- * INA219 and OLED share the same I2C bus.
+ * INA219 Monitor - Scrolling Graph Edition
+ * -----------------------------------------
+ * Reads voltage and current from an INA219 and displays both
+ * numerically and as a scrolling 128-point graph on an SSD1306 OLED.
+ *
+ * Use it to watch a TP4056 charge an 18650 cell and see the CC/CV
+ * curve build up in real time.
+ *
+ * Layout:
+ *   Top line: voltage (left)  current in mA (right)
+ *   Below:    scrolling graph, 0-1200mA, newest sample on the right
+ *             128 samples at 200ms = ~25 seconds of history
  *
  * Board:   ESP32 Dev Board (38-pin)
  * Library: Adafruit INA219 by Adafruit
@@ -122,7 +128,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
  * Wiring:
  *   INA219 + OLED: SDA -> GPIO 21   SCL -> GPIO 22
  *   Both:          VCC -> 3.3V      GND -> GND
- *   INA219 inline: VIN+ from TP4056 B+, VIN- to battery positive
+ *   INA219 inline: VIN+ from supply, VIN- to load
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
@@ -137,56 +143,77 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
 #define SCREEN_WIDTH   128
 #define SCREEN_HEIGHT  64
 #define OLED_RESET     -1
-#define OLED_ADDRESS   0x3C   // Change to 0x3D if needed
+#define OLED_ADDRESS   0x3C    // Change to 0x3D if needed
 
-#define SAMPLE_MS      200    // Update rate - 5 times per second
+#define SAMPLE_MS      200     // 5 samples per second, 128 samples = ~25s history
+#define GRAPH_MAX_MA   1200.0f
+
+#define GRAPH_Y        10
+#define GRAPH_H        (SCREEN_HEIGHT - GRAPH_Y)   // 54px
+#define BUF_SIZE       SCREEN_WIDTH                // 128 points, one per pixel column
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 Adafruit_INA219   ina219;
 
-void drawReadings(float volts, float current_mA) {
+float   graphBuf[BUF_SIZE];
+uint8_t bufHead = 0;
+bool    bufFull = false;
+
+void addSample(float mA) {
+  graphBuf[bufHead] = mA;
+  bufHead = (bufHead + 1) % BUF_SIZE;
+  if (bufHead == 0) bufFull = true;
+}
+
+void drawDisplay(float volts, float mA) {
   display.clearDisplay();
-  display.setTextColor(SSD1306_WHITE);
 
-  // No battery connected - charger output appears on the bus pin through
-  // the shunt with no load to pull it down. Rely on current being truly
-  // zero rather than voltage, which reads ~4V from the charger either way.
-  if (current_mA < 2.0f) {
-    display.setTextSize(2);
-    display.setCursor(0, 20);
-    display.print("No cell");
-    display.display();
-    return;
-  }
-
-  // Voltage
+  // --- Numeric line ---
   display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
   display.setCursor(0, 0);
-  display.print("V");
-
-  display.setTextSize(2);
-  display.setCursor(16, 0);
   display.print(volts, 2);
   display.print("V");
 
-  // Divider
-  display.drawFastHLine(0, 21, SCREEN_WIDTH, SSD1306_WHITE);
+  char maBuf[10];
+  if (mA < 1.0f) {
+    snprintf(maBuf, sizeof(maBuf), "<1mA");
+  } else {
+    snprintf(maBuf, sizeof(maBuf), "%dmA", (int)mA);
+  }
+  int maWidth = strlen(maBuf) * 6;
+  display.setCursor(SCREEN_WIDTH - maWidth, 0);
+  display.print(maBuf);
 
-  // Current
-  display.setTextSize(1);
-  display.setCursor(0, 25);
-  display.print("I");
+  // --- Divider ---
+  display.drawFastHLine(0, GRAPH_Y - 1, SCREEN_WIDTH, SSD1306_WHITE);
 
-  display.setTextSize(2);
-  display.setCursor(16, 25);
-  display.print((int)current_mA);
-  display.print("mA");
+  // --- Scrolling graph ---
+  uint8_t count    = bufFull ? BUF_SIZE : bufHead;
+  uint8_t startIdx = bufFull ? bufHead  : 0;
+
+  for (uint8_t i = 0; i < count; i++) {
+    uint8_t idx    = (startIdx + i) % BUF_SIZE;
+    float   sample = graphBuf[idx];
+
+    if (sample < 0)            sample = 0;
+    if (sample > GRAPH_MAX_MA) sample = GRAPH_MAX_MA;
+
+    int barH = (int)((sample / GRAPH_MAX_MA) * (float)(GRAPH_H - 1));
+    if (barH < 1 && sample >= 1.0f) barH = 1;
+
+    int x = i;
+    int y = GRAPH_Y + (GRAPH_H - 1) - barH;
+    display.drawFastVLine(x, y, barH, SSD1306_WHITE);
+  }
 
   display.display();
 }
 
 void setup() {
   Serial.begin(115200);
+
+  memset(graphBuf, 0, sizeof(graphBuf));
 
   Wire.begin(21, 22);
   Wire.setClock(400000);
@@ -205,11 +232,11 @@ void setup() {
   display.setTextColor(SSD1306_WHITE);
   display.setTextSize(1);
   display.setCursor(0, 0);
-  display.println("Charger monitor");
+  display.println("INA219 monitor");
   display.println("running...");
   display.display();
 
-  Serial.println("Charger monitor running");
+  Serial.println("INA219 monitor running");
   delay(1000);
 }
 
@@ -219,12 +246,13 @@ void loop() {
   if (millis() - lastSample >= SAMPLE_MS) {
     lastSample = millis();
 
-    float busVoltage   = ina219.getBusVoltage_V();
-    float current_mA   = max(0.0f, ina219.getCurrent_mA());
+    float busVoltage = ina219.getBusVoltage_V();
+    float current_mA = max(0.0f, ina219.getCurrent_mA());
 
     Serial.printf("V: %.3f  I: %.1f mA\\n", busVoltage, current_mA);
 
-    drawReadings(busVoltage, current_mA);
+    addSample(current_mA);
+    drawDisplay(busVoltage, current_mA);
   }
 }`}</code></pre>
       <button class="copy-btn">Copy</button>
@@ -236,7 +264,7 @@ void loop() {
     <h2>What You Will See</h2>
     <p>Plug a flat 18650 into the holder. The TP4056 starts charging. Within seconds the display shows voltage on the top line and current below it, updating five times a second.</p>
     <p>A flat cell, freshly connected, reads something like 3.05V and 800-1000mA. Watch for a few minutes and the voltage climbs slowly while the current holds steady. This is the constant current phase.</p>
-    <p>After 30 to 60 minutes, the voltage reaches 4.2V. At this moment the charger transitions to constant voltage. The current starts shrinking - 800mA, then 400mA, then 200mA, then 100mA over maybe another half hour. When the current drops to near zero the TP4056's LED switches from red to blue and charging is done.</p>
+    <p>After 1 to 2 hours, the voltage reaches 4.2V - longer if the cell was fully flat, shorter if it still had some charge. At this moment the charger transitions to constant voltage. The current starts shrinking - 800mA, then 400mA, then 200mA, then 100mA over maybe another half hour. When the current drops to near zero the TP4056's LED switches from red to blue and charging is done.</p>
     <p>That entire sequence is the lithium charge profile in plain sight. Memorise the shape. Once you have seen it, you can spot a misbehaving charger immediately because it does not look like that.</p>
   </div>
 
@@ -262,7 +290,11 @@ void loop() {
     </div>
     <div class="trouble-item">
       <h3>Dead cell</h3>
-      <p>Watch the voltage settle at 4.2V, then unplug the USB and watch it immediately drop to 3.9V or lower. That is a cell that holds no real charge.</p>
+      <p>Charge completes, voltage reads 4.2V, LED goes blue. Put a small load on the cell - a torch, a small motor - and watch the voltage immediately sag to 3.7V or lower. A healthy full cell holds close to 4.2V under a light load. One that sags straight away holds no real charge.</p>
+    </div>
+    <div class="trouble-item">
+      <h3>Erratic current</h3>
+      <p>A healthy CC phase holds flat - the graph draws a steady horizontal line. If current is spiking and dropping rather than holding steady, check your connections first. A loose clip lead or a dodgy contact will show up immediately on the graph. If the wiring is solid, the cell itself has high or unstable internal resistance and is not worth trusting.</p>
     </div>
     <p>Without a meter, all of these failures look identical: a charger module with a red LED. With this rig, each one has a distinct signature on the screen.</p>
   </div>
