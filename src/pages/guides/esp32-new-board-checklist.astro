@@ -9,6 +9,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     {href: '#arduino-ide-setup', label: 'Arduino IDE Setup'},
     {href: '#chip-info', label: 'Chip Info'},
     {href: '#flash-ram-psram', label: 'Flash, RAM & PSRAM'},
+    {href: '#full-report', label: 'Full Report Sketch'},
   ]}
 >
 
@@ -109,6 +110,88 @@ void loop() {}`}</code></pre>
       <li><a href="/guides/esp32-memory-psram">PSRAM - whether it is present and how much</a></li>
     </ul>
     <p>Run them in order. By the end you will know exactly what the board has and how much of it is available before your sketch does anything.</p>
+  </div>
+
+  <!-- Full Report Sketch -->
+  <div class="section" id="full-report">
+    <h2>Full Report Sketch</h2>
+    <p>If you just want everything in one upload, this sketch combines chip info, MAC address, flash, RAM, PSRAM, and the full partition table into a single pass. If you want to understand what each number means, the sections above link to the dedicated guides.</p>
+    <div class="code-wrap">
+      <pre><code>{`/*
+ * We stand on the shoulders of giants when we build
+ * with knowledge gained from others' efforts.
+ * That doesn't make us giants. Be humble.
+ * Create with care. Open source is the way.
+ *
+ * ESP32 System Report
+ * -------------------
+ * Report chip info, flash, RAM, and PSRAM in one pass.
+ *
+ * Board:   Any ESP32
+ * Library: WiFi (built-in), esp_partition (built-in ESP-IDF)
+ *
+ * Open source - MIT Licence
+ * Electronic Zoology - field notes from the garage
+ * https://electroniczoology.com/guides/esp32-new-board-checklist
+ */
+
+#include <WiFi.h>
+#include <esp_partition.h>
+
+void setup() {
+    Serial.begin(115200);
+    delay(1000);
+
+    uint64_t mac = ESP.getEfuseMac();
+    Serial.printf("MAC (efuse):   %02X:%02X:%02X:%02X:%02X:%02X\\n",
+        (uint8_t)(mac), (uint8_t)(mac >> 8),  (uint8_t)(mac >> 16),
+        (uint8_t)(mac >> 24), (uint8_t)(mac >> 32), (uint8_t)(mac >> 40));
+
+    WiFi.mode(WIFI_STA);
+    delay(500);
+    Serial.printf("MAC (wifi):    %s\\n", WiFi.macAddress().c_str());
+
+    Serial.printf("Chip model:    %s\\n", ESP.getChipModel());
+    Serial.printf("Chip revision: %d\\n", ESP.getChipRevision());
+    Serial.printf("CPU freq:      %d MHz\\n", ESP.getCpuFreqMHz());
+    Serial.printf("Cores:         %d\\n", ESP.getChipCores());
+    Serial.printf("Chip ID:       %llX\\n", mac);
+
+    Serial.println("--- Flash Report ---");
+    Serial.printf("Flash chip size:      %u bytes\\n", ESP.getFlashChipSize());
+    Serial.printf("Flash chip speed:     %u Hz\\n", ESP.getFlashChipSpeed());
+    Serial.printf("Sketch size:          %u bytes\\n", ESP.getSketchSize());
+    Serial.printf("Free sketch space:    %u bytes\\n", ESP.getFreeSketchSpace());
+
+    Serial.println("--- RAM Report ---");
+    Serial.printf("Free heap:          %u bytes\\n", ESP.getFreeHeap());
+    Serial.printf("Min free heap:      %u bytes\\n", ESP.getMinFreeHeap());
+    Serial.printf("Largest free block: %u bytes\\n", ESP.getMaxAllocHeap());
+
+    Serial.println("--- PSRAM Report ---");
+    if (psramFound()) {
+        Serial.println("PSRAM found.");
+        Serial.printf("PSRAM size:      %u bytes\\n", ESP.getPsramSize());
+        Serial.printf("Free PSRAM:      %u bytes\\n", ESP.getFreePsram());
+    } else {
+        Serial.println("No PSRAM found on this module.");
+    }
+
+    Serial.println("--- Partition Table ---");
+    Serial.printf("%-16s %-8s %-12s %-10s %s\\n", "Label", "Type", "Subtype", "Offset", "Size");
+    esp_partition_iterator_t it = esp_partition_find(ESP_PARTITION_TYPE_ANY, ESP_PARTITION_SUBTYPE_ANY, NULL);
+    while (it != NULL) {
+        const esp_partition_t* p = esp_partition_get(it);
+        Serial.printf("%-16s %-8d %-12d 0x%08x  %u bytes\\n",
+            p->label, p->type, p->subtype, p->address, p->size);
+        it = esp_partition_next(it);
+    }
+    esp_partition_iterator_release(it);
+}
+
+void loop() {}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
   </div>
 
 </GuideLayout>
