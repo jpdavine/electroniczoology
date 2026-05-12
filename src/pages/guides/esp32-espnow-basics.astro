@@ -6,6 +6,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   description="Send data directly between two ESP32 boards with no router, no IP stack, and no WiFi credentials. One board broadcasts its own MAC address every five seconds. The other receives it and prints it to serial."
   toc={[
     {href: '#what-youll-learn', label: 'What You Will Learn'},
+    {href: '#what-is-a-mac-address', label: 'What is a MAC Address?'},
     {href: '#what-espnow-is', label: 'What ESP-NOW Actually Is'},
     {href: '#hardware', label: 'Hardware'},
     {href: '#mac-address', label: 'The MAC Address Problem'},
@@ -20,6 +21,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   <div class="hero">
     <div class="category">Wireless &bull; ESP32</div>
     <h1>ESP-NOW Basics<br>Two ESP32s Talking Without a Router</h1>
+    <p class="hero-byline">It's Tinder for microcontrollers.</p>
     <div class="meta">
       <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin, both sender and receiver)</div>
       <div class="meta-item"><strong>Topic:</strong> ESP-NOW, wireless, peer-to-peer</div>
@@ -35,12 +37,19 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <p>The MAC address as payload is deliberate. It is self-referential: the sender tells you who it is, and you can cross-check that value against what the "get your MAC" sketch reported before you flashed the sender. If the number matches, the whole pipeline works.</p>
   </div>
 
+  <!-- What is a MAC Address -->
+  <div class="section" id="what-is-a-mac-address">
+    <h2>What is a MAC Address?</h2>
+    <p>A MAC address is a unique identifier assigned to every network device at the factory. It is 6 bytes long, written as six pairs of hex digits separated by colons - something like <code>AA:BB:CC:11:22:33</code>. Unlike an IP address, it is not assigned by a network and does not change. It is baked into the hardware. ESP-NOW uses MAC addresses to route packets directly between boards - no router needed to hand out addresses because each device already has one.</p>
+    <p>MAC addresses are a rabbit hole. They will be getting their own dedicated guide series.</p>
+  </div>
+
   <!-- What ESP-NOW Actually Is -->
   <div class="section" id="what-espnow-is">
     <h2>What ESP-NOW Actually Is</h2>
     <p>Your ESP32 has a WiFi radio. That radio is normally used to connect to an access point, get an IP address, and join a network. ESP-NOW uses the same physical radio but skips all of that. It sends raw frames at the WiFi MAC layer, directly from one device to another.</p>
     <p>There is no router involved. There is no IP stack. There are no credentials. The two boards do not need to be on the same network because there is no network. They just need to be within radio range of each other, which indoors is typically 20 to 50 metres depending on walls and interference.</p>
-    <p>The tradeoff is that ESP-NOW has no guaranteed delivery on its own. This guide uses broadcast mode, where the sender transmits to the broadcast MAC address <code>FF:FF:FF:FF:FF:FF</code> and any ESP-NOW device nearby receives it. Broadcast is the right choice for a first guide because it removes the need to register a specific peer before sending.</p>
+    <p>The tradeoff is that ESP-NOW has no guaranteed delivery on its own. This guide uses broadcast mode - the sender sets the destination address to <code>FF:FF:FF:FF:FF:FF</code> so any nearby ESP-NOW device picks it up. The payload it sends is its own MAC address as a string. Both MACs are in play at once: one is where the packet is going, the other is what is inside it. Broadcast is the right choice for a first guide because it removes the need to register a specific peer before sending.</p>
     <p>Packets are small. ESP-NOW's maximum payload is 250 bytes per packet. For sensor data, strings, and small structs, this is plenty.</p>
   </div>
 
@@ -60,7 +69,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <h2>The MAC Address Problem</h2>
     <p>Every ESP32 has a unique MAC address burned into it at the factory. ESP-NOW uses these addresses to route packets.</p>
     <p>The MAC is not printed on the board. You have to ask the chip what it is. The sketch in the next section does exactly that. Flash it to a board, open serial monitor at 115200, and it prints the MAC. Copy it somewhere before you flash anything else - you will need it if you move to unicast later.</p>
-    <p>For this guide you are using broadcast, so the sender does not need the receiver's MAC. But flashing this sketch to both boards is worth doing anyway - it takes 30 seconds and you will want those addresses later.</p>
+    <p>For this guide you are using broadcast, so the sender does not need the receiver's MAC.</p>
   </div>
 
   <!-- Get Your MAC Sketch -->
@@ -317,6 +326,12 @@ void loop() {
 </GuideLayout>
 
 <style>
+  .hero-byline {
+    font-size: 1rem;
+    color: #888;
+    margin: -0.25rem 0 1rem;
+    font-style: italic;
+  }
   .parts-list {
     margin: 0.5rem 0 1rem 1.2rem;
     font-size: 0.9rem;
