@@ -57,9 +57,8 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   <div class="section" id="hardware">
     <h2>Hardware</h2>
     <ul class="parts-list">
-      <li>Two ESP32 Dev Boards - 30-pin or 38-pin</li>
+      <li>Two ESP32 boards - any variant works (Dev Board, C3, S2, S3, etc.), 30-pin or 38-pin</li>
       <li>Two USB cables and power sources</li>
-      <li>Two computers, or one computer and the Arduino IDE's port switcher</li>
     </ul>
     <p>No wiring beyond USB power. No components, no breadboard.</p>
   </div>
@@ -300,6 +299,12 @@ void loop() {
       <pre><code>{`Send status: OK`}</code></pre>
     </div>
     <p>In broadcast mode this is always OK.</p>
+    <div class="screenshot-wrap">
+      <figure>
+        <img src="/images/esp32-espnow/sender-receiver-working.png" alt="Arduino IDE showing sender and receiver serial monitors side by side - sender reporting Send status: OK and its MAC address, receiver printing the received MAC every five seconds" />
+        <figcaption>Sender (left) and receiver (right) running simultaneously. The sender shows "Not connected" because it was unplugged from the laptop after flashing and powered from a separate USB hub - that is not a requirement, both boards can stay connected to the same machine.</figcaption>
+      </figure>
+    </div>
   </div>
 
   <!-- Going Further -->
@@ -338,4 +343,7 @@ void loop() {
     line-height: 1.7;
   }
   .parts-list li { margin-bottom: 0.5rem; }
+  .screenshot-wrap figure { margin: 1rem 0; }
+  .screenshot-wrap img { width: 100%; border-radius: 6px; border: 1px solid #e0e0e0; }
+  .screenshot-wrap figcaption { font-size: 0.82rem; color: #888; margin-top: 0.5rem; line-height: 1.5; }
 </style>
