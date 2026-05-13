@@ -42,7 +42,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <div class="card">
         <h3>Software</h3>
         <ul>
-          <li>Arduino IDE with ESP32 board support</li>
+          <li><a href="/guides/how-to-check-a-new-esp32" class="term-link">Arduino IDE with ESP32 board support</a></li>
           <li><code>Arduino_GFX_Library</code> by Moon On Our Nation</li>
         </ul>
         <p style="margin-top:1rem;font-size:0.85rem;color:#666;">Install via Arduino IDE Library Manager - search <strong>Arduino_GFX</strong>.</p>
@@ -228,7 +228,7 @@ void loop() {
     <div class="trouble-item">
       <h3>Display initialises but nothing draws</h3>
       <ul>
-        <li>Make sure you're using <code>Arduino_GFX_Library</code>, not TFT_eSPI or Adafruit_GC9A01A</li>
+        <li>Make sure you're using <code>Arduino_GFX_Library</code>, not <a href="/guides/how-to-set-up-tft-espi-esp32" class="term-link">TFT_eSPI</a> or Adafruit_GC9A01A</li>
         <li>Constructor arguments differ between libraries - copy the exact sketch above</li>
       </ul>
     </div>
@@ -239,6 +239,16 @@ void loop() {
         <li>Bond a small heatsink or aluminium offcut to the ESP32</li>
       </ul>
     </div>
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:2rem;">
+    <strong>Ready to display images?</strong>
+    Move on to <a href="/guides/how-to-display-images-gc9a01-esp32" class="term-link">How to display custom images on the GC9A01 &rarr;</a>
+  </div>
+
+  <div class="callout callout-why" style="margin-top:1rem;">
+    <strong>Want to use TFT_eSPI instead of Arduino_GFX?</strong>
+    See <a href="/guides/how-to-configure-gc9a01-tft-espi" class="term-link">How to configure the GC9A01 round display with TFT_eSPI &rarr;</a>
   </div>
 
 </GuideLayout>

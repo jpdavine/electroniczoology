@@ -46,7 +46,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
         <ul>
           <li>ESP32 Dev Board - 30-pin or 38-pin module on a breadboard-friendly carrier</li>
           <li>INA219 breakout - common modules from any maker supplier all use the same chip and pinout. Default I2C address is <code>0x40</code></li>
-          <li>SSD1306 128x64 OLED (4-pin I2C) - default address <code>0x3C</code>. See the <a href="/guides/how-to-use-ssd1306-oled-esp32">SSD1306 setup guide</a> if you have not used this display before</li>
+          <li>SSD1306 128x64 OLED (4-pin I2C) - default address <code>0x3C</code>. See <a href="/guides/how-to-use-ssd1306-oled-esp32" class="term-link">How to use the SSD1306 OLED display with ESP32</a> if you have not used this display before</li>
           <li>TP4056 module with battery protection - the two-IC version. The bare TP4056 works but a protected module is safer for bench experiments</li>
           <li>Single 18650 cell - any healthy cell. If you are charging a salvaged or unknown cell, that is exactly what this rig is for</li>
           <li>18650 holder, or clip leads for brief testing</li>
@@ -56,7 +56,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <div class="card">
         <h3>Software</h3>
         <ul>
-          <li>Arduino IDE with ESP32 board support</li>
+          <li><a href="/guides/how-to-check-a-new-esp32" class="term-link">Arduino IDE with ESP32 board support</a></li>
           <li><code>Adafruit INA219</code> by Adafruit</li>
           <li><code>Adafruit SSD1306</code> by Adafruit</li>
           <li><code>Adafruit GFX Library</code> by Adafruit (dependency - click Install All when prompted)</li>
@@ -377,16 +377,31 @@ void loop() {
     </div>
     <div class="trouble-item">
       <h3>Log the charge curve</h3>
-      <p>Write readings to LittleFS and graph the shape afterward. A healthy cell and a tired cell produce visibly different curves over the full cycle.</p>
+      <p>Write readings to <a href="/guides/how-to-use-littlefs-esp32" class="term-link">LittleFS</a> and graph the shape afterward. A healthy cell and a tired cell produce visibly different curves over the full cycle. See <a href="/guides/how-to-use-littlefs-esp32" class="term-link">How to use LittleFS on ESP32 &rarr;</a></p>
     </div>
     <div class="trouble-item">
       <h3>Remote display</h3>
-      <p>Send readings over ESP-NOW to a second ESP32 so the meter sits next to the charger while the display is across the room.</p>
+      <p>Send readings over <a href="/guides/how-to-use-esp-now-two-esp32s" class="term-link">ESP-NOW</a> to a second ESP32 so the meter sits next to the charger while the display is across the room. See <a href="/guides/how-to-use-esp-now-two-esp32s" class="term-link">How to use ESP-NOW to connect two ESP32s without a router &rarr;</a></p>
     </div>
     <div class="trouble-item">
       <h3>Web dashboard</h3>
       <p>Put the ESP32 on your local network and serve a small web page from it. The page can show live voltage and current. No OLED required - your phone becomes the display.</p>
     </div>
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:2rem;">
+    <strong>Set up the OLED display first</strong>
+    <a href="/guides/how-to-use-ssd1306-oled-esp32" class="term-link">How to use the SSD1306 OLED display with ESP32 &rarr;</a> - wiring, I2C scanner, and test sketch.
+  </div>
+
+  <div class="callout callout-why" style="margin-top:1rem;">
+    <strong>Move the display across the room</strong>
+    <a href="/guides/how-to-use-esp-now-two-esp32s" class="term-link">How to use ESP-NOW to connect two ESP32s without a router &rarr;</a> - send readings wirelessly to a remote display.
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:1rem;">
+    <strong>Log the full charge curve</strong>
+    <a href="/guides/how-to-use-littlefs-esp32" class="term-link">How to use LittleFS on ESP32 &rarr;</a> - write readings to flash and graph the shape afterward.
   </div>
 
   <!-- Safety -->

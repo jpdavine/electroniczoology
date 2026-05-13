@@ -39,7 +39,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <div class="card">
         <h3>Parts</h3>
         <ul>
-          <li>ESP32 Dev Board (38-pin)</li>
+          <li><a href="/guides/how-to-check-a-new-esp32" class="term-link">ESP32 Dev Board (38-pin)</a></li>
           <li>SSD1306 128x64 OLED (4-pin I2C)</li>
           <li>Jumper wires</li>
           <li>USB data cable for flashing</li>
@@ -48,7 +48,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <div class="card">
         <h3>Software</h3>
         <ul>
-          <li>Arduino IDE with ESP32 board support</li>
+          <li><a href="/guides/how-to-check-a-new-esp32" class="term-link">Arduino IDE with ESP32 board support</a></li>
           <li><code>Adafruit SSD1306</code> by Adafruit</li>
           <li><code>Adafruit GFX Library</code> by Adafruit (dependency)</li>
         </ul>
@@ -60,7 +60,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   <!-- How It Works -->
   <div class="section" id="how-it-works">
     <h2>How It Works</h2>
-    <p>The Adafruit SSD1306 library keeps a copy of the entire display in a 1KB frame buffer in the ESP32's RAM. Drawing calls write into that buffer. Nothing appears on screen until you call <code>display.display()</code>, which pushes the full buffer over I2C.</p>
+    <p>The Adafruit SSD1306 library keeps a copy of the entire display in a 1KB frame buffer in the ESP32's <a href="/guides/how-esp32-ram-works" class="term-link">RAM</a>. Drawing calls write into that buffer. Nothing appears on screen until you call <code>display.display()</code>, which pushes the full buffer over I2C. To learn more about how ESP32 RAM works, see <a href="/guides/how-esp32-ram-works" class="term-link">How ESP32 RAM works &rarr;</a></p>
     <p>The workflow for every frame is always the same:</p>
     <pre style="background:#f4f4f4;padding:0.75rem 1rem;border-radius:6px;font-size:0.9rem;margin:1rem 0;">clearDisplay() &rarr; draw everything &rarr; display()</pre>
     <p>Skipping <code>clearDisplay()</code> leaves old content underneath new content. Skipping <code>display()</code> means nothing appears on screen. These two are the source of most first-run confusion.</p>
@@ -334,6 +334,16 @@ void loop() {
         <li>Confirm <code>display.display()</code> is being called after your drawing code. Nothing reaches the screen until that call is made.</li>
       </ul>
     </div>
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:2rem;">
+    <strong>Need a colour display?</strong>
+    See <a href="/guides/how-to-wire-gc9a01-esp32" class="term-link">How to wire the GC9A01 round display with ESP32</a> for a 240x240 round colour TFT over SPI.
+  </div>
+
+  <div class="callout callout-why" style="margin-top:1rem;">
+    <strong>Using this display with the INA219?</strong>
+    See <a href="/guides/how-to-build-ina219-charger-monitor-esp32" class="term-link">How to build an INA219 battery charger monitor with ESP32 and OLED</a> - it uses this exact display to show live charge data.
   </div>
 
 </GuideLayout>

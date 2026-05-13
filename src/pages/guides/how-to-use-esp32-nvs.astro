@@ -27,13 +27,13 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   </div>
 
   <div class="terminal-note">
-    Part of the <a href="/guides/esp32-memory-explained" class="term-link">ESP32 Memory series &rarr;</a>
+    Part of the <a href="/guides/esp32-memory-explained" class="term-link">ESP32 memory explained: flash, RAM, with PSRAM &rarr;</a>
   </div>
 
   <!-- What Is NVS -->
   <div class="section" id="what-is-nvs">
     <h2>What Is NVS</h2>
-    <p>Flash is permanent storage. But writing raw data to flash yourself is complicated and error prone. The ESP32 has a built in system for saving small values to flash without any of that complexity. It is called NVS, Non-Volatile Storage, and the Preferences library is how you use it from Arduino IDE, simplified.</p>
+    <p><a href="/guides/how-esp32-flash-memory-works" class="term-link">Flash</a> is permanent storage. But writing raw data to flash yourself is complicated and error prone. The ESP32 has a built in system for saving small values to flash without any of that complexity. It is called NVS, Non-Volatile Storage, and the Preferences library is how you use it from Arduino IDE, simplified.</p>
     <p>Think of NVS as a small notepad that lives in flash. You write a value to it by name, and it is still there the next time the board boots. Power off, reflash a new sketch, it does not matter. The notepad persists.</p>
   </div>
 
@@ -47,7 +47,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <li>A boot counter tracking how many times the board has started</li>
       <li>The last known state of something before power was lost</li>
     </ul>
-    <p>It is not the right tool for large data or files. For those, LittleFS is covered in the next guide.</p>
+    <p>It is not the right tool for large data or files. For those, <a href="/guides/how-to-use-littlefs-esp32" class="term-link">LittleFS</a> is covered in the next guide.</p>
   </div>
 
   <!-- The Sketch -->
@@ -319,7 +319,7 @@ void loop() {
 }`}</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
-    <p>The count prints to the serial monitor on every boot and survives every power cycle and reflash. For fuller tracking - total uptime, a history of every project ever flashed to the board - see the <a href="/guides/how-to-log-esp32-boot-count-littlefs">Board Health guide</a>.</p>
+    <p>The count prints to the serial monitor on every boot and survives every power cycle and reflash. For fuller tracking - total uptime, a history of every project ever flashed to the board - see <a href="/guides/how-to-log-esp32-boot-count-littlefs" class="term-link">How to log ESP32 boot count and uptime with LittleFS</a>.</p>
   </div>
 
   <!-- Namespaces -->
@@ -356,14 +356,29 @@ String name = prefs.getString("name", "unknown");`}</code></pre>
   <!-- Flash Budget -->
   <div class="section" id="flash-budget">
     <h2>NVS and the Flash Budget</h2>
-    <p>NVS lives in its own dedicated partition in flash, separate from your sketch partition and your LittleFS partition. It is small by design - typically 20KB in most partition schemes - because it is only meant for small values. Do not try to store large data in NVS. That is what LittleFS is for.</p>
+    <p>NVS lives in its own dedicated partition in flash, separate from your sketch partition and your LittleFS partition. It is small by design - typically 20KB in most partition schemes - because it is only meant for small values. Do not try to store large data in NVS. That is what LittleFS is for - see <a href="/guides/how-to-use-littlefs-esp32" class="term-link">How to use LittleFS on ESP32 &rarr;</a></p>
     <div class="terminal-note" style="margin-top:1rem;">
-      Want to build on this further? The <a href="/guides/how-to-log-esp32-boot-count-littlefs" class="term-link">next guide</a> uses NVS to keep a permanent record of a board's entire history - total uptime, every project ever flashed, surviving every reflash. One namespace, every board, forever.
+      Want to build on this further? <a href="/guides/how-to-log-esp32-boot-count-littlefs" class="term-link">How to log ESP32 boot count and uptime with LittleFS</a> uses NVS to keep a permanent record of a board's entire history - total uptime, every project ever flashed, surviving every reflash. One namespace, every board, forever.
     </div>
   </div>
 
   <div class="terminal-note">
-    <a href="/guides/esp32-memory-explained" class="term-link">&larr; Back to series</a>
+    <a href="/guides/esp32-memory-explained" class="term-link">&larr; Back to series</a> &nbsp;&middot;&nbsp; <a href="/guides/how-to-log-esp32-boot-count-littlefs" class="term-link">Next: Boot count &amp; uptime &rarr;</a>
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:1.5rem;">
+    <strong>Next in series</strong>
+    <a href="/guides/how-to-log-esp32-boot-count-littlefs" class="term-link">How to log ESP32 boot count and uptime with LittleFS &rarr;</a>
+  </div>
+
+  <div class="callout callout-why" style="margin-top:1rem;">
+    <strong>Need to store files, not values?</strong>
+    <a href="/guides/how-to-use-littlefs-esp32" class="term-link">How to use LittleFS on ESP32 &rarr;</a> - named files, folders, read and write at runtime.
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:1rem;">
+    <strong>See NVS in an audio project</strong>
+    <a href="/guides/how-to-play-audio-esp32-pam8403" class="term-link">How to play audio from ESP32 with PAM8403 &rarr;</a> - NVS can track how many times a clip has played.
   </div>
 
 </GuideLayout>

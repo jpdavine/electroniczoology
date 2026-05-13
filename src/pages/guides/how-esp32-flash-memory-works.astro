@@ -23,7 +23,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   </div>
 
   <div class="terminal-note">
-    Part of the <a href="/guides/esp32-memory-explained" class="term-link">ESP32 Memory series &rarr;</a>
+    Part of the <a href="/guides/esp32-memory-explained" class="term-link">ESP32 memory explained: flash, RAM, with PSRAM &rarr;</a>
   </div>
 
   <!-- What Is Flash -->
@@ -31,7 +31,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <h2>What Is Flash</h2>
     <p>Your ESP32 has a flash memory chip that acts as permanent storage. When you upload your sketch, everything goes here.</p>
     <p>Flash is non-volatile, meaning it persists beyond reboots and power cycles. This is where your program lives permanently.</p>
-    <p>Flash is slow to read compared to RAM and PSRAM. You cannot freely write to it at runtime, Think of it as the filing cabinet. You do not do your actual work in the filing cabinet. You go to it, grab what you need, bring it to your workbench (RAM, PSRAM), work on it there, and when you are done it goes back.</p>
+    <p>Flash is slow to read compared to <a href="/guides/how-esp32-ram-works" class="term-link">RAM</a> and <a href="/guides/how-esp32-psram-works" class="term-link">PSRAM</a>. You cannot freely write to it at runtime, Think of it as the filing cabinet. You do not do your actual work in the filing cabinet. You go to it, grab what you need, bring it to your workbench (RAM, PSRAM), work on it there, and when you are done it goes back.</p>
     <p>On most ESP32 modules the flash chip is 4MB. That is your total budget for everything: your sketch code, your images, your web files, all of it. How you divide that 4MB is up to you - that is covered in the partition scheme section.</p>
     <p>The key thing to understand about flash is that it is permanent storage, not working memory. It is where things live, not where things happen.</p>
   </div>
@@ -116,12 +116,27 @@ void loop() {}`}</code></pre>
 
     <div class="callout callout-why">
       <strong>Need the full 4MB or a custom split?</strong>
-      A custom partition table gives you full control over how flash is divided between app, OTA, SPIFFS, and LittleFS partitions. That is covered in a separate guide.
+      A custom partition table gives you full control over how flash is divided between app, OTA, SPIFFS, and <a href="/guides/how-to-use-littlefs-esp32" class="term-link">LittleFS</a> partitions. That is covered in a separate guide.
     </div>
   </div>
 
   <div class="terminal-note">
-    <a href="/guides/esp32-memory-explained" class="term-link">&larr; Back to series</a>
+    <a href="/guides/esp32-memory-explained" class="term-link">&larr; Back to series</a> &nbsp;&middot;&nbsp; <a href="/guides/how-esp32-ram-works" class="term-link">Next: How ESP32 RAM works &rarr;</a>
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:1.5rem;">
+    <strong>Use flash as a filesystem</strong>
+    <a href="/guides/how-to-use-littlefs-esp32" class="term-link">How to use LittleFS on ESP32 &rarr;</a> - named files, folders, read and write at runtime.
+  </div>
+
+  <div class="callout callout-why" style="margin-top:1rem;">
+    <strong>Store images in flash</strong>
+    <a href="/guides/how-to-display-images-gc9a01-esp32" class="term-link">How to display custom images on the GC9A01 &rarr;</a> - a practical example of storing 115KB image data in flash.
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:1rem;">
+    <strong>Not sure what flash your board has?</strong>
+    <a href="/guides/how-to-check-a-new-esp32" class="term-link">How to check a new ESP32 &rarr;</a> - diagnostic sketches to confirm chip size and specs.
   </div>
 
 </GuideLayout>

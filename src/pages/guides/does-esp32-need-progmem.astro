@@ -25,13 +25,13 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   </div>
 
   <div class="terminal-note">
-    Part of the <a href="/guides/esp32-memory-explained" class="term-link">ESP32 Memory series &rarr;</a>
+    Part of the <a href="/guides/esp32-memory-explained" class="term-link">ESP32 memory explained: flash, RAM, with PSRAM &rarr;</a>
   </div>
 
   <!-- Where It Came From -->
   <div class="section" id="where-it-came-from">
     <h2>Where It Came From</h2>
-    <p>PROGMEM is an AVR thing. On older Arduino boards like the Uno and Pro Mini, the microcontroller has completely separate address spaces for flash and RAM. The CPU physically cannot read from flash like normal memory. If you declared a large array without PROGMEM, it had no choice but to live in RAM, eating into the tiny 2KB you had to work with. PROGMEM was the only way to keep data in flash and out of RAM on those chips.</p>
+    <p>PROGMEM is an AVR thing. On older Arduino boards like the Uno and Pro Mini, the microcontroller has completely separate address spaces for flash and RAM. The CPU physically cannot read from flash like normal memory. If you declared a large array without PROGMEM, it had no choice but to live in RAM, eating into the tiny 2KB you had to work with. PROGMEM was the only way to keep data in <a href="/guides/how-esp32-flash-memory-works" class="term-link">flash</a> and out of <a href="/guides/how-esp32-ram-works" class="term-link">RAM</a> on those chips.</p>
   </div>
 
   <!-- Why It Keeps Showing Up -->
@@ -74,7 +74,22 @@ uint8_t pixel = myImage[i];`}</code></pre>
   </div>
 
   <div class="terminal-note">
-    <a href="/guides/esp32-memory-explained" class="term-link">&larr; Back to series</a>
+    <a href="/guides/esp32-memory-explained" class="term-link">&larr; Back to series</a> &nbsp;&middot;&nbsp; <a href="/guides/how-to-use-esp32-nvs" class="term-link">Next: How to use ESP32 NVS &rarr;</a>
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:1.5rem;">
+    <strong>Next in series</strong>
+    <a href="/guides/how-to-use-esp32-nvs" class="term-link">How to use ESP32 NVS for persistent storage &rarr;</a>
+  </div>
+
+  <div class="callout callout-why" style="margin-top:1rem;">
+    <strong>See PROGMEM in audio sketches</strong>
+    <a href="/guides/how-to-play-audio-esp32-pam8403" class="term-link">How to play audio from ESP32 with PAM8403 &rarr;</a> - uses PROGMEM in the header converter script.
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:1rem;">
+    <strong>How flash actually works</strong>
+    <a href="/guides/how-esp32-flash-memory-works" class="term-link">How ESP32 flash memory works &rarr;</a> - understand where const arrays actually live.
   </div>
 
 </GuideLayout>

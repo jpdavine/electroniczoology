@@ -27,7 +27,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   </div>
 
   <div class="terminal-note">
-    This guide assumes your GC9A01 is already wired and working. If not, start with the <a href="/guides/how-to-wire-gc9a01-esp32" class="term-link">GC9A01 setup guide &rarr;</a>
+    This guide assumes your GC9A01 is already wired and working. If not, start with the <a href="/guides/how-to-wire-gc9a01-esp32" class="term-link">How to wire the GC9A01 round display with ESP32 &rarr;</a>
   </div>
 
   <!-- What You Need -->
@@ -46,7 +46,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <div class="card">
         <h3>Software</h3>
         <ul>
-          <li>Arduino IDE with ESP32 board support</li>
+          <li><a href="/guides/how-to-check-a-new-esp32" class="term-link">Arduino IDE with ESP32 board support</a></li>
           <li><code>Arduino_GFX_Library</code> by Moon On Our Nation</li>
           <li>Python 3 + Pillow - image converter</li>
           <li>Any image editor (GIMP, Photoshop, etc.)</li>
@@ -74,7 +74,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <p>The process is: resize your image to 240x240, run a Python script to convert every pixel to its RGB565 value, and write the result out as a C header file. The sketch includes that header and blits the pixel array straight to the display in one call.</p>
     <div class="callout callout-why">
       <strong>Why not decode on the device?</strong>
-      Decoding JPEG or PNG on an ESP32 is possible but slow and complex. Pre-converting to raw RGB565 on your computer means the sketch is trivial - just a memcpy to the display. A 240x240 image is 115KB in flash, well within the ESP32's 4MB.
+      Decoding JPEG or PNG on an ESP32 is possible but slow and complex. Pre-converting to raw RGB565 on your computer means the sketch is trivial - just a memcpy to the display. A 240x240 image is 115KB in <a href="/guides/how-esp32-flash-memory-works" class="term-link">flash</a>, well within the ESP32's 4MB.
     </div>
   </div>
 
@@ -259,7 +259,7 @@ void loop() {}`}</code></pre>
     </div>
 
     <div class="terminal-note" style="margin-top:1.5rem;">
-      Want to cycle through multiple images? See the <a href="/guides/how-to-cycle-images-gc9a01-esp32" class="term-link">multiple images guide &rarr;</a>
+      Want to cycle through multiple images? See <a href="/guides/how-to-cycle-images-gc9a01-esp32" class="term-link">How to cycle images on the GC9A01 with batch conversion &rarr;</a>
     </div>
   </div>
 
@@ -277,8 +277,8 @@ void loop() {}`}</code></pre>
     <div class="trouble-item">
       <h3>Compile error - array too large / out of memory</h3>
       <ul>
-        <li>On ESP32, <code>const</code> arrays are automatically stored in flash by the compiler - the 115KB array will not overflow RAM</li>
-        <li>If you see this error, confirm your board is set to an ESP32 variant in Arduino IDE - AVR boards (Uno, Nano) do not have this behaviour and would need <code>PROGMEM</code></li>
+        <li>On ESP32, <code>const</code> arrays are automatically stored in flash by the compiler - the 115KB array will not overflow <a href="/guides/how-esp32-ram-works" class="term-link">RAM</a> - see <a href="/guides/how-esp32-ram-works" class="term-link">How ESP32 RAM works &rarr;</a> to learn more</li>
+        <li>If you see this error, confirm your board is set to an ESP32 variant in Arduino IDE - AVR boards (Uno, Nano) do not have this behaviour and would need <a href="/guides/does-esp32-need-progmem" class="term-link"><code>PROGMEM</code></a></li>
       </ul>
     </div>
     <div class="trouble-item">
@@ -304,6 +304,16 @@ void loop() {}`}</code></pre>
         <li>Open Serial Monitor - if nothing appears, the sketch may have crashed on boot</li>
       </ul>
     </div>
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:2rem;">
+    <strong>Have a smaller round display?</strong>
+    See <a href="/guides/how-to-use-gc9d01-round-tft-esp32" class="term-link">How to use the GC9D01 160x160 round TFT with ESP32</a> - a different chip with a different driver.
+  </div>
+
+  <div class="callout callout-why" style="margin-top:1rem;">
+    <strong>Need a simpler display for status readouts?</strong>
+    See <a href="/guides/how-to-use-ssd1306-oled-esp32" class="term-link">How to use the SSD1306 OLED display with ESP32</a> - two wires, no colour, very low power.
   </div>
 
 </GuideLayout>

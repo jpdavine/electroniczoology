@@ -26,10 +26,10 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   </div>
 
   <div class="terminal-note">
-    Part of the <a href="/guides/esp32-memory-explained" class="term-link">ESP32 Memory series &rarr;</a>
+    Part of the <a href="/guides/esp32-memory-explained" class="term-link">ESP32 memory explained: flash, RAM, with PSRAM &rarr;</a>
   </div>
 
-  <p class="guide-intro">Flash is the filing cabinet. LittleFS is the filing system inside the cabinet. Without it you have a drawer full of loose bytes and no way to find anything. With it you have folders, filenames, and the same open-read-write pattern you use on any computer.</p>
+  <p class="guide-intro"><a href="/guides/how-esp32-flash-memory-works" class="term-link">Flash</a> is the filing cabinet. LittleFS is the filing system inside the cabinet. Without it you have a drawer full of loose bytes and no way to find anything. With it you have folders, filenames, and the same open-read-write pattern you use on any computer.</p>
 
   <!-- Installing the Plugin -->
   <div class="section" id="installing-the-plugin">
@@ -253,13 +253,28 @@ void loop() {
       <li>Config files and calibration values that survive a power cycle</li>
       <li>A copy of the sketch itself, so the board can tell you what it is months later</li>
     </ul>
-    <p>The last one is the use case that turned me onto LittleFS in the first place. Covered separately in <a href="/guides/how-to-keep-sketch-copy-in-littlefs" class="term-link">Self-documenting boards with LittleFS &rarr;</a></p>
+    <p>The last one is the use case that turned me onto LittleFS in the first place. Covered separately in <a href="/guides/how-to-keep-sketch-copy-in-littlefs" class="term-link">How to keep a copy of your sketch in LittleFS &rarr;</a></p>
   </div>
 
   <div class="terminal-note">
     <a href="/guides/esp32-memory-explained" class="term-link">&larr; Back to series</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="/guides/esp32-memory-compression" class="term-link">Next: Compression &rarr;</a>
+    <a href="/guides/esp32-memory-compression" class="term-link">Next: ESP32 Flash Compression &rarr;</a>
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:1.5rem;">
+    <strong>Next in series</strong>
+    <a href="/guides/esp32-memory-compression" class="term-link">ESP32 Flash Compression - the Tardis treatment &rarr;</a>
+  </div>
+
+  <div class="callout callout-why" style="margin-top:1rem;">
+    <strong>Want persistent values instead of files?</strong>
+    <a href="/guides/how-to-use-esp32-nvs" class="term-link">How to use ESP32 NVS for persistent storage &rarr;</a> - the right tool for small values that survive reflashing.
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:1rem;">
+    <strong>See LittleFS storing images</strong>
+    <a href="/guides/how-to-display-images-gc9a01-esp32" class="term-link">How to display custom images on the GC9A01 &rarr;</a> - pre-converted RGB565 images stored in flash.
   </div>
 
 </GuideLayout>

@@ -26,7 +26,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   </div>
 
   <div class="terminal-note">
-    This guide continues from the <a href="/guides/how-to-display-images-gc9a01-esp32" class="term-link">single image guide &rarr;</a> - make sure your display is working with one image before starting here.
+    This guide continues from <a href="/guides/how-to-display-images-gc9a01-esp32" class="term-link">How to display custom images on the GC9A01 &rarr;</a> - make sure your display is working with one image before starting here.
   </div>
 
   <!-- What You Need -->
@@ -45,7 +45,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <div class="card">
         <h3>Software & Files</h3>
         <ul>
-          <li>Arduino IDE with ESP32 board support</li>
+          <li><a href="/guides/how-to-check-a-new-esp32" class="term-link">Arduino IDE with ESP32 board support</a></li>
           <li><code>Arduino_GFX_Library</code> by Moon On Our Nation</li>
           <li>Python 3 + Pillow - image converter</li>
           <li>Multiple PNG images prepared and converted to <code>.h</code> files</li>
@@ -70,7 +70,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   <!-- Flash Memory -->
   <div class="section" id="flash">
     <h2>Flash Memory</h2>
-    <p>Each 240x240 image takes <strong>115KB</strong> of flash. The ESP32 default partition gives the app 1MB total - shared with the compiled sketch and libraries. With multiple images you will likely hit that limit.</p>
+    <p>Each 240x240 image takes <strong>115KB</strong> of <a href="/guides/how-esp32-flash-memory-works" class="term-link">flash</a>. The ESP32 default partition gives the app 1MB total - shared with the compiled sketch and libraries. With multiple images you will likely hit that limit.</p>
     <div class="callout callout-why">
       <strong>Change the partition scheme</strong>
       <p>In Arduino IDE go to <strong>Tools &rarr; Partition Scheme &rarr; Huge APP (3MB No OTA / 1MB SPIFFS)</strong> before compiling. That gives the app 3MB, comfortably fitting around 25 images.</p>
@@ -168,7 +168,7 @@ void loop() {
       <h3>Compile error - sketch too large / not enough flash</h3>
       <ul>
         <li>Go to <strong>Tools &rarr; Partition Scheme &rarr; Huge APP (3MB No OTA / 1MB SPIFFS)</strong> and recompile</li>
-        <li>Each image is 115KB - check how many you have included and whether it exceeds the partition size</li>
+        <li>Each image is 115KB - check how many you have included and whether it exceeds the <a href="/guides/how-esp32-flash-memory-works" class="term-link">flash</a> partition size</li>
       </ul>
     </div>
     <div class="trouble-item">
@@ -193,6 +193,21 @@ void loop() {
         <li>Rename by rerunning the converter with a different varname argument</li>
       </ul>
     </div>
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:2rem;">
+    <strong>Start from the beginning?</strong>
+    Head back to <a href="/guides/how-to-wire-gc9a01-esp32" class="term-link">How to wire the GC9A01 round display with ESP32 &rarr;</a>
+  </div>
+
+  <div class="callout callout-why" style="margin-top:1rem;">
+    <strong>Have a smaller round display?</strong>
+    See <a href="/guides/how-to-use-gc9d01-round-tft-esp32" class="term-link">How to use the GC9D01 160x160 round TFT with ESP32</a> - a different chip with a different driver.
+  </div>
+
+  <div class="callout callout-why" style="margin-top:1rem;">
+    <strong>Need a simpler display for status readouts?</strong>
+    See <a href="/guides/how-to-use-ssd1306-oled-esp32" class="term-link">How to use the SSD1306 OLED display with ESP32</a> - two wires, no colour, very low power.
   </div>
 
 </GuideLayout>

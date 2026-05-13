@@ -45,7 +45,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   <div class="section" id="arduino-ide-setup">
     <h2>Arduino IDE Setup</h2>
     <p>Select the right board under Tools. For an ESP32-S3 use <strong>ESP32S3 Dev Module</strong>. For a C3 use <strong>ESP32C3 Dev Module</strong>. The generic ESP32 option is for the original WROOM and WROVER modules and will not work correctly with S3 or C3 hardware.</p>
-    <p>Set the PSRAM option to match your module variant. If your module has R8 in the name, set PSRAM to <strong>OPI PSRAM</strong>. If it has R2, set it to <strong>QSPI PSRAM</strong>. No R in the name means no PSRAM - leave it disabled. The PSRAM sketch in the memory series will confirm whether this is correct.</p>
+    <p>Set the PSRAM option to match your module variant. If your module has R8 in the name, set PSRAM to <strong>OPI PSRAM</strong>. If it has R2, set it to <strong>QSPI PSRAM</strong>. No R in the name means no PSRAM - leave it disabled. The <a href="/guides/how-esp32-psram-works" class="term-link">PSRAM guide</a> will confirm whether this is correct.</p>
     <p>Set the baud rate to 115200. All sketches in this guide and the linked memory guides use this.</p>
   </div>
 
@@ -105,9 +105,9 @@ void loop() {}`}</code></pre>
     <h2>Flash, RAM, and PSRAM</h2>
     <p>These three sketches are covered in full in the memory series, including what each line reports and what the numbers mean for your project.</p>
     <ul class="link-list">
-      <li><a href="/guides/how-esp32-flash-memory-works">Flash - chip size, speed, and sketch space</a></li>
-      <li><a href="/guides/how-esp32-ram-works">RAM - free heap, minimum heap, and largest free block</a></li>
-      <li><a href="/guides/how-esp32-psram-works">PSRAM - whether it is present and how much</a></li>
+      <li><a href="/guides/how-esp32-flash-memory-works" class="term-link">How ESP32 flash memory works</a> - chip size, speed, and sketch space</li>
+      <li><a href="/guides/how-esp32-ram-works" class="term-link">How ESP32 RAM works</a> - free heap, minimum heap, and largest free block</li>
+      <li><a href="/guides/how-esp32-psram-works" class="term-link">How ESP32 PSRAM works</a> - whether it is present and how much</li>
     </ul>
     <p>Run them in order. By the end you will know exactly what the board has and how much of it is available before your sketch does anything.</p>
   </div>
@@ -192,6 +192,21 @@ void setup() {
 void loop() {}`}</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:2rem;">
+    <strong>Dig deeper into flash</strong>
+    <a href="/guides/how-esp32-flash-memory-works" class="term-link">How ESP32 flash memory works &rarr;</a> - partition schemes, sketch space, and what the numbers mean.
+  </div>
+
+  <div class="callout callout-why" style="margin-top:1rem;">
+    <strong>Understand your RAM budget</strong>
+    <a href="/guides/how-esp32-ram-works" class="term-link">How ESP32 RAM works &rarr;</a> - free heap, fragmentation, and what a real project costs.
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:1rem;">
+    <strong>Got PSRAM? Use it</strong>
+    <a href="/guides/how-esp32-psram-works" class="term-link">How ESP32 PSRAM works &rarr;</a> - which modules have it and how to allocate into it.
   </div>
 
 </GuideLayout>

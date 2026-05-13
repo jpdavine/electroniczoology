@@ -24,7 +24,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   </div>
 
   <div class="terminal-note">
-    Part of the <a href="/guides/esp32-memory-explained" class="term-link">ESP32 Memory series &rarr;</a>
+    Part of the <a href="/guides/esp32-memory-explained" class="term-link">ESP32 memory explained: flash, RAM, with PSRAM &rarr;</a>
   </div>
 
   <p class="guide-intro">If your sketch is only doing one thing at a time RAM is most likely not going to be an issue. But if you are stacking libraries, running WiFi, or asking a lot to happen continuously, RAM can become a problem faster than you expect. This guide lets you see it in real time.</p>
@@ -37,7 +37,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <p>RAM is fast. Much faster than flash. The ESP32 can read and write to it freely, as many times as it likes, with no wear concerns. The tradeoff is that it is volatile - the moment power is removed, everything in RAM is gone. It is also tiny in comparison, around 300KB on a standard ESP32.</p>
     <div class="callout callout-why">
       <strong>The central tension of ESP32 development:</strong>
-      Flash is large but slow and permanent. RAM is fast and flexible but tiny and temporary. Everything you write is a negotiation between the two. When later guides talk about keeping large data in flash, or spilling things out to PSRAM, it is always in service of the same goal: keeping your workbench clear enough to actually work.
+      Flash is large but slow and permanent. RAM is fast and flexible but tiny and temporary. Everything you write is a negotiation between the two. When later guides talk about keeping large data in <a href="/guides/how-esp32-flash-memory-works" class="term-link">flash</a>, or spilling things out to <a href="/guides/how-esp32-psram-works" class="term-link">PSRAM</a>, it is always in service of the same goal: keeping your workbench clear enough to actually work.
     </div>
   </div>
 
@@ -839,7 +839,22 @@ void loop() {
   <div class="terminal-note">
     <a href="/guides/esp32-memory-explained" class="term-link">&larr; Back to series</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="/guides/how-esp32-flash-memory-works" class="term-link">Next: Flash &rarr;</a>
+    <a href="/guides/how-esp32-psram-works" class="term-link">Next: How ESP32 PSRAM works &rarr;</a>
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:1.5rem;">
+    <strong>Need more RAM?</strong>
+    <a href="/guides/how-esp32-psram-works" class="term-link">How ESP32 PSRAM works &rarr;</a> - a second, much larger workbench on supported modules.
+  </div>
+
+  <div class="callout callout-why" style="margin-top:1rem;">
+    <strong>See RAM in action with a display</strong>
+    <a href="/guides/how-to-use-ssd1306-oled-esp32" class="term-link">How to use the SSD1306 OLED display with ESP32 &rarr;</a> - the library keeps a 1KB frame buffer in RAM.
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:1rem;">
+    <strong>Not sure what board you have?</strong>
+    <a href="/guides/how-to-check-a-new-esp32" class="term-link">How to check a new ESP32 &rarr;</a> - diagnostic sketches to confirm chip specs including RAM.
   </div>
 
 </GuideLayout>

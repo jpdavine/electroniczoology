@@ -18,20 +18,20 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <div class="meta">
       <div class="meta-item"><strong>Display:</strong> ST7789 - 240x240 TFT</div>
       <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin)</div>
-      <div class="meta-item"><strong>Library:</strong> TFT_eSPI by Bodmer</div>
+      <div class="meta-item"><strong>Library:</strong> <a href="/guides/how-to-set-up-tft-espi-esp32" class="term-link">How to set up TFT_eSPI with ESP32</a></div>
     </div>
     <div class="badge badge-confirmed">&#10003; Confirmed Working</div>
   </div>
 
   <div class="back-link">
-    &larr; <a href="/guides">All guides</a> &nbsp;&middot;&nbsp; &larr; <a href="/guides/how-to-set-up-tft-espi-esp32">TFT_eSPI main guide</a>
+    &larr; <a href="/guides">All guides</a> &nbsp;&middot;&nbsp; &larr; <a href="/guides/how-to-set-up-tft-espi-esp32">How to set up TFT_eSPI with ESP32</a>
   </div>
 
   <!-- Overview -->
   <div class="section" id="overview">
     <h2>Overview</h2>
     <p>The ST7789 is a 240x240 TFT display driven over SPI. It is the square equivalent of the GC9A01 and uses the same pin layout. Many modules use the same breakout board form factor.</p>
-    <p>This page covers the <code>User_Setup_Select.h</code> config to drive it with TFT_eSPI. Once configured, use the <a href="/guides/how-to-set-up-tft-espi-esp32#step-4" class="term-link">standard test sketch</a> to confirm it is working.</p>
+    <p>This page covers the <code>User_Setup_Select.h</code> config to drive it with TFT_eSPI. Once configured, use the <a href="/guides/how-to-set-up-tft-espi-esp32#step-4" class="term-link">How to set up TFT_eSPI with ESP32 - test sketch</a> to confirm it is working.</p>
   </div>
 
   <!-- Wiring -->
@@ -108,6 +108,11 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <h3>Image offset or wrong size</h3>
       <p>Some ST7789 modules are 240x280 or 170x320. If the image is cropped or offset, update <code>TFT_WIDTH</code> and <code>TFT_HEIGHT</code> in Setup24 to match your actual display resolution.</p>
     </div>
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:1.5rem;">
+    <strong>Try another display:</strong>
+    <a href="/guides/how-to-use-st7735-esp32" class="term-link">How to use the ST7735 128x128 display with ESP32</a> · <a href="/guides/how-to-configure-gc9a01-tft-espi" class="term-link">How to configure the GC9A01 round display with TFT_eSPI</a>
   </div>
 
   <div class="continue-link">

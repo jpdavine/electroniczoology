@@ -42,7 +42,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <div class="card">
         <h3>Software</h3>
         <ul>
-          <li>Arduino IDE with ESP32 board support</li>
+          <li><a href="/guides/how-to-check-a-new-esp32" class="term-link">Arduino IDE with ESP32 board support</a></li>
           <li><code>Arduino_GFX_Library</code> by Moon On Our Nation</li>
         </ul>
         <p style="margin-top:1rem;font-size:0.85rem;color:#666;">Install via Arduino IDE Library Manager - search <strong>Arduino_GFX</strong>.</p>
@@ -53,12 +53,12 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   <!-- Not a GC9A01 -->
   <div class="section" id="not-a-gc9a01">
     <h2>Not a GC9A01</h2>
-    <p>Many 0.71" 160x160 round displays are sold as "GC9A01" - same listing, same photo, wrong chip. The actual driver is the GC9D01. They share a similar command set but have different init sequences. Using the GC9A01 driver on a GC9D01 gives vertical lines, wrong colours, or no output at all.</p>
+    <p>Many 0.71" 160x160 round displays are sold as "GC9A01" - same listing, same photo, wrong chip. The actual driver is the GC9D01. They share a similar command set but have different init sequences. Using the <a href="/guides/how-to-wire-gc9a01-esp32" class="term-link">GC9A01 round display with ESP32</a> driver on a GC9D01 gives vertical lines, wrong colours, or no output at all.</p>
     <div class="callout callout-tip">
       <strong>How to tell which chip you have.</strong>
       Size is the giveaway - the GC9A01 is 240x240, the GC9D01 is 160x160. If your round display is around 0.71" across and the listing says GC9A01, it's almost certainly a GC9D01.
     </div>
-    <p>Arduino_GFX v1.6.1+ has native GC9D01 support via <code>Arduino_GC9D01</code>. Use that constructor and the init sequence is correct from the start. TFT_eSPI does not have a GC9D01 driver - Arduino_GFX is the right library for this display.</p>
+    <p>Arduino_GFX v1.6.1+ has native GC9D01 support via <code>Arduino_GC9D01</code>. Use that constructor and the init sequence is correct from the start. <a href="/guides/how-to-set-up-tft-espi-esp32" class="term-link">TFT_eSPI</a> does not have a GC9D01 driver - Arduino_GFX is the right library for this display.</p>
   </div>
 
   <!-- Wiring -->
@@ -247,6 +247,11 @@ void loop() {
         <li>Close and reopen Arduino IDE after installing</li>
       </ul>
     </div>
+  </div>
+
+  <div class="callout callout-why" style="margin-top:2rem;">
+    <strong>Have a GC9A01 instead?</strong>
+    See <a href="/guides/how-to-wire-gc9a01-esp32" class="term-link">How to wire the GC9A01 round display with ESP32</a> - the 240x240 version with a different driver.
   </div>
 
 </GuideLayout>

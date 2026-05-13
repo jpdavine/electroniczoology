@@ -19,7 +19,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <div class="meta-item"><strong>Topic:</strong> Flash, RAM, PSRAM, PROGMEM, LittleFS, Compression</div>
     </div>
     <div class="series-step">ESP32 Memory Series - Introduction</div>
-    <div class="badge badge-untested">&#9888; Untested</div>
+    <div class="badge badge-confirmed">&#10003; Confirmed Working</div>
   </div>
 
   <!-- What This Covers -->
@@ -35,11 +35,11 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <h2>The Series</h2>
     <div class="two-col">
       <div class="card">
-        <h3>Flash</h3>
+        <h3><a href="/guides/how-esp32-flash-memory-works" class="term-link">Flash</a></h3>
         <p>Permanent storage. Your sketch lives here. Non-volatile - survives power loss. Slow to read, limited write cycles. Think filing cabinet.</p>
       </div>
       <div class="card">
-        <h3>RAM</h3>
+        <h3><a href="/guides/how-esp32-ram-works" class="term-link">RAM</a></h3>
         <p>Working memory. Your variables live here at runtime. Fast, flexible, but tiny (around 300KB) and wiped at power-off. Think workbench.</p>
       </div>
     </div>
@@ -49,37 +49,37 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
         <p>Flash is large but slow and permanent. RAM is fast and flexible but tiny and temporary. Everything you write is a negotiation between the two. When later guides talk about keeping large data in flash, or spilling things out to PSRAM, it is always in service of the same goal: keeping your workbench clear enough to actually work.</p>
       </div>
       <div class="card">
-        <h3>PSRAM</h3>
+        <h3><a href="/guides/how-esp32-psram-works" class="term-link">PSRAM</a></h3>
         <p>A second, much larger workbench. An extra chip bolted on - 4 to 8MB on supported modules. Volatile like RAM but big enough for framebuffers, audio buffers, and large data structures.</p>
       </div>
     </div>
     <div class="two-col">
       <div class="card">
-        <h3>PROGMEM</h3>
+        <h3><a href="/guides/does-esp32-need-progmem" class="term-link">PROGMEM</a></h3>
         <p>An AVR legacy keyword that does nothing on ESP32. <code>const</code> arrays are already kept in flash by the compiler - no hint needed. This guide explains where PROGMEM came from and why you can skip it for ESP32-only projects.</p>
       </div>
       <div class="card">
-        <h3>NVS</h3>
+        <h3><a href="/guides/how-to-use-esp32-nvs" class="term-link">NVS</a></h3>
         <p>A small notepad that lives in flash. Write a value by name and it survives power-off, power-on, and reflashing. The right tool for settings, calibration values, boot counters, and any small persistent state.</p>
       </div>
     </div>
     <div class="two-col">
       <div class="card">
-        <h3>Board Health</h3>
+        <h3><a href="/guides/how-to-log-esp32-boot-count-littlefs" class="term-link">Board Health</a></h3>
         <p>Build on NVS to track total boot count, last project name, and accumulated uptime across every sketch ever flashed to a board. Pull up any board and immediately know its history.</p>
       </div>
       <div class="card">
-        <h3>LittleFS</h3>
+        <h3><a href="/guides/how-to-use-littlefs-esp32" class="term-link">LittleFS</a></h3>
         <p>A filing system inside the filing cabinet. Gives you named files, folders, and the ability to read and write at runtime. The right place for images, web files, and config that needs to survive a reboot.</p>
       </div>
     </div>
     <div class="two-col">
       <div class="card">
-        <h3>Compression</h3>
+        <h3><a href="/guides/esp32-memory-compression" class="term-link">Compression</a></h3>
         <p>Store your data compressed in flash, decompress in small chunks into RAM as you need it. The Tardis treatment - smaller on the outside. No PSRAM required.</p>
       </div>
       <div class="card">
-        <h3>Compression with PSRAM</h3>
+        <h3><a href="/guides/esp32-memory-compression-psram" class="term-link">Compression with PSRAM</a></h3>
         <p>Decompress everything into PSRAM at boot and access it freely with a normal pointer. No chunking, no decompressor state. The next dimension.</p>
       </div>
     </div>
@@ -89,13 +89,13 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   <div class="section" id="reading-order">
     <h2>Reading Order</h2>
     <ol>
-      <li><a href="/guides/how-esp32-flash-memory-works" class="term-link">Flash - the filing cabinet</a></li>
-      <li><a href="/guides/how-esp32-ram-works" class="term-link">RAM - the workbench</a></li>
-      <li><a href="/guides/how-esp32-psram-works" class="term-link">PSRAM - the bigger workbench</a></li>
-      <li><a href="/guides/does-esp32-need-progmem" class="term-link">PROGMEM - why you probably don&apos;t need it</a></li>
-      <li><a href="/guides/how-to-use-esp32-nvs" class="term-link">NVS - the notepad that endures</a></li>
-      <li><a href="/guides/how-to-log-esp32-boot-count-littlefs" class="term-link">Board health - lifetime tracking with NVS</a></li>
-      <li><a href="/guides/how-to-use-littlefs-esp32" class="term-link">LittleFS - a filing system inside the cabinet</a></li>
+      <li><a href="/guides/how-esp32-flash-memory-works" class="term-link">How ESP32 flash memory works</a></li>
+      <li><a href="/guides/how-esp32-ram-works" class="term-link">How ESP32 RAM works</a></li>
+      <li><a href="/guides/how-esp32-psram-works" class="term-link">How ESP32 PSRAM works</a></li>
+      <li><a href="/guides/does-esp32-need-progmem" class="term-link">Does ESP32 need PROGMEM?</a></li>
+      <li><a href="/guides/how-to-use-esp32-nvs" class="term-link">How to use ESP32 NVS for persistent storage</a></li>
+      <li><a href="/guides/how-to-log-esp32-boot-count-littlefs" class="term-link">How to log ESP32 boot count and uptime with LittleFS</a></li>
+      <li><a href="/guides/how-to-use-littlefs-esp32" class="term-link">How to use LittleFS on ESP32</a></li>
       <li><a href="/guides/esp32-memory-compression" class="term-link">Compression - the Tardis treatment</a></li>
       <li><a href="/guides/esp32-memory-compression-psram" class="term-link">Compression with PSRAM - the next dimension</a></li>
     </ol>

@@ -25,13 +25,13 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   </div>
 
   <div class="terminal-note">
-    Part of the <a href="/guides/esp32-memory-explained" class="term-link">ESP32 Memory series &rarr;</a>
+    Part of the <a href="/guides/esp32-memory-explained" class="term-link">ESP32 memory explained: flash, RAM, with PSRAM &rarr;</a>
   </div>
 
   <!-- What Is PSRAM -->
   <div class="section" id="what-is-psram">
     <h2>What Is PSRAM</h2>
-    <p>You already know about the filing cabinet (flash) and the workbench (RAM). PSRAM is a second, much bigger workbench that some ESP32 modules have bolted on the side - it is a whole extra chip.</p>
+    <p>You already know about the filing cabinet (<a href="/guides/how-esp32-flash-memory-works" class="term-link">flash</a>) and the workbench (<a href="/guides/how-esp32-ram-works" class="term-link">RAM</a>). PSRAM is a second, much bigger workbench that some ESP32 modules have bolted on the side - it is a whole extra chip.</p>
     <p>It is fast enough to work from directly, volatile like regular RAM (wiped at power-off), and typically 4 to 8MB in size. That is a significant chunk of space compared to the roughly 300KB of internal RAM your standard boards ship with. If you have it, use it.</p>
     <p>Not all ESP32 modules include PSRAM. The AI Thinker ESP32-CAM, the ESP32 WROVER, and most ESP32-S3 modules have it. The standard ESP32 Dev Board (38-pin WROOM module) does not.</p>
   </div>
@@ -145,7 +145,22 @@ void loop() {}`}</code></pre>
   </div>
 
   <div class="terminal-note">
-    <a href="/guides/esp32-memory-explained" class="term-link">&larr; Back to series</a>
+    <a href="/guides/esp32-memory-explained" class="term-link">&larr; Back to series</a> &nbsp;&middot;&nbsp; <a href="/guides/does-esp32-need-progmem" class="term-link">Next: Does ESP32 need PROGMEM? &rarr;</a>
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:1.5rem;">
+    <strong>Next in series</strong>
+    <a href="/guides/does-esp32-need-progmem" class="term-link">Does ESP32 need PROGMEM? &rarr;</a> - the AVR legacy keyword and why you can skip it on ESP32.
+  </div>
+
+  <div class="callout callout-why" style="margin-top:1rem;">
+    <strong>See PSRAM in action with images</strong>
+    <a href="/guides/how-to-cycle-images-gc9a01-esp32" class="term-link">How to cycle images on the GC9A01 with batch conversion &rarr;</a> - PSRAM lets you hold full image buffers in one place.
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:1rem;">
+    <strong>Not sure if your board has PSRAM?</strong>
+    <a href="/guides/how-to-check-a-new-esp32" class="term-link">How to check a new ESP32 &rarr;</a> - diagnostic sketches to confirm chip specs including PSRAM.
   </div>
 
 </GuideLayout>

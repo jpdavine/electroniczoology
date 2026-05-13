@@ -57,7 +57,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   <div class="section" id="hardware">
     <h2>Hardware</h2>
     <ul class="parts-list">
-      <li>Two ESP32 boards - any variant works (Dev Board, C3, S2, S3, etc.), 30-pin or 38-pin</li>
+      <li>Two ESP32 boards - any variant works (Dev Board, C3, S2, S3, etc.), 30-pin or 38-pin - see <a href="/guides/how-to-check-a-new-esp32" class="term-link">How to check a new ESP32</a></li>
       <li>Two USB cables and power sources</li>
     </ul>
     <p>No wiring beyond USB power. No components, no breadboard.</p>
@@ -324,8 +324,23 @@ void loop() {
     </div>
     <div class="trouble-item">
       <h3>Remote charger monitor</h3>
-      <p>An INA219 current sensor on one ESP32 reads voltage and current from a TP4056 charging an 18650 cell and sends those readings over ESP-NOW to a second ESP32 connected to an SSD1306 OLED. The meter sits next to the charger. The display sits wherever you want it. See the <a href="/guides/how-to-build-ina219-charger-monitor-esp32">INA219 charger monitor guide</a> for the single-board version this builds on.</p>
+      <p>An INA219 current sensor on one ESP32 reads voltage and current from a TP4056 charging an 18650 cell and sends those readings over ESP-NOW to a second ESP32 connected to an <a href="/guides/how-to-use-ssd1306-oled-esp32" class="term-link">SSD1306 OLED</a>. The meter sits next to the charger. The display sits wherever you want it. See <a href="/guides/how-to-build-ina219-charger-monitor-esp32" class="term-link">How to build an INA219 battery charger monitor with ESP32 and OLED</a> for the single-board version this builds on.</p>
     </div>
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:2rem;">
+    <strong>Put a round display on the receiver</strong>
+    <a href="/guides/how-to-wire-gc9a01-esp32" class="term-link">How to wire the GC9A01 round display with ESP32 &rarr;</a> - display received data on a 240x240 round TFT.
+  </div>
+
+  <div class="callout callout-why" style="margin-top:1rem;">
+    <strong>Add a display to the receiver</strong>
+    <a href="/guides/how-to-use-ssd1306-oled-esp32" class="term-link">How to use the SSD1306 OLED display with ESP32 &rarr;</a> - two wires, no SPI, perfect for a wireless receiver board.
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:1rem;">
+    <strong>Setting up a new ESP32?</strong>
+    <a href="/guides/how-to-check-a-new-esp32" class="term-link">How to check a new ESP32 &rarr;</a> - confirm both boards are working before wiring ESP-NOW.
   </div>
 
 </GuideLayout>
