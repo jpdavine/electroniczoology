@@ -15,7 +15,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
 
   <div class="hero">
     <div class="category">Memory &bull; ESP32</div>
-    <h1>ESP32 Board Health<br>Lifetime Tracking With NVS</h1>
+    <h1>How to log ESP32 boot<br>count and uptime<br>with LittleFS</h1>
     <div class="meta">
       <div class="meta-item"><strong>Board:</strong> Any ESP32</div>
       <div class="meta-item"><strong>Topic:</strong> NVS, Preferences, board history</div>
@@ -25,7 +25,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   </div>
 
   <div class="terminal-note">
-    Part of the <a href="/guides/esp32-memory-intro" class="term-link">ESP32 Memory series &rarr;</a>
+    Part of the <a href="/guides/esp32-memory-explained" class="term-link">ESP32 Memory series &rarr;</a>
   </div>
 
   <!-- The Idea -->
@@ -67,7 +67,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/esp32-memory-board-health
+ * https://electroniczoology.com/guides/how-to-log-esp32-boot-count-littlefs
  */
 
 #include <Preferences.h>
@@ -167,7 +167,7 @@ void loop() {
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/esp32-memory-board-health
+ * https://electroniczoology.com/guides/how-to-log-esp32-boot-count-littlefs
  */
 
 #include <Arduino_GFX_Library.h>
@@ -266,7 +266,7 @@ void loop() {
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/esp32-memory-board-health
+ * https://electroniczoology.com/guides/how-to-log-esp32-boot-count-littlefs
  */
 
 #include <Arduino_GFX_Library.h>
@@ -412,9 +412,9 @@ void loop() {
   </div>
 
   <div class="terminal-note">
-    <a href="/guides/esp32-memory-intro" class="term-link">&larr; Back to series</a>
+    <a href="/guides/esp32-memory-explained" class="term-link">&larr; Back to series</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="/guides/esp32-memory-littlefs" class="term-link">Next: LittleFS &rarr;</a>
+    <a href="/guides/how-to-use-littlefs-esp32" class="term-link">Next: LittleFS &rarr;</a>
   </div>
 
 </GuideLayout>

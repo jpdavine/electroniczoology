@@ -17,7 +17,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
 
   <div class="hero">
     <div class="category">Memory &bull; ESP32</div>
-    <h1>ESP32 NVS<br>The Notepad That Endures</h1>
+    <h1>How to use ESP32 NVS<br>for persistent storage</h1>
     <div class="meta">
       <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board or ESP32-C3</div>
       <div class="meta-item"><strong>Topic:</strong> NVS, Preferences library, persistent storage</div>
@@ -27,7 +27,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   </div>
 
   <div class="terminal-note">
-    Part of the <a href="/guides/esp32-memory-intro" class="term-link">ESP32 Memory series &rarr;</a>
+    Part of the <a href="/guides/esp32-memory-explained" class="term-link">ESP32 Memory series &rarr;</a>
   </div>
 
   <!-- What Is NVS -->
@@ -71,7 +71,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/esp32-memory-nvs
+ * https://electroniczoology.com/guides/how-to-use-esp32-nvs
  */
 
 #include <Preferences.h>
@@ -138,7 +138,7 @@ void loop() {}`}</code></pre>
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/esp32-memory-nvs
+ * https://electroniczoology.com/guides/how-to-use-esp32-nvs
  */
 
 #include <Arduino_GFX_Library.h>
@@ -236,7 +236,7 @@ void loop() {
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/esp32-memory-nvs
+ * https://electroniczoology.com/guides/how-to-use-esp32-nvs
  */
 
 #include <Arduino_GFX_Library.h>
@@ -319,7 +319,7 @@ void loop() {
 }`}</code></pre>
       <button class="copy-btn">Copy</button>
     </div>
-    <p>The count prints to the serial monitor on every boot and survives every power cycle and reflash. For fuller tracking - total uptime, a history of every project ever flashed to the board - see the <a href="/guides/esp32-memory-board-health">Board Health guide</a>.</p>
+    <p>The count prints to the serial monitor on every boot and survives every power cycle and reflash. For fuller tracking - total uptime, a history of every project ever flashed to the board - see the <a href="/guides/how-to-log-esp32-boot-count-littlefs">Board Health guide</a>.</p>
   </div>
 
   <!-- Namespaces -->
@@ -358,12 +358,12 @@ String name = prefs.getString("name", "unknown");`}</code></pre>
     <h2>NVS and the Flash Budget</h2>
     <p>NVS lives in its own dedicated partition in flash, separate from your sketch partition and your LittleFS partition. It is small by design - typically 20KB in most partition schemes - because it is only meant for small values. Do not try to store large data in NVS. That is what LittleFS is for.</p>
     <div class="terminal-note" style="margin-top:1rem;">
-      Want to build on this further? The <a href="/guides/esp32-memory-board-health" class="term-link">next guide</a> uses NVS to keep a permanent record of a board's entire history - total uptime, every project ever flashed, surviving every reflash. One namespace, every board, forever.
+      Want to build on this further? The <a href="/guides/how-to-log-esp32-boot-count-littlefs" class="term-link">next guide</a> uses NVS to keep a permanent record of a board's entire history - total uptime, every project ever flashed, surviving every reflash. One namespace, every board, forever.
     </div>
   </div>
 
   <div class="terminal-note">
-    <a href="/guides/esp32-memory-intro" class="term-link">&larr; Back to series</a>
+    <a href="/guides/esp32-memory-explained" class="term-link">&larr; Back to series</a>
   </div>
 
 </GuideLayout>

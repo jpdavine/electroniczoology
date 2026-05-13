@@ -17,7 +17,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
 
   <div class="hero">
     <div class="category">Audio &bull; ESP32</div>
-    <h1>MAX98357A I2S Amplifier<br>ESP32 Dev Board &bull; ESP32-C3</h1>
+    <h1>How to play audio from<br>ESP32 with MAX98357A</h1>
     <div class="meta">
       <div class="meta-item"><strong>Amp:</strong> MAX98357A (3.2W mono class-D, I2S)</div>
       <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin) or ESP32-C3</div>
@@ -25,11 +25,11 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <div class="meta-item"><strong>Interface:</strong> I2S (digital)</div>
     </div>
     <div class="series-step">MAX98357A I2S Series - Step 2 of 4 - Playing a clip</div>
-    <div class="badge badge-wip">&#9881; Under Construction</div>
+    <div class="badge badge-confirmed">&#10003; Confirmed Working</div>
   </div>
 
   <div class="terminal-note">
-    These guides are ordered by complexity but each one stands alone - if you believe and have courage, stand tall and boldly continue. If this is your first time, start at <a href="/guides/max98357a-wiring-tone-test" class="term-link">Step 1 &rarr;</a>
+    These guides are ordered by complexity but each one stands alone - if you believe and have courage, stand tall and boldly continue. If this is your first time, start at <a href="/guides/how-to-wire-max98357a-i2s-amp-esp32" class="term-link">Step 1 - How to wire the MAX98357A I2S amp with ESP32 &rarr;</a>
   </div>
 
   <!-- What You Need -->
@@ -49,7 +49,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <div class="card">
         <h3>Software</h3>
         <ul>
-          <li>Arduino IDE with ESP32 board support</li>
+          <li><a href="/guides/how-to-check-a-new-esp32" class="term-link">Arduino IDE with ESP32 board support</a></li>
           <li><code>espeak-ng</code> - generate voice clips</li>
           <li><code>ffmpeg</code> - convert audio files</li>
           <li>Python 3 - WAV to C header</li>
@@ -259,7 +259,7 @@ print('Done: ' + str(len(samples)) + ' samples -> ' + output_file)`}</code></pre
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/max98357a-esp32-audio
+ * https://electroniczoology.com/guides/how-to-play-audio-esp32-max98357a
  */
 
 #include <driver/i2s.h>
@@ -352,7 +352,7 @@ void loop() {
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/max98357a-esp32-audio
+ * https://electroniczoology.com/guides/how-to-play-audio-esp32-max98357a
  */
 
 #include <driver/i2s.h>
@@ -417,7 +417,7 @@ void loop() {
     </div>
     <div class="callout callout-why">
       <strong>Why not PROGMEM?</strong>
-      On ESP32, <code>const</code> arrays are stored in flash automatically by the compiler - no <code>PROGMEM</code> keyword needed. <code>PROGMEM</code> is an AVR legacy keyword; on ESP32 it does nothing. The array lives in flash either way, and you can read it directly without <code>pgm_read_word()</code>. A 2-second clip at 44100 Hz 16-bit is ~176KB - flash handles it, RAM does not.
+      On ESP32, <code>const</code> arrays are stored in flash automatically by the compiler - no <code>PROGMEM</code> keyword needed. <a href="/guides/does-esp32-need-progmem" class="term-link"><code>PROGMEM</code> is an AVR legacy keyword</a>; on ESP32 it does nothing. The array lives in flash either way, and you can read it directly without <code>pgm_read_word()</code>. A 2-second clip at 44100 Hz 16-bit is ~176KB - <a href="/guides/how-esp32-flash-memory-works" class="term-link">flash</a> handles it, <a href="/guides/how-esp32-ram-works" class="term-link">RAM</a> does not.
     </div>
     <div class="callout callout-tip">
       <strong>Tuning the <a href="/glossary/sample-rate-i2s" class="term-link">sample rate</a>.</strong>
@@ -428,6 +428,15 @@ void loop() {
       Adjust <code>VOLUME</code> between <code>0.0</code> (silent) and <code>1.0</code> (full). Samples are scaled in the buffer before being sent to I2S. For hardware volume, tie the GAIN pin directly to VIN for 15dB (loudest), leave floating for 9dB, or tie to GND for 6dB.
     </div>
   </div>
+
+  <div class="callout callout-tip">
+      <strong>Ready for more clips?</strong>
+      Move on to <a href="/guides/how-to-play-multiple-audio-files-esp32-max98357a" class="term-link">Step 3 - How to play multiple audio files from ESP32 with MAX98357A &rarr;</a>
+    </div>
+    <div class="callout callout-why">
+      <strong>Prefer analogue audio?</strong>
+      The <a href="/guides/how-to-play-audio-esp32-pam8403" class="term-link">How to play audio from ESP32 with PAM8403</a> guide covers a DAC-based alternative - no I2S required.
+    </div>
 
   <!-- Troubleshooting -->
   <div class="section" id="troubleshooting">

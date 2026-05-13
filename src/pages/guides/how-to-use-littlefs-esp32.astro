@@ -16,7 +16,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
 
   <div class="hero">
     <div class="category">Memory &bull; ESP32</div>
-    <h1>ESP32 LittleFS<br>A Filing System Inside the Cabinet</h1>
+    <h1>How to use<br>LittleFS on ESP32</h1>
     <div class="meta">
       <div class="meta-item"><strong>Board:</strong> Any ESP32</div>
       <div class="meta-item"><strong>Topic:</strong> LittleFS, filesystem, file upload</div>
@@ -26,7 +26,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   </div>
 
   <div class="terminal-note">
-    Part of the <a href="/guides/esp32-memory-intro" class="term-link">ESP32 Memory series &rarr;</a>
+    Part of the <a href="/guides/esp32-memory-explained" class="term-link">ESP32 Memory series &rarr;</a>
   </div>
 
   <p class="guide-intro">Flash is the filing cabinet. LittleFS is the filing system inside the cabinet. Without it you have a drawer full of loose bytes and no way to find anything. With it you have folders, filenames, and the same open-read-write pattern you use on any computer.</p>
@@ -73,7 +73,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/esp32-memory-littlefs
+ * https://electroniczoology.com/guides/how-to-use-littlefs-esp32
  */
 
 #include <LittleFS.h>
@@ -113,7 +113,7 @@ void loop() {}`}</code></pre>
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/esp32-memory-littlefs
+ * https://electroniczoology.com/guides/how-to-use-littlefs-esp32
  */
 
 #include <LittleFS.h>
@@ -164,7 +164,7 @@ void loop() {}`}</code></pre>
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/esp32-memory-littlefs
+ * https://electroniczoology.com/guides/how-to-use-littlefs-esp32
  */
 
 #include <LittleFS.h>
@@ -208,7 +208,7 @@ void loop() {}`}</code></pre>
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/esp32-memory-littlefs
+ * https://electroniczoology.com/guides/how-to-use-littlefs-esp32
  */
 
 #include <LittleFS.h>
@@ -253,11 +253,11 @@ void loop() {
       <li>Config files and calibration values that survive a power cycle</li>
       <li>A copy of the sketch itself, so the board can tell you what it is months later</li>
     </ul>
-    <p>The last one is the use case that turned me onto LittleFS in the first place. Covered separately in <a href="/guides/esp32-self-documenting-boards" class="term-link">Self-documenting boards with LittleFS &rarr;</a></p>
+    <p>The last one is the use case that turned me onto LittleFS in the first place. Covered separately in <a href="/guides/how-to-keep-sketch-copy-in-littlefs" class="term-link">Self-documenting boards with LittleFS &rarr;</a></p>
   </div>
 
   <div class="terminal-note">
-    <a href="/guides/esp32-memory-intro" class="term-link">&larr; Back to series</a>
+    <a href="/guides/esp32-memory-explained" class="term-link">&larr; Back to series</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
     <a href="/guides/esp32-memory-compression" class="term-link">Next: Compression &rarr;</a>
   </div>

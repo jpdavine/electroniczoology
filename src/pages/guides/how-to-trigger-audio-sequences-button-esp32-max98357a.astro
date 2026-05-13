@@ -15,24 +15,24 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
 
   <div class="hero">
     <div class="category">Audio &bull; ESP32</div>
-    <h1>Triggered Playback Modes<br>MAX98357A I2S</h1>
+    <h1>How to trigger audio sequences<br>with a button on ESP32<br>with MAX98357A</h1>
     <div class="meta">
       <div class="meta-item"><strong>Modes:</strong> Button trigger, Custom sequence</div>
       <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin) or ESP32-C3</div>
       <div class="meta-item"><strong>Amp:</strong> MAX98357A</div>
     </div>
     <div class="series-step">MAX98357A I2S Series - Step 4 of 4 - Button trigger and custom sequence</div>
-    <div class="badge badge-wip">&#9881; Under Construction</div>
+    <div class="badge badge-confirmed">&#10003; Confirmed Working</div>
   </div>
 
   <div class="terminal-note">
-    This guide continues from <a href="/guides/max98357a-multiple-clips" class="term-link">Step 3 - Multiple Clips &rarr;</a> - have your clips converted and header files ready before starting here.
+    This guide continues from <a href="/guides/how-to-play-multiple-audio-files-esp32-max98357a" class="term-link">Step 3 - How to play multiple audio files from ESP32 with MAX98357A &rarr;</a> - have your clips converted and header files ready before starting here.
   </div>
 
   <!-- Before You Start -->
   <div class="section" id="before-you-start">
     <h2>Before You Start</h2>
-    <p>These guides are ordered by complexity but each one stands alone - if you believe and have courage, stand tall and boldly continue. If this is your first time, start at <a href="/guides/max98357a-wiring-tone-test" class="term-link">Step 1 &rarr;</a></p>
+    <p>These guides are ordered by complexity but each one stands alone - if you believe and have courage, stand tall and boldly continue. If this is your first time, start at <a href="/guides/how-to-wire-max98357a-i2s-amp-esp32" class="term-link">Step 1 - How to wire the MAX98357A I2S amp with ESP32 &rarr;</a></p>
     <p>The amp wiring is the same as Step 3 - no changes needed there. The only addition for button mode is one button wired to a single GPIO.</p>
   </div>
 
@@ -83,7 +83,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/max98357a-playback-modes
+ * https://electroniczoology.com/guides/how-to-trigger-audio-sequences-button-esp32-max98357a
  */
 
 #include <driver/i2s.h>
@@ -203,7 +203,7 @@ void loop() {
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/max98357a-playback-modes
+ * https://electroniczoology.com/guides/how-to-trigger-audio-sequences-button-esp32-max98357a
  */
 
 #include <driver/i2s.h>
@@ -306,7 +306,7 @@ void loop() {
     <div class="trouble-item">
       <h3>Sketch too large - won&rsquo;t fit in flash</h3>
       <ul>
-        <li>Switch to the Huge APP partition scheme in Arduino IDE under Tools &rarr; Partition Scheme. This gives around 1.2MB for your sketch and clips combined.</li>
+        <li>Switch to the Huge APP partition scheme in Arduino IDE under Tools &rarr; Partition Scheme. This gives around 1.2MB for your sketch and clips combined - see <a href="/guides/how-esp32-flash-memory-works" class="term-link">how ESP32 flash memory works</a>.</li>
         <li>Drop the sample rate: re-convert your clips with <code>-ar 22050</code> in ffmpeg and update <code>SAMPLE_RATE</code> in the sketch. Speech stays clear at 22050Hz and clips are half the size.</li>
         <li>Trim clips shorter - every second at 44100Hz 16-bit mono is ~86KB.</li>
       </ul>
@@ -326,6 +326,11 @@ void loop() {
       </ul>
     </div>
   </div>
+
+  <div class="callout callout-tip">
+      <strong>Want to start from the beginning?</strong>
+      Head back to <a href="/guides/how-to-wire-max98357a-i2s-amp-esp32" class="term-link">Step 1 - How to wire the MAX98357A I2S amp with ESP32 &rarr;</a>
+    </div>
 
 </GuideLayout>
 

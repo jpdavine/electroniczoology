@@ -13,7 +13,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
 
   <div class="hero">
     <div class="category">LittleFS &bull; ESP32</div>
-    <h1>Self-Documenting Boards<br>with LittleFS</h1>
+    <h1>How to keep a copy<br>of your sketch<br>in LittleFS</h1>
     <div class="meta">
       <div class="meta-item"><strong>Board:</strong> Any ESP32</div>
       <div class="meta-item"><strong>Topic:</strong> LittleFS, self-documentation</div>
@@ -22,7 +22,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   </div>
 
   <div class="terminal-note">
-    Requires <a href="/guides/esp32-memory-littlefs" class="term-link">LittleFS on ESP32 &rarr;</a>
+    Requires <a href="/guides/how-to-use-littlefs-esp32" class="term-link">LittleFS on ESP32 &rarr;</a>
   </div>
 
   <p class="guide-intro">You pick up a board off the shelf. It is wired to something, half-built, and you cannot remember what. You wrote this six months ago and the source is in a folder somewhere, on a laptop somewhere, or nowhere at all. The fix is to put a copy of the sketch on the board itself. Plug it in, ask the board what it is, and the board tells you.</p>
@@ -69,7 +69,7 @@ ln -s ../starfield.ino data/sketch.ino`}</code></pre>
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/esp32-self-documenting-boards
+ * https://electroniczoology.com/guides/how-to-keep-sketch-copy-in-littlefs
  */
 
 #include <LittleFS.h>
@@ -106,7 +106,7 @@ void loop() {
   </div>
 
   <div class="terminal-note">
-    <a href="/guides/esp32-memory-littlefs" class="term-link">&larr; Back to LittleFS</a>
+    <a href="/guides/how-to-use-littlefs-esp32" class="term-link">&larr; Back to LittleFS</a>
   </div>
 
 </GuideLayout>

@@ -14,7 +14,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
 
   <div class="hero">
     <div class="category">Memory &bull; ESP32</div>
-    <h1>ESP32 RAM<br>The Workbench</h1>
+    <h1>How ESP32<br>RAM works</h1>
     <div class="meta">
       <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board or AI Thinker ESP32-CAM</div>
       <div class="meta-item"><strong>Topic:</strong> RAM, heap, fragmentation</div>
@@ -24,7 +24,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   </div>
 
   <div class="terminal-note">
-    Part of the <a href="/guides/esp32-memory-intro" class="term-link">ESP32 Memory series &rarr;</a>
+    Part of the <a href="/guides/esp32-memory-explained" class="term-link">ESP32 Memory series &rarr;</a>
   </div>
 
   <p class="guide-intro">If your sketch is only doing one thing at a time RAM is most likely not going to be an issue. But if you are stacking libraries, running WiFi, or asking a lot to happen continuously, RAM can become a problem faster than you expect. This guide lets you see it in real time.</p>
@@ -60,7 +60,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/esp32-memory-ram
+ * https://electroniczoology.com/guides/how-esp32-ram-works
  */
 
 void setup() {
@@ -123,7 +123,7 @@ void loop() {}`}</code></pre>
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/esp32-memory-ram
+ * https://electroniczoology.com/guides/how-esp32-ram-works
  */
 
 #include <Arduino_GFX_Library.h>
@@ -229,7 +229,7 @@ void loop() {
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/esp32-memory-ram
+ * https://electroniczoology.com/guides/how-esp32-ram-works
  */
 
 #include <Arduino_GFX_Library.h>
@@ -441,7 +441,7 @@ void loop() {
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/esp32-memory-ram
+ * https://electroniczoology.com/guides/how-esp32-ram-works
  */
 
 #include <Wire.h>
@@ -837,9 +837,9 @@ void loop() {
   </div>
 
   <div class="terminal-note">
-    <a href="/guides/esp32-memory-intro" class="term-link">&larr; Back to series</a>
+    <a href="/guides/esp32-memory-explained" class="term-link">&larr; Back to series</a>
     &nbsp;&nbsp;&bull;&nbsp;&nbsp;
-    <a href="/guides/esp32-memory-flash" class="term-link">Next: Flash &rarr;</a>
+    <a href="/guides/how-esp32-flash-memory-works" class="term-link">Next: Flash &rarr;</a>
   </div>
 
 </GuideLayout>

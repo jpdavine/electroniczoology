@@ -18,7 +18,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
 
   <div class="hero">
     <div class="category">Power &bull; ESP32</div>
-    <h1>INA219 Battery Charger Monitor<br>Never Charge Blind</h1>
+    <h1>How to build an INA219<br>battery charger monitor<br>with ESP32 and OLED</h1>
     <div class="meta">
       <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin)</div>
       <div class="meta-item"><strong>Sensor:</strong> INA219 (I2C 0x40)</div>
@@ -46,7 +46,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
         <ul>
           <li>ESP32 Dev Board - 30-pin or 38-pin module on a breadboard-friendly carrier</li>
           <li>INA219 breakout - common modules from any maker supplier all use the same chip and pinout. Default I2C address is <code>0x40</code></li>
-          <li>SSD1306 128x64 OLED (4-pin I2C) - default address <code>0x3C</code>. See the <a href="/guides/ssd1306-oled-esp32">SSD1306 setup guide</a> if you have not used this display before</li>
+          <li>SSD1306 128x64 OLED (4-pin I2C) - default address <code>0x3C</code>. See the <a href="/guides/how-to-use-ssd1306-oled-esp32">SSD1306 setup guide</a> if you have not used this display before</li>
           <li>TP4056 module with battery protection - the two-IC version. The bare TP4056 works but a protected module is safer for bench experiments</li>
           <li>Single 18650 cell - any healthy cell. If you are charging a salvaged or unknown cell, that is exactly what this rig is for</li>
           <li>18650 holder, or clip leads for brief testing</li>
@@ -87,7 +87,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     </div>
     <p>The TP4056 and ESP32 are on separate USB supplies.</p>
     <div class="callout">
-      <strong>I2C addresses:</strong> INA219 defaults to <code>0x40</code>. SSD1306 defaults to <code>0x3C</code>. They do not conflict. If you are unsure of your OLED's address, flash the <a href="/guides/ssd1306-oled-esp32#i2c-scanner">I2C scanner from the SSD1306 guide</a> first - it will report both devices on the bus.
+      <strong>I2C addresses:</strong> INA219 defaults to <code>0x40</code>. SSD1306 defaults to <code>0x3C</code>. They do not conflict. If you are unsure of your OLED's address, flash the <a href="/guides/how-to-use-ssd1306-oled-esp32#i2c-scanner">I2C scanner from the SSD1306 guide</a> first - it will report both devices on the bus.
     </div>
     <img src="/images/ina219/oledIna.png" alt="Fritzing breadboard diagram showing ESP32, INA219, SSD1306 OLED, TP4056 charger and 18650 cell wired together" class="guide-img" />
     <div class="callout">
@@ -142,7 +142,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/esp32-ina219-charger-monitor-oled
+ * https://electroniczoology.com/guides/how-to-build-ina219-charger-monitor-esp32
  */
 
 #include <Wire.h>

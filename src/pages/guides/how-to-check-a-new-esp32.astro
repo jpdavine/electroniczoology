@@ -15,7 +15,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
 
   <div class="hero">
     <div class="category">Diagnostics &bull; ESP32</div>
-    <h1>New ESP32 Board Checklist<br>First Steps</h1>
+    <h1>How to check<br>a new ESP32</h1>
     <div class="meta">
       <div class="meta-item"><strong>Board:</strong> Any ESP32</div>
       <div class="meta-item"><strong>Topic:</strong> Diagnostics, chip info, board verification</div>
@@ -68,7 +68,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/esp32-new-board-checklist
+ * https://electroniczoology.com/guides/how-to-check-a-new-esp32
  */
 
 void setup() {
@@ -94,7 +94,7 @@ void loop() {}`}</code></pre>
 
     <div class="screenshot-wrap">
       <figure>
-        <img src="/images/esp32-new-board-checklist/chip-info-serial-output.png" alt="Arduino IDE serial monitor showing chip info output - ESP32-S3, revision 2, 240MHz, 2 cores" />
+        <img src="/images/how-to-check-a-new-esp32/chip-info-serial-output.png" alt="Arduino IDE serial monitor showing chip info output - ESP32-S3, revision 2, 240MHz, 2 cores" />
         <figcaption>Chip info output on an ESP32-S3 - revision 2, 240MHz, 2 cores</figcaption>
       </figure>
     </div>
@@ -105,9 +105,9 @@ void loop() {}`}</code></pre>
     <h2>Flash, RAM, and PSRAM</h2>
     <p>These three sketches are covered in full in the memory series, including what each line reports and what the numbers mean for your project.</p>
     <ul class="link-list">
-      <li><a href="/guides/esp32-memory-flash">Flash - chip size, speed, and sketch space</a></li>
-      <li><a href="/guides/esp32-memory-ram">RAM - free heap, minimum heap, and largest free block</a></li>
-      <li><a href="/guides/esp32-memory-psram">PSRAM - whether it is present and how much</a></li>
+      <li><a href="/guides/how-esp32-flash-memory-works">Flash - chip size, speed, and sketch space</a></li>
+      <li><a href="/guides/how-esp32-ram-works">RAM - free heap, minimum heap, and largest free block</a></li>
+      <li><a href="/guides/how-esp32-psram-works">PSRAM - whether it is present and how much</a></li>
     </ul>
     <p>Run them in order. By the end you will know exactly what the board has and how much of it is available before your sketch does anything.</p>
   </div>
@@ -132,7 +132,7 @@ void loop() {}`}</code></pre>
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/esp32-new-board-checklist
+ * https://electroniczoology.com/guides/how-to-check-a-new-esp32
  */
 
 #include <WiFi.h>

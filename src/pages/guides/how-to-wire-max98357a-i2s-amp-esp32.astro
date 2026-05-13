@@ -14,14 +14,14 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
 
   <div class="hero">
     <div class="category">Audio &bull; ESP32</div>
-    <h1>MAX98357A I2S<br>Wiring &amp; Tone Test</h1>
+    <h1>How to wire the<br>MAX98357A I2S amp<br>with ESP32</h1>
     <div class="meta">
       <div class="meta-item"><strong>Amp:</strong> MAX98357A (3.2W mono class-D, I2S)</div>
       <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin) or ESP32-C3</div>
       <div class="meta-item"><strong>Goal:</strong> Confirm wiring and I2S are working</div>
     </div>
     <div class="series-step">MAX98357A I2S Series - Step 1 of 4 - Wiring and tone test</div>
-    <div class="badge badge-wip">&#9881; Under Construction</div>
+    <div class="badge badge-confirmed">&#10003; Confirmed Working</div>
   </div>
 
   <!-- What You Need -->
@@ -41,7 +41,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <div class="card">
         <h3>Software</h3>
         <ul>
-          <li>Arduino IDE with ESP32 board support</li>
+          <li><a href="/guides/how-to-check-a-new-esp32" class="term-link">Arduino IDE with ESP32 board support</a></li>
         </ul>
         <p style="margin-top:0.75rem;font-size:0.85rem;color:#666;">No audio tools needed for this step - the tone test generates a 440Hz sine wave in code.</p>
       </div>
@@ -120,7 +120,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/max98357a-wiring-tone-test
+ * https://electroniczoology.com/guides/how-to-wire-max98357a-i2s-amp-esp32
  */
 
 #include <driver/i2s.h>
@@ -183,7 +183,11 @@ void loop() {
     </div>
     <div class="callout callout-tip">
       <strong>Tone confirmed - ready for Step 2.</strong>
-      Once you hear the tone, move on to <a href="/guides/max98357a-esp32-audio" class="term-link">Step 2 - Playing a clip &rarr;</a>
+      Once you hear the tone, move on to <a href="/guides/how-to-play-audio-esp32-max98357a" class="term-link">Step 2 - How to play audio from ESP32 with MAX98357A &rarr;</a>
+    </div>
+    <div class="callout callout-why">
+      <strong>Prefer analogue audio?</strong>
+      The <a href="/guides/how-to-play-audio-esp32-pam8403" class="term-link">How to play audio from ESP32 with PAM8403</a> guide covers a DAC-based alternative - no I2S required.
     </div>
   </div>
 

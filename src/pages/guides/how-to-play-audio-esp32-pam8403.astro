@@ -17,7 +17,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
 
   <div class="hero">
     <div class="category">Audio &bull; ESP32</div>
-    <h1>PAM8403 Audio Amplifier<br>with ESP32 Dev Board</h1>
+    <h1>How to play audio from<br>ESP32 with PAM8403</h1>
     <div class="meta">
       <div class="meta-item"><strong>Amp:</strong> PAM8403 (3W stereo class-D)</div>
       <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin)</div>
@@ -46,7 +46,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <div class="card">
         <h3>Software</h3>
         <ul>
-          <li><a id="arduino-ide" href="/glossary/arduino-ide" class="term-link">Arduino IDE</a> with ESP32 board support</li>
+          <li><a id="arduino-ide" href="/glossary/arduino-ide" class="term-link">Arduino IDE</a> with <a href="/guides/how-to-check-a-new-esp32" class="term-link">ESP32 board support</a></li>
           <li><code>espeak-ng</code> - generate voice clips</li>
           <li><code>ffmpeg</code> - convert audio files</li>
           <li>Python 3 - WAV to C header</li>
@@ -169,7 +169,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     </ul>
     <div class="callout callout-why">
       <strong>Why 8kHz?</strong>
-      It's what phone calls use - speech is fully intelligible. A 1-second clip at 8kHz = 8KB; at 44.1kHz = 44KB. The ESP32 has ~4MB flash, so 8kHz is a sensible default.
+      It's what phone calls use - speech is fully intelligible. A 1-second clip at 8kHz = 8KB; at 44.1kHz = 44KB. The ESP32 has ~4MB <a href="/guides/how-esp32-flash-memory-works" class="term-link">flash</a>, so 8kHz is a sensible default.
     </div>
   </div>
 
@@ -274,7 +274,7 @@ void loop() &#123;
       <button class="copy-btn">Copy</button>
     </div>
     <div class="callout callout-why">
-      <strong><a id="progmem" href="/glossary/progmem" class="term-link">PROGMEM</a></strong>
+      <strong><a href="/guides/does-esp32-need-progmem" class="term-link">PROGMEM</a></strong>
       Stores the audio data in flash instead of RAM. Without it, a large audio array would overflow the ESP32's 320KB RAM. <code>pgm_read_byte()</code> reads it back one byte at a time during playback.
     </div>
     <div class="callout callout-tip">
@@ -315,13 +315,18 @@ void loop() &#123;
       </ul>
     </div>
     <div class="trouble-item">
-      <h3>Clip too large / flash usage too high</h3>
+      <h3><a href="/guides/how-esp32-flash-memory-works" class="term-link">Clip too large / flash usage too high</a></h3>
       <ul>
         <li>Trim the clip shorter with ffmpeg</li>
         <li>Drop to 4kHz: <code>-ar 4000</code> - speech stays intelligible at half the size</li>
       </ul>
     </div>
   </div>
+
+  <div class="callout callout-why">
+      <strong>Prefer digital I2S audio?</strong>
+      The <a href="/guides/how-to-wire-max98357a-i2s-amp-esp32" class="term-link">How to wire the MAX98357A I2S amp with ESP32</a> guide covers the I2S alternative - no DAC, no capacitors, better audio quality.
+    </div>
 
 </GuideLayout>
 

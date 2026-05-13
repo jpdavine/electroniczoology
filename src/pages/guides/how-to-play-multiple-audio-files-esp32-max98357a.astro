@@ -17,7 +17,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
 
   <div class="hero">
     <div class="category">Audio &bull; ESP32</div>
-    <h1>Multiple Audio Clips<br>MAX98357A I2S</h1>
+    <h1>How to play multiple<br>audio files from ESP32<br>with MAX98357A</h1>
     <div class="meta">
       <div class="meta-item"><strong>Mode:</strong> Auto sequence - loops forever</div>
       <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin) or ESP32-C3</div>
@@ -44,7 +44,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <div class="card">
         <h3>Software</h3>
         <ul>
-          <li>Arduino IDE with ESP32 board support</li>
+          <li><a href="/guides/how-to-check-a-new-esp32" class="term-link">Arduino IDE with ESP32 board support</a></li>
           <li><code>ffmpeg</code> - convert audio files</li>
           <li>Python 3 - WAV to header conversion</li>
         </ul>
@@ -56,10 +56,10 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   <div class="section" id="how-it-works">
     <h2>How It Works</h2>
     <p>The hardware is the same as Step 2 - the MAX98357A receives I2S audio from the ESP32, converts it to analogue, and drives the speaker. Three signal wires, no capacitors, no DAC.</p>
-    <p>This guide adds multiple clips. Each clip is a separate C array stored in flash via <code>PROGMEM</code> and included as a header file. The sketch works through all clips in sequence and loops forever. For button-triggered playback and custom sequence control, see <a href="/guides/max98357a-playback-modes" class="term-link">Step 4 &rarr;</a></p>
+    <p>This guide adds multiple clips. Each clip is a separate C array stored in flash via <a href="/guides/does-esp32-need-progmem" class="term-link"><code>PROGMEM</code></a> and included as a header file. The sketch works through all clips in sequence and loops forever. For button-triggered playback and custom sequence control, see <a href="/guides/how-to-trigger-audio-sequences-button-esp32-max98357a" class="term-link">Step 4 - How to trigger audio sequences with a button on ESP32 with MAX98357A &rarr;</a></p>
     <div class="callout callout-why">
       <strong>Flash memory budget</strong>
-      Multiple clips add up fast. The ESP32 has around 1.2MB available under the Huge APP partition scheme. Lower sample rates mean smaller files - run your own tests to find what sounds acceptable for your speaker and use case.
+      Multiple clips add up fast. The ESP32 has around 1.2MB available under the Huge APP partition scheme - see <a href="/guides/how-esp32-flash-memory-works" class="term-link">how ESP32 flash memory works</a>. Lower sample rates mean smaller files - run your own tests to find what sounds acceptable for your speaker and use case.
     </div>
   </div>
 
@@ -87,7 +87,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   <!-- Before You Start -->
   <div class="section" id="before-you-start">
     <h2>Before You Start</h2>
-    <p>These guides are ordered by complexity but each one stands alone - if you believe and have courage, stand tall and boldly continue. If this is your first time, start at <a href="/guides/max98357a-wiring-tone-test" class="term-link">Step 1 &rarr;</a></p>
+    <p>These guides are ordered by complexity but each one stands alone - if you believe and have courage, stand tall and boldly continue. If this is your first time, start at <a href="/guides/how-to-wire-max98357a-i2s-amp-esp32" class="term-link">Step 1 - How to wire the MAX98357A I2S amp with ESP32 &rarr;</a></p>
   </div>
 
   <h3 class="steps-outline-heading">Page outline</h3>
@@ -244,7 +244,7 @@ done`}</code></pre>
  *
  * Open source - MIT Licence
  * Electronic Zoology - field notes from the garage
- * https://electroniczoology.com/guides/max98357a-multiple-clips
+ * https://electroniczoology.com/guides/how-to-play-multiple-audio-files-esp32-max98357a
  */
 
 #include <driver/i2s.h>
@@ -341,6 +341,16 @@ void loop() {
       <button class="copy-btn">Copy</button>
     </div>
   </div>
+
+  <div class="callout callout-tip">
+      <strong>Ready for button-triggered playback?</strong>
+      Move on to <a href="/guides/how-to-trigger-audio-sequences-button-esp32-max98357a" class="term-link">Step 4 - How to trigger audio sequences with a button on ESP32 with MAX98357A &rarr;</a>
+    </div>
+
+  <div class="callout callout-why">
+      <strong>Prefer analogue audio?</strong>
+      The <a href="/guides/how-to-play-audio-esp32-pam8403" class="term-link">How to play audio from ESP32 with PAM8403</a> guide covers a DAC-based alternative - no I2S required.
+    </div>
 
   <!-- Troubleshooting -->
   <div class="section" id="troubleshooting">
