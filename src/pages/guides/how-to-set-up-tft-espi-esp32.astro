@@ -35,7 +35,7 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   <div class="section" id="why-tft-espi">
     <h2>Why TFT_eSPI</h2>
     <p>Most display guides pick one display and one library. That works until you get a second display, swap to a smaller board, or try to reuse code across projects - and suddenly you are learning a new API from scratch.</p>
-    <p>TFT_eSPI by Bodmer solves this. It is a single library that supports dozens of SPI display controllers - ST7735, ST7789, GC9A01, ILI9341, and more - all with the same API. To switch displays, you change a config file. The sketch stays the same.</p>
+    <p>TFT_eSPI by Bodmer solves this. It is a single library that supports dozens of SPI display controllers - <a href="/guides/how-to-use-st7735-esp32" class="term-link">ST7735</a>, <a href="/guides/how-to-use-st7789-esp32" class="term-link">ST7789</a>, <a href="/guides/how-to-wire-gc9a01-esp32" class="term-link">GC9A01</a>, ILI9341, and more - all with the same API. To switch displays, you change a config file. The sketch stays the same.</p>
     <blockquote class="lotr-quote">
       "One library to rule them all, one library to find them,<br/>one library to drive them all and in the PROGMEM bind them."
     </blockquote>
@@ -78,8 +78,8 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
       <div class="card">
         <h3>Parts</h3>
         <ul>
-          <li>ESP32 Dev Board (38-pin)</li>
-          <li>GC9A01 240x240 round IPS TFT <em>(used as example - swap for any supported display)</em></li>
+          <li><a href="/guides/how-to-check-a-new-esp32" class="term-link">ESP32 Dev Board (38-pin)</a></li>
+          <li><a href="/guides/how-to-wire-gc9a01-esp32" class="term-link">GC9A01 240x240 round IPS TFT</a> <em>(used as example - swap for any supported display)</em></li>
           <li>Jumper wires</li>
           <li>USB data cable for flashing</li>
         </ul>
@@ -127,19 +127,19 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
             <td>ST7735</td>
             <td>128x128</td>
             <td><span class="badge badge-confirmed" style="font-size:0.75rem;padding:0.2rem 0.6rem;">&#10003; Confirmed</span></td>
-            <td><a href="/guides/how-to-use-st7735-esp32" class="term-link">ST7735 config &rarr;</a></td>
+            <td><a href="/guides/how-to-use-st7735-esp32" class="term-link">How to use the ST7735 128x128 display with ESP32 &rarr;</a></td>
           </tr>
           <tr>
             <td>ST7789</td>
             <td>240x240</td>
             <td><span class="badge badge-confirmed" style="font-size:0.75rem;padding:0.2rem 0.6rem;">&#10003; Confirmed</span></td>
-            <td><a href="/guides/how-to-use-st7789-esp32" class="term-link">ST7789 config &rarr;</a></td>
+            <td><a href="/guides/how-to-use-st7789-esp32" class="term-link">How to use the ST7789 240x240 display with ESP32 &rarr;</a></td>
           </tr>
           <tr>
             <td>GC9A01</td>
             <td>240x240 round</td>
             <td><span class="badge badge-confirmed" style="font-size:0.75rem;padding:0.2rem 0.6rem;">&#10003; Confirmed</span></td>
-            <td><a href="/guides/how-to-configure-gc9a01-tft-espi" class="term-link">GC9A01 config &rarr;</a></td>
+            <td><a href="/guides/how-to-configure-gc9a01-tft-espi" class="term-link">How to configure the GC9A01 round display with TFT_eSPI &rarr;</a></td>
           </tr>
         </tbody>
       </table>
@@ -411,6 +411,11 @@ void printProcessorName(void) {
       </div>
     </div>
   </div>
+
+  <div class="callout callout-tip">
+      <strong>Want to display images?</strong>
+      See <a href="/guides/how-to-display-images-gc9a01-esp32" class="term-link">How to display custom images on the GC9A01 &rarr;</a>
+    </div>
 
 </GuideLayout>
 
