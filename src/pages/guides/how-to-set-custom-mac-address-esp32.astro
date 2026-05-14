@@ -1,0 +1,266 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+---
+<GuideLayout
+  title="How to set a custom MAC address on ESP32 | Electronic Zoology"
+  description="How to override the factory MAC address on an ESP32 at runtime using esp_wifi_set_mac(). Covers the rules for valid MAC bytes, boot persistence, and a practical ESP-NOW fleet use case."
+  toc={[
+    {href: '#how-it-works', label: 'How It Works'},
+    {href: '#valid-mac-bytes', label: 'Rules for Valid MAC Bytes'},
+    {href: '#set-mac-sketch', label: 'Set MAC Sketch'},
+    {href: '#verify', label: 'Verify It Worked'},
+    {href: '#esp-now', label: 'Using It With ESP-NOW'},
+    {href: '#what-it-does-not-do', label: 'What It Does Not Do'},
+  ]}
+>
+
+  <div class="hero">
+    <div class="category">Wireless &bull; ESP32</div>
+    <h1>How to set a custom MAC<br>address on ESP32</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Board:</strong> Any ESP32 variant</div>
+      <div class="meta-item"><strong>Requires:</strong> Arduino IDE with ESP32 board support</div>
+    </div>
+    <div class="badge badge-wip">&#9881; Under Construction</div>
+  </div>
+
+  <!-- What This Guide Builds On -->
+  <div class="prereq-box">
+    <h3>What this guide builds on</h3>
+    <ul>
+      <li><a href="/guides/how-to-get-your-esp32-mac-address" class="term-link">How to get your ESP32 MAC address</a> - reading the factory STA and AP MAC addresses from any board</li>
+      <li><a href="/guides/how-to-use-esp-now-two-esp32s" class="term-link">How to use ESP-NOW to connect two ESP32s without a router</a> - broadcast mode, MAC addresses, the send and receive callbacks</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <p>The factory MAC address is burned into eFuse and cannot be changed. What you can change is what the radio actually uses. <code>esp_wifi_set_mac()</code> overrides the active MAC at runtime. The factory value is untouched and comes back on every reboot. You set the override again in <code>setup()</code> on every boot.</p>
+    <p>The main reason to do this in a maker context is ESP-NOW fleet deployments: if every sender board uses the same known MAC, you hardcode one address in the receiver sketch instead of tracking a different address per board.</p>
+  </div>
+
+  <!-- How It Works -->
+  <div class="section" id="how-it-works">
+    <h2>How it works</h2>
+    <p>Every ESP32 stores a factory MAC address in eFuse, a one-time-programmable memory region on the chip. The WiFi driver reads that value at boot and loads it into the radio. <code>esp_wifi_set_mac()</code> replaces the value the radio is using without touching eFuse. The factory address is always there underneath. Power cycle the board without calling <code>esp_wifi_set_mac()</code> and it returns to the factory MAC.</p>
+    <p>The call has to happen after <code>WiFi.mode()</code> and before <code>esp_now_init()</code> or any other WiFi operation. The radio needs to be initialised before you can set the MAC, and it needs the correct MAC in place before ESP-NOW registers peers.</p>
+  </div>
+
+  <!-- Rules for Valid MAC Bytes -->
+  <div class="section" id="valid-mac-bytes">
+    <h2>Rules for valid MAC bytes</h2>
+    <p>Not every 6-byte value is a valid unicast MAC. Two bits in the first byte matter:</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Bit</th><th>Position</th><th>Meaning</th><th>Required value</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>LSB (bit 0)</td><td>First byte</td><td>0 = unicast, 1 = multicast</td><td>Must be 0</td></tr>
+          <tr><td>Bit 1</td><td>First byte</td><td>0 = globally unique, 1 = locally administered</td><td>Should be 1</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Setting bit 1 to 1 marks the address as locally administered, which is the correct way to signal that this is a software-assigned address rather than a factory one. Setting bit 0 to 1 makes it a multicast address and <code>esp_wifi_set_mac()</code> will reject it.</p>
+    <p><code>0xAA</code> is a safe first byte for custom MACs. In binary it is <code>10101010</code>: bit 0 is 0 (unicast), bit 1 is 1 (locally administered). The remaining five bytes can be anything.</p>
+    <p><code>0x02</code> also works and is commonly used: <code>00000010</code>, bit 0 = 0, bit 1 = 1.</p>
+    <p>Avoid first bytes with an odd value (0x01, 0xAB, 0xFF, etc.) as those have bit 0 set and will be rejected.</p>
+  </div>
+
+  <!-- Set MAC Sketch -->
+  <div class="section" id="set-mac-sketch">
+    <h2>Set MAC sketch</h2>
+    <p>This sketch sets a custom MAC, then prints both the custom MAC and the original factory MAC so you can confirm the override is in effect.</p>
+    <p>Open Serial Monitor at <strong>115200 baud</strong> after flashing.</p>
+    <div class="code-wrap">
+      <pre><code>{`/*
+ * We stand on the shoulders of giants when we build
+ * with knowledge gained from others' efforts.
+ * That doesn't make us giants. Be humble.
+ * Create with care. Open source is the way.
+ *
+ * ESP32 - Set Custom MAC Address
+ * --------------------------------
+ * Overrides the active WiFi MAC at runtime using esp_wifi_set_mac().
+ * The factory MAC in eFuse is not changed. Override applies until reboot.
+ * Call this in setup() before esp_now_init() or any WiFi operation.
+ *
+ * First byte rules:
+ *   Bit 0 must be 0 (unicast). Bit 1 should be 1 (locally administered).
+ *   0xAA and 0x02 are safe first bytes.
+ *
+ * Works on: ESP32 Dev Board, ESP32-C3, ESP32-S3, ESP32-S2
+ *
+ * Open source - MIT Licence
+ * Electronic Zoology - field notes from the garage
+ * https://electroniczoology.com/guides/how-to-set-custom-mac-address-esp32
+ */
+
+#include <WiFi.h>
+#include "esp_wifi.h"
+
+// Custom MAC - change the last three bytes to whatever you want.
+// First byte 0xAA: bit 0 = 0 (unicast), bit 1 = 1 (locally administered).
+uint8_t customMAC[] = { 0xAA, 0xBB, 0xCC, 0x11, 0x22, 0x33 };
+
+void setup() {
+  Serial.begin(115200);
+  delay(500);
+
+  WiFi.mode(WIFI_STA);
+
+  // Read factory MAC before overriding
+  uint8_t factoryMAC[6];
+  esp_wifi_get_mac(WIFI_IF_STA, factoryMAC);
+
+  Serial.print("Factory MAC: ");
+  for (int i = 0; i < 6; i++) {
+    if (factoryMAC[i] < 0x10) Serial.print("0");
+    Serial.print(factoryMAC[i], HEX);
+    if (i < 5) Serial.print(":");
+  }
+  Serial.println();
+
+  // Set the custom MAC
+  esp_err_t result = esp_wifi_set_mac(WIFI_IF_STA, customMAC);
+
+  if (result == ESP_OK) {
+    Serial.print("Custom MAC set: ");
+    Serial.println(WiFi.macAddress());
+  } else {
+    Serial.print("Failed to set MAC. Error: ");
+    Serial.println(result);
+    Serial.println("Check that first byte bit 0 is 0 (not a multicast address).");
+  }
+}
+
+void loop() {}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+  </div>
+
+  <!-- Verify It Worked -->
+  <div class="section" id="verify">
+    <h2>Verify it worked</h2>
+    <p>Expected output:</p>
+    <pre style="background:#f4f4f4;padding:0.75rem 1rem;border-radius:6px;font-size:0.9rem;margin:1rem 0;">Factory MAC: A0:B7:65:11:22:33
+Custom MAC set: AA:BB:CC:11:22:33</pre>
+    <p>If you see a failure message instead, the most likely cause is an invalid first byte. Check that bit 0 of your first byte is 0. <code>0xAA</code> is always safe.</p>
+    <p>Reboot the board without the custom MAC call in <code>setup()</code> and <code>WiFi.macAddress()</code> will return the factory address again. The override is not persistent.</p>
+  </div>
+
+  <!-- Using It With ESP-NOW -->
+  <div class="section" id="esp-now">
+    <h2>Using it with ESP-NOW</h2>
+    <p>The practical value of MAC spoofing for ESP-NOW is in multi-sender setups. Without it, every board has a unique factory MAC and your receiver sketch either needs a lookup table of every sender's address or you rely on broadcast.</p>
+    <p>With a fixed custom MAC on every sender, the receiver knows exactly who is sending before you even plug the boards in. Flash the same sender sketch to ten boards and all ten identify themselves identically to the receiver.</p>
+    <p>The call order in <code>setup()</code> must be:</p>
+    <ol style="margin:0.75rem 0 0.75rem 1.5rem;font-size:0.95rem;">
+      <li><code>WiFi.mode(WIFI_STA)</code></li>
+      <li><code>esp_wifi_set_mac()</code></li>
+      <li><code>esp_now_init()</code></li>
+    </ol>
+    <p>Calling <code>esp_now_init()</code> before <code>esp_wifi_set_mac()</code> means ESP-NOW initialises with the factory MAC. The custom MAC set afterwards does not retroactively update ESP-NOW's internal state.</p>
+    <p>A sender sketch with a fixed custom MAC looks like this in <code>setup()</code>:</p>
+    <div class="code-wrap">
+      <pre><code>{`WiFi.mode(WIFI_STA);
+esp_wifi_set_mac(WIFI_IF_STA, customMAC);
+
+if (esp_now_init() != ESP_OK) {
+  Serial.println("ESP-NOW init failed");
+  while (true) delay(1000);
+}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>Everything else in the sender sketch stays the same.</p>
+  </div>
+
+  <!-- What It Does Not Do -->
+  <div class="section" id="what-it-does-not-do">
+    <h2>What it does not do</h2>
+    <div class="trouble-item">
+      <h3>It does not change the factory MAC permanently</h3>
+      <p>eFuse is one-time-programmable and the Arduino ESP32 framework gives no safe way to modify it. The factory value always comes back on reboot.</p>
+    </div>
+    <div class="trouble-item">
+      <h3>It does not affect BLE</h3>
+      <p>The BLE radio has its own MAC derived from the same factory base value. <code>esp_wifi_set_mac()</code> only applies to the WiFi interface. BLE MAC spoofing uses a separate API.</p>
+    </div>
+    <div class="trouble-item">
+      <h3>It does not work after ESP-NOW is initialised</h3>
+      <p>Set the MAC first, always. If <code>esp_now_init()</code> has already run, the custom MAC will not take effect for ESP-NOW peer registration.</p>
+    </div>
+  </div>
+
+  <h2 style="margin-top:2.5rem;margin-bottom:1rem;">Going Further</h2>
+
+  <div class="callout callout-tip" style="margin-top:1rem;">
+    <strong>Ready to use this in an ESP-NOW project?</strong>
+    <a href="/guides/how-to-use-esp-now-two-esp32s" class="term-link">How to use ESP-NOW to connect two ESP32s without a router &rarr;</a>
+  </div>
+
+  <div class="callout callout-why" style="margin-top:1rem;">
+    <strong>Build a wireless remote sensor monitor</strong>
+    <a href="/guides/how-to-build-esp-now-ina219-remote-monitor" class="term-link">How to build an ESP-NOW remote charger monitor with INA219 and OLED &rarr;</a>
+  </div>
+
+  <h2 style="margin-top:2.5rem;margin-bottom:1rem;">Take a look at our other guides</h2>
+
+  <div class="callout callout-tip" style="margin-top:1rem;">
+    <strong>Read the MAC address first</strong>
+    <a href="/guides/how-to-get-your-esp32-mac-address" class="term-link">How to get your ESP32 MAC address &rarr;</a>
+  </div>
+
+  <div class="callout callout-why" style="margin-top:1rem;">
+    <strong>Find the address of any I2C device</strong>
+    <a href="/guides/how-to-find-your-i2c-address" class="term-link">How to find your I2C address - scanner sketch, common addresses, and troubleshooting &rarr;</a>
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:1rem;">
+    <strong>New board? Start here</strong>
+    <a href="/guides/how-to-check-a-new-esp32" class="term-link">How to check a new ESP32 - board setup, inspection, and diagnostic sketches &rarr;</a>
+  </div>
+
+</GuideLayout>
+
+<style>
+  .prereq-box {
+    background: #f0f4ff;
+    border-left: 3px solid #6366f1;
+    border-radius: 0 6px 6px 0;
+    padding: 0.75rem 1rem 0.75rem 1.25rem;
+    margin: 1.5rem 0;
+  }
+  .prereq-box h3 {
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #3730a3;
+  }
+  .prereq-box ul {
+    margin: 0;
+    padding-left: 1.2rem;
+    font-size: 0.9rem;
+  }
+  .prereq-box li { margin-bottom: 0.3rem; }
+
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.5rem; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    min-width: 400px;
+  }
+  th {
+    background: #1a1a2e;
+    color: #fff;
+    text-align: left;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+  }
+  td {
+    padding: 0.55rem 1rem;
+    border-bottom: 1px solid #eee;
+  }
+  tr:nth-child(even) td { background: #fafafa; }
+  tr:last-child td { border-bottom: none; }
+</style>
