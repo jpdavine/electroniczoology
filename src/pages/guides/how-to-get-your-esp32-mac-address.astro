@@ -1,0 +1,141 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+---
+<GuideLayout
+  title="How to get your ESP32 MAC address | Electronic Zoology"
+  description="How to find the MAC address of any ESP32 board using a simple sketch. Covers station vs access point MAC, where to find it in the serial monitor, and how to use it in ESP-NOW projects."
+  toc={[
+    {href: '#what-a-mac-address-is', label: 'What a MAC Address Is'},
+    {href: '#station-vs-ap', label: 'Station MAC vs AP MAC'},
+    {href: '#get-mac-sketch', label: 'Get MAC Sketch'},
+    {href: '#reading-the-output', label: 'Reading the Output'},
+    {href: '#where-to-use-it', label: 'Where to Use It'},
+  ]}
+>
+
+  <div class="hero">
+    <div class="category">Wireless &bull; ESP32</div>
+    <h1>How to get your<br>ESP32 MAC address</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Board:</strong> Any ESP32 variant</div>
+      <div class="meta-item"><strong>Requires:</strong> Arduino IDE with ESP32 board support</div>
+    </div>
+    <div class="badge badge-wip">&#9881; Under Construction</div>
+  </div>
+
+  <div class="section">
+    <p>The MAC address is not printed on the board. You have to ask the chip. Flash the sketch below, open Serial Monitor at 115200 baud, and it prints the address in one line. That is all this guide does. If you are here because an ESP-NOW guide sent you, get the address, note it down, and go back.</p>
+  </div>
+
+  <!-- What a MAC Address Is -->
+  <div class="section" id="what-a-mac-address-is">
+    <h2>What a MAC address is</h2>
+    <p>A MAC address is a unique identifier burned into every network device at the factory. It is 6 bytes long, written as six pairs of hex digits separated by colons: <code>AA:BB:CC:DD:EE:FF</code>. It is hardware-level identification. It does not change between reboots, sketch uploads, or factory resets. Every ESP32 you own has a different one.</p>
+    <p>ESP-NOW uses MAC addresses to route packets directly between boards. There is no router and no IP stack involved. A board that wants to send to a specific target needs to know that target's MAC before it can register it as a peer. The sketch below is how you find it.</p>
+  </div>
+
+  <!-- Station MAC vs AP MAC -->
+  <div class="section" id="station-vs-ap">
+    <h2>Station MAC vs AP MAC</h2>
+    <p>Every ESP32 actually has two MAC addresses: one for station mode (STA) and one for access point mode (AP). They are different addresses derived from the same base value burned in at the factory.</p>
+    <p><code>WiFi.macAddress()</code> returns the <strong>station MAC</strong>. <code>WiFi.softAPmacAddress()</code> returns the AP MAC.</p>
+    <p>ESP-NOW uses the station MAC. When an ESP-NOW guide asks for your board's MAC, it means the station MAC. The sketch below prints both so you can see the difference, but the one labelled STA is the one you need.</p>
+  </div>
+
+  <!-- Get MAC Sketch -->
+  <div class="section" id="get-mac-sketch">
+    <h2>Get MAC sketch</h2>
+    <p>Flash this to your board and open Serial Monitor at <strong>115200 baud</strong>.</p>
+    <div class="code-wrap">
+      <pre><code>{`/*
+ * We stand on the shoulders of giants when we build
+ * with knowledge gained from others' efforts.
+ * That doesn't make us giants. Be humble.
+ * Create with care. Open source is the way.
+ *
+ * ESP32 - Get MAC Address
+ * ------------------------
+ * Prints this board's station and AP MAC addresses to serial.
+ * Use the STA address for ESP-NOW projects.
+ *
+ * Works on: ESP32 Dev Board, ESP32-C3, ESP32-S3, ESP32-S2
+ *
+ * Open source - MIT Licence
+ * Electronic Zoology - field notes from the garage
+ * https://electroniczoology.com/guides/how-to-get-your-esp32-mac-address
+ */
+
+#include <WiFi.h>
+
+void setup() {
+  Serial.begin(115200);
+  delay(500);
+
+  WiFi.mode(WIFI_STA);
+
+  Serial.println();
+  Serial.print("STA MAC (use this for ESP-NOW): ");
+  Serial.println(WiFi.macAddress());
+
+  WiFi.mode(WIFI_AP);
+
+  Serial.print("AP MAC:                         ");
+  Serial.println(WiFi.softAPmacAddress());
+}
+
+void loop() {}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+  </div>
+
+  <!-- Reading the Output -->
+  <div class="section" id="reading-the-output">
+    <h2>Reading the output</h2>
+    <p>Serial Monitor will print something like this:</p>
+    <pre style="background:#f4f4f4;padding:0.75rem 1rem;border-radius:6px;font-size:0.9rem;margin:1rem 0;">STA MAC (use this for ESP-NOW): A0:B7:65:11:22:33
+AP MAC:                         A2:B7:65:11:22:33</pre>
+    <p>Note the STA address. Write it down or keep the Serial Monitor window open while you edit your sender sketch. The address is the same every time you run the sketch on that board, so you only need to do this once per board.</p>
+  </div>
+
+  <!-- Where to Use It -->
+  <div class="section" id="where-to-use-it">
+    <h2>Where to use it</h2>
+    <p>In ESP-NOW unicast mode, the sender sketch registers the receiver's MAC as a peer. It looks like this:</p>
+    <div class="code-wrap">
+      <pre><code>{`uint8_t receiverAddress[] = { 0xA0, 0xB7, 0x65, 0x11, 0x22, 0x33 };`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+    <p>Each pair of hex digits from the MAC address becomes one byte in the array. Drop the colons and prefix each pair with <code>0x</code>. The address <code>A0:B7:65:11:22:33</code> becomes <code>{"{ 0xA0, 0xB7, 0x65, 0x11, 0x22, 0x33 }"}</code>.</p>
+    <p>That array goes wherever the broadcast address <code>{"{ 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }"}</code> was. The rest of the sender sketch stays the same.</p>
+  </div>
+
+  <h2 style="margin-top:2.5rem;margin-bottom:1rem;">Going Further</h2>
+
+  <div class="callout callout-tip" style="margin-top:1rem;">
+    <strong>Ready to send data between two boards?</strong>
+    <a href="/guides/how-to-use-esp-now-two-esp32s" class="term-link">How to use ESP-NOW to connect two ESP32s without a router &rarr;</a>
+  </div>
+
+  <div class="callout callout-why" style="margin-top:1rem;">
+    <strong>Build a wireless remote sensor monitor</strong>
+    <a href="/guides/how-to-build-esp-now-ina219-remote-monitor" class="term-link">How to build an ESP-NOW remote charger monitor with INA219 and OLED &rarr;</a>
+  </div>
+
+  <h2 style="margin-top:2.5rem;margin-bottom:1rem;">Take a look at our other guides</h2>
+
+  <div class="callout callout-tip" style="margin-top:1rem;">
+    <strong>Find the address of any I2C device</strong>
+    <a href="/guides/how-to-find-your-i2c-address" class="term-link">How to find your I2C address - scanner sketch, common addresses, and troubleshooting &rarr;</a>
+  </div>
+
+  <div class="callout callout-why" style="margin-top:1rem;">
+    <strong>New board? Start here</strong>
+    <a href="/guides/how-to-check-a-new-esp32" class="term-link">How to check a new ESP32 - board setup, inspection, and diagnostic sketches &rarr;</a>
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:1rem;">
+    <strong>Store files in flash - config, images, web files</strong>
+    <a href="/guides/how-to-use-littlefs-esp32" class="term-link">How to use LittleFS on ESP32 &rarr;</a>
+  </div>
+
+</GuideLayout>
