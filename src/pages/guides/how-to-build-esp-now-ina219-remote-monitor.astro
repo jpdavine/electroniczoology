@@ -1,0 +1,592 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+---
+<GuideLayout
+  title="ESP-NOW Remote Charger Monitor with INA219 and OLED | Electronic Zoology"
+  description="Move the display off the charger. An INA219 on one ESP32 reads voltage and current from a TP4056 charging an 18650. A second ESP32 with an SSD1306 OLED shows the readings across the room over ESP-NOW."
+  toc={[
+    {href: '#what-youll-learn', label: 'What You Will Learn'},
+    {href: '#unicast', label: 'How Unicast Differs From Broadcast'},
+    {href: '#hardware', label: 'Hardware'},
+    {href: '#wiring', label: 'Wiring'},
+    {href: '#get-mac', label: "Get the Receiver's MAC"},
+    {href: '#sender-sketch', label: 'The Sender Sketch'},
+    {href: '#receiver-sketch', label: 'The Receiver Sketch'},
+    {href: '#what-youll-see', label: 'What You Will See'},
+    {href: '#going-further', label: 'Going Further'},
+  ]}
+>
+
+  <div class="hero">
+    <div class="category">Wireless &bull; ESP32</div>
+    <h1>How to build an ESP-NOW remote<br>charger monitor with INA219<br>and OLED</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin, both sender and receiver)</div>
+      <div class="meta-item"><strong>Sensor:</strong> INA219 (I2C 0x40)</div>
+      <div class="meta-item"><strong>Display:</strong> SSD1306 128x64 OLED (I2C 0x3C)</div>
+      <div class="meta-item"><strong>Topic:</strong> ESP-NOW, unicast, INA219, wireless sensor data</div>
+    </div>
+    <div class="badge badge-wip">Under Construction</div>
+  </div>
+
+  <!-- What You Will Learn -->
+  <div class="section" id="what-youll-learn">
+    <h2>What You Will Learn</h2>
+    <p>The <a href="/guides/how-to-use-esp-now-two-esp32s" class="term-link">first ESP-NOW guide</a> used broadcast mode with a dummy payload. The sender put its own MAC address in a packet and sent it to every ESP-NOW device in range. No target, no real data, no wiring. That is the right place to start because it removes every variable except the radio itself.</p>
+    <p>This guide adds two things. First, the sender targets a specific receiver by MAC address instead of broadcasting. Second, the payload is real: voltage and current from an INA219 sitting inline on a TP4056 charging an 18650 cell.</p>
+    <p>The result is a charger monitor split across two boards. The sender lives next to the charger. The receiver and its display go wherever you want them. You can watch a full charge cycle from the other side of the room.</p>
+    <p>The <a href="/guides/how-to-build-ina219-charger-monitor-esp32" class="term-link">single-board version of this build</a> is worth reading first if you have not seen the INA219 and SSD1306 together yet. This guide assumes you have both libraries installed and understand how the INA219 sits inline on the charge line.</p>
+  </div>
+
+  <!-- How Unicast Differs From Broadcast -->
+  <div class="section" id="unicast">
+    <h2>How Unicast Differs From Broadcast</h2>
+    <p>In broadcast mode the sender uses <code>FF:FF:FF:FF:FF:FF</code> as the destination. Any ESP-NOW device nearby picks up the packet. The send callback always reports success because there is no specific recipient to confirm delivery.</p>
+    <p>Unicast changes both of those things. You replace the broadcast address with a single receiver's MAC, register that MAC as a named peer, and send only to it. The send callback now tells you something real: <code>ESP_NOW_SEND_SUCCESS</code> means the receiver acknowledged the packet at the radio layer. <code>FAIL</code> means it did not. Walk the sender out of range and you will see <code>FAIL</code> appear in serial.</p>
+    <p>The receiver side does not change much. The receive callback works the same way regardless of whether the packet came from a broadcast or a unicast sender. The difference is entirely on the sender: you have to know the receiver's MAC before you flash, and you have to paste it into the sketch.</p>
+  </div>
+
+  <!-- Hardware -->
+  <div class="section" id="hardware">
+    <h2>Hardware</h2>
+    <div class="two-col">
+      <div class="card">
+        <h3>Sender</h3>
+        <ul>
+          <li>ESP32 Dev Board (30-pin or 38-pin)</li>
+          <li>INA219 breakout - I2C address <code>0x40</code></li>
+          <li>TP4056 module with battery protection</li>
+          <li>Single 18650 cell and holder</li>
+          <li>Separate USB power for the TP4056 and the ESP32</li>
+        </ul>
+        <h3 style="margin-top:1rem;">Libraries (sender)</h3>
+        <ul>
+          <li><code>Adafruit INA219</code> by Adafruit</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Receiver</h3>
+        <ul>
+          <li>ESP32 Dev Board (30-pin or 38-pin)</li>
+          <li>SSD1306 128x64 OLED (4-pin I2C, address <code>0x3C</code>)</li>
+        </ul>
+        <h3 style="margin-top:1rem;">Libraries (receiver)</h3>
+        <ul>
+          <li><code>Adafruit SSD1306</code> by Adafruit</li>
+          <li><code>Adafruit GFX Library</code> by Adafruit (dependency - install when prompted)</li>
+        </ul>
+      </div>
+    </div>
+    <p>The sender has no display. The receiver has no INA219. Each board only carries what it needs.</p>
+  </div>
+
+  <!-- Wiring -->
+  <div class="section" id="wiring">
+    <h2>Wiring</h2>
+    <h3>Sender</h3>
+    <p>The INA219 sits inline on the positive line between the TP4056 and the battery, the same as the single-board build. The ESP32 and INA219 are on separate USB power from the TP4056.</p>
+    <p><strong>Positive line:</strong> TP4056 B+ &rarr; INA219 VIN+ &rarr; INA219 VIN- &rarr; Battery +</p>
+    <p><strong>Negative line:</strong> Battery - &rarr; TP4056 B- &rarr; Common GND (ESP32, INA219)</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>ESP32 Pin</th><th>Connects to</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>GPIO 21 (SDA)</td><td>INA219 SDA</td></tr>
+          <tr><td>GPIO 22 (SCL)</td><td>INA219 SCL</td></tr>
+          <tr><td>3.3V</td><td>INA219 VCC</td></tr>
+          <tr><td>GND</td><td>INA219 GND, battery negative</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Receiver</h3>
+    <p>The OLED wires directly to the ESP32 with no other components.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>ESP32 Pin</th><th>Connects to</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>GPIO 21 (SDA)</td><td>OLED SDA</td></tr>
+          <tr><td>GPIO 22 (SCL)</td><td>OLED SCL</td></tr>
+          <tr><td>3.3V</td><td>OLED VCC</td></tr>
+          <tr><td>GND</td><td>OLED GND</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Get the Receiver's MAC -->
+  <div class="section" id="get-mac">
+    <h2>Get the Receiver's MAC</h2>
+    <p>Before you flash the sender, you need the receiver's MAC address. Flash the <a href="/guides/how-to-use-esp-now-two-esp32s#get-mac-sketch" class="term-link">get-your-MAC sketch from the first ESP-NOW guide</a> to the receiver board, open serial monitor at 115200, and copy the address it prints.</p>
+    <p>It looks like this:</p>
+    <div class="code-wrap">
+      <pre><code>{`MAC address: AA:BB:CC:DD:EE:FF`}</code></pre>
+    </div>
+    <p>Copy it into a text editor or write it down. You will paste it into the sender sketch before flashing.</p>
+  </div>
+
+  <!-- The Sender Sketch -->
+  <div class="section" id="sender-sketch">
+    <h2>The Sender Sketch</h2>
+    <p>A few things to understand before you read the code:</p>
+    <p><strong>The struct.</strong> <code>PacketData</code> holds two floats: <code>voltage</code> and <code>current_mA</code>. Both sender and receiver define the same struct. The sender fills it from the INA219. The receiver reads it from the packet. If the structs differ between sketches the data unpacks as garbage.</p>
+    <p><strong>Registering the peer.</strong> In broadcast mode you add <code>FF:FF:FF:FF:FF:FF</code> as a peer and it just works. Here you add the receiver's specific MAC. If <code>esp_now_add_peer()</code> fails, the address you pasted does not match what is actually in the array. Check the format: each byte from the MAC (<code>AA</code>) becomes <code>0xAA</code> in the array.</p>
+    <p><strong>The send callback now means something.</strong> In broadcast mode <code>OnDataSent</code> always reported success. In unicast the receiver acknowledges the packet at the radio layer. If the sender is in range and the receiver is running, you see <code>OK</code>. If you walk the sender out of range, you see <code>FAIL</code>. That is real delivery feedback, not a formality.</p>
+    <p>Paste the receiver's MAC into <code>receiverMAC[]</code> before uploading. Each byte in the address (<code>AA:BB:CC:DD:EE:FF</code>) becomes a hex value in the array (<code>0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF</code>).</p>
+    <div class="code-wrap">
+      <pre><code>{`/*
+ * We stand on the shoulders of giants when we build
+ * with knowledge gained from others' efforts.
+ * That doesn't make us giants. Be humble.
+ * Create with care. Open source is the way.
+ *
+ * ESP-NOW Remote Monitor - Sender
+ * --------------------------------
+ * Reads voltage and current from an INA219 and sends both
+ * to a specific receiver board over ESP-NOW every two seconds.
+ *
+ * Unicast mode: paste the receiver's MAC address into receiverMAC[]
+ * before flashing. Flash the get-your-MAC sketch to the receiver
+ * first if you have not already noted its address.
+ *
+ * Board:   ESP32 Dev Board (38-pin)
+ * Library: Adafruit INA219 by Adafruit
+ *
+ * Wiring:
+ *   INA219: SDA -> GPIO 21   SCL -> GPIO 22
+ *   INA219: VCC -> 3.3V      GND -> GND
+ *   INA219 inline: VIN+ from TP4056 B+, VIN- to battery +
+ *
+ * Open source - MIT Licence
+ * Electronic Zoology - field notes from the garage
+ * https://electroniczoology.com/guides/how-to-build-esp-now-ina219-remote-monitor
+ */
+
+#include <WiFi.h>
+#include <esp_now.h>
+#include <Wire.h>
+#include <Adafruit_INA219.h>
+
+// --- Paste the receiver's MAC address here ---
+uint8_t receiverMAC[] = { 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF };
+
+#define SEND_INTERVAL_MS 2000
+
+typedef struct {
+  float voltage;
+  float current_mA;
+} PacketData;
+
+PacketData outgoing;
+esp_now_peer_info_t peerInfo;
+Adafruit_INA219 ina219;
+
+void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
+  Serial.print("Send status: ");
+  Serial.println(status == ESP_NOW_SEND_SUCCESS ? "OK" : "FAIL");
+}
+
+void setup() {
+  Serial.begin(115200);
+  delay(500);
+
+  WiFi.mode(WIFI_STA);
+
+  Serial.print("Sender MAC: ");
+  Serial.println(WiFi.macAddress());
+
+  Wire.begin(21, 22);
+
+  if (!ina219.begin()) {
+    Serial.println("INA219 not found - check wiring");
+    while (true) delay(1000);
+  }
+
+  if (esp_now_init() != ESP_OK) {
+    Serial.println("ESP-NOW init failed");
+    while (true) delay(1000);
+  }
+
+  esp_now_register_send_cb(OnDataSent);
+
+  memcpy(peerInfo.peer_addr, receiverMAC, 6);
+  peerInfo.channel = 0;
+  peerInfo.encrypt = false;
+
+  if (esp_now_add_peer(&peerInfo) != ESP_OK) {
+    Serial.println("Failed to add peer - check receiver MAC");
+    while (true) delay(1000);
+  }
+
+  Serial.println("Sender ready");
+}
+
+void loop() {
+  static uint32_t lastSend = 0;
+
+  if (millis() - lastSend >= SEND_INTERVAL_MS) {
+    lastSend = millis();
+
+    outgoing.voltage    = ina219.getBusVoltage_V();
+    outgoing.current_mA = max(0.0f, ina219.getCurrent_mA());
+
+    Serial.printf("Sending: %.3fV  %.1fmA\\n", outgoing.voltage, outgoing.current_mA);
+
+    esp_err_t result = esp_now_send(
+      receiverMAC,
+      (uint8_t *)&outgoing,
+      sizeof(outgoing)
+    );
+
+    if (result != ESP_OK) {
+      Serial.println("Send error");
+    }
+  }
+}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+  </div>
+
+  <!-- The Receiver Sketch -->
+  <div class="section" id="receiver-sketch">
+    <h2>The Receiver Sketch</h2>
+    <p>Two things to understand about the receive callback:</p>
+    <p><strong><code>volatile bool newPacket</code>.</strong> The callback runs in a different execution context from <code>loop()</code>. Marking the flag <code>volatile</code> tells the compiler not to cache it in a register. Without it, <code>loop()</code> might check a stale copy and miss packets. Set the flag in the callback, do the work in <code>loop()</code>.</p>
+    <p><strong>The <code>mac</code> parameter.</strong> This is the sender's hardware MAC from the radio frame, separate from the data inside the packet. You do not need to do anything with it here, but it is available if you want to verify which board sent the packet or log it to serial.</p>
+    <div class="code-wrap">
+      <pre><code>{`/*
+ * We stand on the shoulders of giants when we build
+ * with knowledge gained from others' efforts.
+ * That doesn't make us giants. Be humble.
+ * Create with care. Open source is the way.
+ *
+ * ESP-NOW Remote Monitor - Receiver
+ * -----------------------------------
+ * Receives voltage and current readings from a remote INA219 sender
+ * and displays them on an SSD1306 OLED with dual scrolling graphs.
+ *
+ * Two views rotate every VIEW_ROTATE_MS milliseconds:
+ *
+ *   Live view:   one sample per packet (every 2s), 128 samples = ~4 min
+ *                Shows recent current draw as a scrolling bar graph.
+ *
+ *   Charge view: one sample per minute, 128 samples = ~2 hours
+ *                Shows the full CC/CV curve as the charge progresses.
+ *
+ * Both views share the same numeric top line (live voltage and current).
+ * Shows "signal lost" if no packet arrives within 10 seconds.
+ *
+ * Board:   ESP32 Dev Board (38-pin)
+ * Library: Adafruit SSD1306 + Adafruit GFX by Adafruit
+ *
+ * Wiring:
+ *   OLED: SDA -> GPIO 21   SCL -> GPIO 22
+ *   OLED: VCC -> 3.3V      GND -> GND
+ *
+ * Open source - MIT Licence
+ * Electronic Zoology - field notes from the garage
+ * https://electroniczoology.com/guides/how-to-build-esp-now-ina219-remote-monitor
+ */
+
+#include <WiFi.h>
+#include <esp_now.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+#define SCREEN_WIDTH    128
+#define SCREEN_HEIGHT   64
+#define OLED_RESET      -1
+#define OLED_ADDRESS    0x3C
+
+#define GRAPH_MAX_MA    1200.0f
+#define CHARGE_SAMPLE_MS 60000   // one sample/min, 128 samples = ~2hr
+#define VIEW_ROTATE_MS  5000
+#define TIMEOUT_MS      10000
+
+#define GRAPH_Y         10
+#define GRAPH_H         (SCREEN_HEIGHT - GRAPH_Y)   // 54px
+#define BUF_SIZE        SCREEN_WIDTH                // 128 points
+
+typedef struct {
+  float voltage;
+  float current_mA;
+} PacketData;
+
+PacketData incoming;
+volatile bool newPacket = false;
+
+// Live buffer - one entry per received packet
+float   liveBuf[BUF_SIZE];
+uint8_t liveHead = 0;
+bool    liveFull = false;
+
+// Charge buffer - one entry per minute
+float   chargeBuf[BUF_SIZE];
+uint8_t chargeHead = 0;
+bool    chargeFull = false;
+
+bool showLive = true;
+
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
+void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
+  memcpy(&incoming, incomingData, sizeof(incoming));
+  newPacket = true;
+}
+
+void addToLive(float mA) {
+  liveBuf[liveHead] = mA;
+  liveHead = (liveHead + 1) % BUF_SIZE;
+  if (liveHead == 0) liveFull = true;
+}
+
+void addToCharge(float mA) {
+  chargeBuf[chargeHead] = mA;
+  chargeHead = (chargeHead + 1) % BUF_SIZE;
+  if (chargeHead == 0) chargeFull = true;
+}
+
+void drawGraph(float* buf, uint8_t head, bool full) {
+  uint8_t count    = full ? BUF_SIZE : head;
+  uint8_t startIdx = full ? head     : 0;
+
+  for (uint8_t i = 0; i < count; i++) {
+    uint8_t idx    = (startIdx + i) % BUF_SIZE;
+    float   sample = buf[idx];
+
+    if (sample < 0)            sample = 0;
+    if (sample > GRAPH_MAX_MA) sample = GRAPH_MAX_MA;
+
+    int barH = (int)((sample / GRAPH_MAX_MA) * (float)(GRAPH_H - 1));
+    if (barH < 1 && sample >= 1.0f) barH = 1;
+
+    int x = i;
+    int y = GRAPH_Y + (GRAPH_H - 1) - barH;
+    display.drawFastVLine(x, y, barH, SSD1306_WHITE);
+  }
+}
+
+void drawDisplay(float volts, float mA) {
+  display.clearDisplay();
+  display.setTextColor(SSD1306_WHITE);
+
+  // --- Numeric line ---
+  display.setTextSize(1);
+  display.setCursor(0, 0);
+  display.print(volts, 2);
+  display.print("V");
+
+  // View label centred
+  const char* label = showLive ? "LIVE" : "CHARGE";
+  int labelW = strlen(label) * 6;
+  display.setCursor((SCREEN_WIDTH - labelW) / 2, 0);
+  display.print(label);
+
+  // mA right-aligned
+  char maBuf[10];
+  if (mA < 1.0f) {
+    snprintf(maBuf, sizeof(maBuf), "<1mA");
+  } else {
+    snprintf(maBuf, sizeof(maBuf), "%dmA", (int)mA);
+  }
+  int maWidth = strlen(maBuf) * 6;
+  display.setCursor(SCREEN_WIDTH - maWidth, 0);
+  display.print(maBuf);
+
+  // --- Divider ---
+  display.drawFastHLine(0, GRAPH_Y - 1, SCREEN_WIDTH, SSD1306_WHITE);
+
+  // --- Graph ---
+  if (showLive) {
+    drawGraph(liveBuf, liveHead, liveFull);
+  } else {
+    if (chargeHead == 0 && !chargeFull) {
+      display.setTextSize(1);
+      display.setCursor(10, GRAPH_Y + 18);
+      display.print("< 1 min of data");
+    } else {
+      drawGraph(chargeBuf, chargeHead, chargeFull);
+    }
+  }
+
+  display.display();
+}
+
+void drawSignalLost() {
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(20, 24);
+  display.print("signal lost");
+  display.display();
+}
+
+void setup() {
+  Serial.begin(115200);
+  delay(500);
+
+  WiFi.mode(WIFI_STA);
+
+  Serial.print("Receiver MAC: ");
+  Serial.println(WiFi.macAddress());
+
+  memset(liveBuf,   0, sizeof(liveBuf));
+  memset(chargeBuf, 0, sizeof(chargeBuf));
+
+  Wire.begin(21, 22);
+
+  if (!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADDRESS)) {
+    Serial.println("SSD1306 not found - check wiring and OLED_ADDRESS");
+    while (true) delay(1000);
+  }
+
+  display.clearDisplay();
+  display.setTextSize(1);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0, 0);
+  display.println("ESP-NOW receiver");
+  display.println("waiting...");
+  display.display();
+
+  if (esp_now_init() != ESP_OK) {
+    Serial.println("ESP-NOW init failed");
+    while (true) delay(1000);
+  }
+
+  esp_now_register_recv_cb(OnDataRecv);
+
+  Serial.println("Receiver ready - waiting for packets");
+}
+
+void loop() {
+  static uint32_t lastPacket = 0;
+  static uint32_t lastCharge = 0;
+  static uint32_t lastRotate = 0;
+  static bool signalLost = false;
+
+  uint32_t now = millis();
+
+  if (newPacket) {
+    newPacket  = false;
+    lastPacket = now;
+    signalLost = false;
+
+    Serial.printf("Received: %.3fV  %.1fmA\\n", incoming.voltage, incoming.current_mA);
+
+    addToLive(incoming.current_mA);
+
+    if (now - lastCharge >= CHARGE_SAMPLE_MS) {
+      lastCharge = now;
+      addToCharge(incoming.current_mA);
+    }
+
+    drawDisplay(incoming.voltage, incoming.current_mA);
+  }
+
+  if (now - lastRotate >= VIEW_ROTATE_MS) {
+    lastRotate = now;
+    showLive = !showLive;
+  }
+
+  if (!signalLost && now - lastPacket >= TIMEOUT_MS) {
+    signalLost = true;
+    drawSignalLost();
+    Serial.println("Signal lost");
+  }
+}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+  </div>
+
+  <!-- What You Will See -->
+  <div class="section" id="what-youll-see">
+    <h2>What You Will See</h2>
+    <p>Flash the receiver first. Its OLED shows "ESP-NOW receiver / waiting..." and holds there until packets arrive.</p>
+    <p>Flash the sender with the receiver's MAC pasted in. Open serial monitor on the sender at 115200. Every two seconds:</p>
+    <div class="code-wrap">
+      <pre><code>{`Sending: 3.752V  843.0mA
+Send status: OK`}</code></pre>
+    </div>
+    <p>The receiver's OLED updates to show the live reading. Walk the sender to the edge of range and <code>Send status: FAIL</code> appears in serial. After ten seconds with no packet the OLED switches to "signal lost". Walk back in range and the display recovers on the next successful packet.</p>
+    <div class="callout">
+      <strong>Peer add failure at startup.</strong> If the sender reports <code>Failed to add peer</code> and halts, the MAC in <code>receiverMAC[]</code> does not match the receiver's actual address. Reflash the get-your-MAC sketch to the receiver, re-read the serial output, and compare byte by byte.
+    </div>
+  </div>
+
+  <!-- Going Further -->
+  <div class="section" id="going-further">
+    <h2>Going Further</h2>
+    <div class="trouble-item">
+      <h3>Adjust the live window</h3>
+      <p>The live buffer adds one sample per received packet. At a 2-second send interval, 128 samples covers roughly 4 minutes of history. Halve the send interval on the sender to get 2 minutes, or double it to get 8. The charge buffer is independent and always samples once per minute regardless of packet rate.</p>
+    </div>
+    <div class="trouble-item">
+      <h3>Two cells at once</h3>
+      <p>Add a second INA219 at address <code>0x41</code> (jumper A0 high on the breakout) to the sender. Extend <code>PacketData</code> to carry four floats: <code>voltage_a</code>, <code>current_a</code>, <code>voltage_b</code>, <code>current_b</code>. The receiver displays both channels. Update the struct on both sides before flashing.</p>
+    </div>
+    <div class="trouble-item">
+      <h3>Put the display on a round screen</h3>
+      <p>The <a href="/guides/how-to-wire-gc9a01-esp32" class="term-link">GC9A01 240x240 round TFT</a> is a natural remote gauge but it is not a drop-in swap. The SSD1306 uses I2C and the Adafruit SSD1306 library. The GC9A01 uses SPI and TFT_eSPI, which has a completely different drawing API, different wiring, and requires configuring a <code>User_Setup.h</code> file before anything compiles. The sender sketch does not change. The receiver needs to be rewritten from scratch around TFT_eSPI calls. See <a href="/guides/how-to-wire-gc9a01-esp32" class="term-link">How to wire the GC9A01 round display with ESP32 &rarr;</a></p>
+    </div>
+    <div class="trouble-item">
+      <h3>Send readings back</h3>
+      <p>ESP-NOW is bidirectional. The receiver can register the sender as a peer and send acknowledgement packets back: a timestamp, a display-received confirmation, or a command to change the sample rate. Both boards become sender and receiver simultaneously.</p>
+    </div>
+    <div class="trouble-item">
+      <h3>Skip the MAC paste with peer discovery</h3>
+      <p>This guide requires you to know the receiver's MAC before flashing the sender. The sender can instead broadcast a "who's there?" packet on boot. Any receiver that hears it reads the sender's MAC from the <code>mac</code> parameter in its receive callback, registers it as a peer, and broadcasts its own MAC back. The sender catches the reply, registers the receiver, and both boards switch to unicast. No addresses copied between sketches, no fixed flashing order. Either board can reboot and the handshake runs again automatically.</p>
+    </div>
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:2rem;">
+    <strong>Build the single-board version first</strong>
+    <a href="/guides/how-to-build-ina219-charger-monitor-esp32" class="term-link">How to build an INA219 battery charger monitor with ESP32 and OLED &rarr;</a>
+  </div>
+
+  <div class="callout callout-why" style="margin-top:1rem;">
+    <strong>The broadcast foundation this builds on</strong>
+    <a href="/guides/how-to-use-esp-now-two-esp32s" class="term-link">How to use ESP-NOW to connect two ESP32s without a router &rarr;</a>
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:1rem;">
+    <strong>Put the remote display on a round TFT</strong>
+    <a href="/guides/how-to-wire-gc9a01-esp32" class="term-link">How to wire the GC9A01 round display with ESP32 &rarr;</a>
+  </div>
+
+</GuideLayout>
+
+<style>
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.5rem; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    min-width: 360px;
+  }
+  th {
+    background: #1a1a2e;
+    color: #fff;
+    text-align: left;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+  }
+  td {
+    padding: 0.55rem 1rem;
+    border-bottom: 1px solid #eee;
+  }
+  tr:nth-child(even) td { background: #fafafa; }
+  tr:last-child td { border-bottom: none; }
+
+  .callout {
+    background: #f3e8ff;
+    border-left: 3px solid #a855f7;
+    border-radius: 0 6px 6px 0;
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    margin: 1.25rem 0;
+  }
+</style>
