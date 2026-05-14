@@ -71,13 +71,12 @@ void setup() {
   Serial.begin(115200);
   delay(500);
 
-  WiFi.mode(WIFI_STA);
+  WiFi.mode(WIFI_AP_STA);
+  delay(200);
 
   Serial.println();
   Serial.print("STA MAC (use this for ESP-NOW): ");
   Serial.println(WiFi.macAddress());
-
-  WiFi.mode(WIFI_AP);
 
   Serial.print("AP MAC:                         ");
   Serial.println(WiFi.softAPmacAddress());
@@ -91,9 +90,7 @@ void loop() {}`}</code></pre>
   <!-- Reading the Output -->
   <div class="section" id="reading-the-output">
     <h2>Reading the output</h2>
-    <p>Serial Monitor will print something like this:</p>
-    <pre style="background:#f4f4f4;padding:0.75rem 1rem;border-radius:6px;font-size:0.9rem;margin:1rem 0;">STA MAC (use this for ESP-NOW): A0:B7:65:11:22:33
-AP MAC:                         A2:B7:65:11:22:33</pre>
+    <img src="/images/esp32-get-mac/serial-output.png" alt="Arduino IDE Serial Monitor showing STA and AP MAC addresses printed by the sketch" style="width:100%;border-radius:6px;margin:1rem 0;" />
     <p>Note the STA address. Write it down or keep the Serial Monitor window open while you edit your sender sketch. The address is the same every time you run the sketch on that board, so you only need to do this once per board.</p>
   </div>
 
