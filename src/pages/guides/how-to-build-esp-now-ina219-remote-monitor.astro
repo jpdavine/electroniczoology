@@ -29,13 +29,24 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <div class="badge badge-wip">Under Construction</div>
   </div>
 
+  <!-- What This Guide Builds On -->
+  <div class="prereq-box">
+    <h3>What this guide builds on</h3>
+    <ul>
+      <li><a href="/guides/how-to-check-a-new-esp32" class="term-link">How to check a new ESP32</a> - board setup in Arduino IDE, confirming the board is working before you build on it</li>
+      <li><a href="/guides/how-to-use-ssd1306-oled-esp32" class="term-link">How to use the SSD1306 OLED display with ESP32</a> - I2C wiring, library setup, I2C scanner</li>
+      <li><a href="/guides/how-to-build-ina219-charger-monitor-esp32" class="term-link">How to build an INA219 battery charger monitor with ESP32 and OLED</a> - INA219 wiring, inline current sensing, the SSD1306 scrolling graph sketch</li>
+      <li><a href="/guides/how-to-use-esp-now-two-esp32s" class="term-link">How to use ESP-NOW to connect two ESP32s without a router</a> - broadcast mode, MAC addresses, the send and receive callbacks</li>
+    </ul>
+  </div>
+
   <!-- What You Will Learn -->
   <div class="section" id="what-youll-learn">
     <h2>What You Will Learn</h2>
     <p>The <a href="/guides/how-to-use-esp-now-two-esp32s" class="term-link">first ESP-NOW guide</a> used broadcast mode with a dummy payload. The sender put its own MAC address in a packet and sent it to every ESP-NOW device in range. No target, no real data, no wiring. That is the right place to start because it removes every variable except the radio itself.</p>
     <p>This guide adds two things. First, the sender targets a specific receiver by MAC address instead of broadcasting. Second, the payload is real: voltage and current from an INA219 sitting inline on a TP4056 charging an 18650 cell.</p>
     <p>The result is a charger monitor split across two boards. The sender lives next to the charger. The receiver and its display go wherever you want them. You can watch a full charge cycle from the other side of the room.</p>
-    <p>The <a href="/guides/how-to-build-ina219-charger-monitor-esp32" class="term-link">single-board version of this build</a> is worth reading first if you have not seen the INA219 and SSD1306 together yet. This guide assumes you have both libraries installed and understand how the INA219 sits inline on the charge line.</p>
+    <p>The single-board version of this build is worth reading first if you have not seen the INA219 and SSD1306 together yet. This guide assumes you have both libraries installed and understand how the INA219 sits inline on the charge line. See <a href="/guides/how-to-build-ina219-charger-monitor-esp32" class="term-link">How to build an INA219 battery charger monitor with ESP32 and OLED &rarr;</a></p>
   </div>
 
   <!-- How Unicast Differs From Broadcast -->
@@ -560,6 +571,26 @@ Send status: OK`}</code></pre>
 </GuideLayout>
 
 <style>
+  .prereq-box {
+    background: #f0f4ff;
+    border-left: 3px solid #6366f1;
+    border-radius: 0 6px 6px 0;
+    padding: 0.75rem 1rem 0.75rem 1.25rem;
+    margin: 1.5rem 0;
+  }
+  .prereq-box h3 {
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #3730a3;
+  }
+  .prereq-box ul {
+    margin: 0;
+    padding-left: 1.2rem;
+    font-size: 0.9rem;
+  }
+  .prereq-box li { margin-bottom: 0.3rem; }
+
   .table-wrap { overflow-x: auto; margin: 1rem 0 1.5rem; }
   table {
     width: 100%;
