@@ -1,0 +1,267 @@
+---
+import GuideLayout from '../../layouts/GuideLayout.astro';
+---
+<GuideLayout
+  title="How to find your I2C address | Electronic Zoology"
+  description="How I2C addressing works and how to find the address of any I2C device using an ESP32 and a simple scanner sketch. Works with any sensor, display, or module on the I2C bus."
+  toc={[
+    {href: '#how-it-works', label: 'How I2C Addressing Works'},
+    {href: '#common-addresses', label: 'Common Addresses'},
+    {href: '#wiring', label: 'Wiring'},
+    {href: '#scanner-sketch', label: 'Scanner Sketch'},
+    {href: '#reading-the-output', label: 'Reading the Output'},
+  ]}
+>
+
+  <div class="hero">
+    <div class="category">Interface &bull; ESP32</div>
+    <h1>How to find your<br>I2C address</h1>
+    <div class="meta">
+      <div class="meta-item"><strong>Board:</strong> ESP32 Dev Board (38-pin) or ESP32-C3 Super Mini</div>
+      <div class="meta-item"><strong>Interface:</strong> I2C</div>
+      <div class="meta-item"><strong>Requires:</strong> Arduino IDE with ESP32 board support</div>
+    </div>
+    <div class="badge badge-confirmed">&#10003; Confirmed Working</div>
+  </div>
+
+  <div class="section">
+    <p>Every I2C device on a bus has a 7-bit address. The scanner sketch below sends a probe to every possible address and reports back whatever responds. Run it before you write a single line of project code and you will know exactly what address to use.</p>
+  </div>
+
+  <!-- How I2C Addressing Works -->
+  <div class="section" id="how-it-works">
+    <h2>How I2C addressing works</h2>
+    <p>I2C is a two-wire bus. One wire carries the clock (SCL), the other carries data (SDA). Multiple devices can share the same two wires because every device has a unique address. When the ESP32 wants to talk to a device, it puts that address on the bus first. Every device listens, only the one with the matching address responds.</p>
+    <p>Addresses are 7 bits wide, giving a range of 0x01 to 0x7F (1 to 127 in decimal). A handful of addresses at each end of that range are reserved by the I2C spec, which leaves around 112 usable addresses in practice. The scanner below probes all 127 and reports only the ones that answer.</p>
+    <p>Most modules ship with a fixed default address. Some have a solder jumper or a pull-up resistor on an ADDR pin that lets you choose between two addresses, which is useful when you need two of the same device on one bus. The back of your module will usually show which address corresponds to which jumper state, but the scanner is faster than reading the silkscreen and confirms the wiring is good at the same time.</p>
+    <p>Addresses are almost always written in hexadecimal, prefixed with <code>0x</code>. You will sometimes see 8-bit notation on datasheets (for example 0x78 instead of 0x3C). The difference is that the 8-bit version shifts the 7-bit address one place left to make room for the read/write bit. Arduino's Wire library uses 7-bit addresses, so if a datasheet gives you 0x78, right-shift it to get 0x3C and use that.</p>
+  </div>
+
+  <!-- Common Addresses -->
+  <div class="section" id="common-addresses">
+    <h2>Common addresses</h2>
+    <p>These are the addresses you are most likely to encounter in ESP32 maker projects. Your specific module may differ, so always confirm with the scanner.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Device</th><th>Default address</th><th>Alternate</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>SSD1306 OLED (0.96", 1.3")</td><td>0x3C</td><td>0x3D</td></tr>
+          <tr><td>INA219 current sensor</td><td>0x40</td><td>0x41, 0x44, 0x45</td></tr>
+          <tr><td>AHT10 / AHT20 temp + humidity</td><td>0x38</td><td>-</td></tr>
+          <tr><td>BME280 temp + pressure + humidity</td><td>0x76</td><td>0x77</td></tr>
+          <tr><td>BMP280 temp + pressure</td><td>0x76</td><td>0x77</td></tr>
+          <tr><td>MPU-6050 / MPU-6500 gyro + accel</td><td>0x68</td><td>0x69</td></tr>
+          <tr><td>DS3231 RTC</td><td>0x68</td><td>-</td></tr>
+          <tr><td>PCF8574 I/O expander</td><td>0x20</td><td>0x20 to 0x27</td></tr>
+          <tr><td>PCA9685 PWM driver</td><td>0x40</td><td>0x40 to 0x7F</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Wiring -->
+  <div class="section" id="wiring">
+    <h2>Wiring</h2>
+    <p>Connect SDA and SCL to the correct pins for your board. The defaults for each:</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Board</th><th>SDA</th><th>SCL</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>ESP32 Dev Board (38-pin)</td><td>GPIO 21</td><td>GPIO 22</td></tr>
+          <tr><td>ESP32-C3 Super Mini</td><td>GPIO 6</td><td>GPIO 7</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:1rem;">If you are using a different ESP32 variant, check the pinout for your specific board. The sketch uses <code>Wire.begin(SDA, SCL)</code> with explicit pin numbers, so you can change them to match.</p>
+    <div class="table-wrap" style="margin-top:1.25rem;">
+      <table>
+        <thead>
+          <tr><th>Device pin</th><th>ESP32 pin</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>VCC</td><td>3.3V</td></tr>
+          <tr><td>GND</td><td>GND</td></tr>
+          <tr><td>SDA</td><td>GPIO 21 (or your board's SDA)</td></tr>
+          <tr><td>SCL</td><td>GPIO 22 (or your board's SCL)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Scanner Sketch -->
+  <div class="section" id="scanner-sketch">
+    <h2>Scanner sketch</h2>
+    <p>Flash this to your ESP32 and open Serial Monitor at <strong>115200 baud</strong>. It scans the full address range every three seconds and reports anything it finds.</p>
+    <p>Update <code>SDA_PIN</code> and <code>SCL_PIN</code> if your board uses different defaults.</p>
+    <div class="code-wrap">
+      <pre><code>{`/*
+ * We stand on the shoulders of giants when we build
+ * with knowledge gained from others' efforts.
+ * That doesn't make us giants. Be humble.
+ * Create with care. Open source is the way.
+ *
+ * I2C Address Scanner
+ * --------------------
+ * Reports all devices found on the I2C bus to Serial Monitor.
+ * Open Serial Monitor at 115200 baud.
+ *
+ * Defaults:
+ *   ESP32 Dev Board (38-pin): SDA = 21, SCL = 22
+ *   ESP32-C3 Super Mini:      SDA = 6,  SCL = 7
+ *
+ * Open source - MIT Licence
+ * Electronic Zoology - field notes from the garage
+ * https://electroniczoology.com/guides/how-to-find-your-i2c-address
+ */
+
+#include <Wire.h>
+
+#define SDA_PIN 21    // Change to 6 for ESP32-C3 Super Mini
+#define SCL_PIN 22    // Change to 7 for ESP32-C3 Super Mini
+
+void setup() {
+  Serial.begin(115200);
+  Wire.begin(SDA_PIN, SCL_PIN);
+  delay(1000);
+  Serial.println("Scanning I2C bus...");
+  Serial.println();
+}
+
+void loop() {
+  int found = 0;
+
+  for (byte addr = 1; addr < 127; addr++) {
+    Wire.beginTransmission(addr);
+    byte error = Wire.endTransmission();
+
+    if (error == 0) {
+      Serial.print("Device found at 0x");
+      if (addr < 16) Serial.print("0");
+      Serial.println(addr, HEX);
+      found++;
+    }
+  }
+
+  if (found == 0) {
+    Serial.println("No devices found. Check wiring.");
+  } else {
+    Serial.print(found);
+    Serial.println(found == 1 ? " device found." : " devices found.");
+  }
+
+  Serial.println("---");
+  delay(3000);
+}`}</code></pre>
+      <button class="copy-btn">Copy</button>
+    </div>
+  </div>
+
+  <!-- Reading the Output -->
+  <div class="section" id="reading-the-output">
+    <h2>Reading the output</h2>
+    <p>A device found on the bus looks like this in Serial Monitor:</p>
+    <pre style="background:#f4f4f4;padding:0.75rem 1rem;border-radius:6px;font-size:0.9rem;margin:1rem 0;">Scanning I2C bus...
+
+Device found at 0x3C
+1 device found.
+---</pre>
+    <p>Note that address. It goes directly into your project sketch wherever the library asks for an I2C address. For the Adafruit SSD1306 library that is <code>SCREEN_ADDRESS</code>. For the INA219 library it is the address argument passed to <code>begin()</code>. Check your library's documentation if you are not sure where it goes.</p>
+
+    <div class="scanner-photos">
+      <figure>
+        <img src="/images/i2c-scanner/oled.png" alt="Arduino IDE serial monitor showing Device found at 0x3C for an SSD1306 OLED" />
+        <figcaption>SSD1306 OLED found at 0x3C - confirmed working</figcaption>
+      </figure>
+      <figure>
+        <img src="/images/i2c-scanner/ina.png" alt="Arduino IDE serial monitor showing No devices found then Device found at 0x40 for an INA219 after fixing swapped SDA SCL wires" />
+        <figcaption>INA219 at 0x40 - the first two scans showed nothing because SDA and SCL were swapped. Wires corrected, address appeared immediately.</figcaption>
+      </figure>
+    </div>
+
+    <p style="margin-top:1.5rem;">If the scan reports nothing:</p>
+    <div class="trouble-item">
+      <h3>No devices found</h3>
+      <ul>
+        <li>SDA and SCL swapped is the most common cause. Swap the two signal wires and scan again.</li>
+        <li>Check that VCC is connected and the device is powered.</li>
+        <li>Some devices need pull-up resistors on SDA and SCL (typically 4.7k to 3.3V). Many breakout modules include these on-board. If yours does not, add them.</li>
+        <li>A few devices need a short delay after power-on before they respond. The one-second <code>delay(1000)</code> in <code>setup()</code> covers most cases.</li>
+      </ul>
+    </div>
+    <div class="trouble-item">
+      <h3>Found at an unexpected address</h3>
+      <ul>
+        <li>Check the address select jumper on the back of the module. The silkscreen will show which pad to bridge for each address.</li>
+        <li>Some datasheets use 8-bit notation. If your datasheet says 0x78, the 7-bit address is 0x3C - right-shift by one bit.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Going Further -->
+  <div class="section" id="going-further">
+    <h2>Going Further</h2>
+    <div class="trouble-item">
+      <h3>Put the address to use with an SSD1306 OLED</h3>
+      <p>Once you have confirmed the address the next step is putting it to work. The SSD1306 is one of the most common I2C devices in ESP32 projects. The full guide covers library setup, wiring, and a test sketch that uses the address the scanner just gave you. See <a href="/guides/how-to-use-ssd1306-oled-esp32" class="term-link">How to use the SSD1306 OLED display with ESP32 &rarr;</a></p>
+    </div>
+    <div class="trouble-item">
+      <h3>Add an INA219 current sensor</h3>
+      <p>The INA219 is another common I2C device - default address 0x40, with alternate addresses available via a solder jumper if you need two on the same bus. The charger monitor guide wires an INA219 inline on a TP4056 charge line and displays live voltage and current on an SSD1306 OLED. Two I2C devices, two addresses, one bus. See <a href="/guides/how-to-build-ina219-charger-monitor-esp32" class="term-link">How to build an INA219 battery charger monitor with ESP32 and OLED &rarr;</a></p>
+    </div>
+  </div>
+
+  <h2 style="margin-top:2.5rem;margin-bottom:1rem;">Take a look at our other guides</h2>
+
+  <div class="callout callout-tip" style="margin-top:1rem;">
+    <strong>New board? Start here</strong>
+    <a href="/guides/how-to-check-a-new-esp32" class="term-link">How to check a new ESP32 - board setup, inspection, and diagnostic sketches &rarr;</a>
+  </div>
+
+  <div class="callout callout-why" style="margin-top:1rem;">
+    <strong>Send sensor data between two ESP32s without a router</strong>
+    <a href="/guides/how-to-use-esp-now-two-esp32s" class="term-link">How to use ESP-NOW to connect two ESP32s without a router &rarr;</a>
+  </div>
+
+  <div class="callout callout-tip" style="margin-top:1rem;">
+    <strong>Store files in flash - config, images, web files</strong>
+    <a href="/guides/how-to-use-littlefs-esp32" class="term-link">How to use LittleFS on ESP32 &rarr;</a>
+  </div>
+
+</GuideLayout>
+
+<style>
+  .scanner-photos {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin: 1.25rem 0;
+  }
+  .scanner-photos figure { margin: 0; }
+  .scanner-photos img { width: 100%; border-radius: 6px; border: 1px solid #e0e0e0; display: block; }
+  .scanner-photos figcaption { font-size: 0.8rem; color: #888; margin-top: 0.4rem; text-align: center; }
+
+  .table-wrap { overflow-x: auto; margin: 1rem 0 1.5rem; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+    min-width: 360px;
+  }
+  th {
+    background: #1a1a2e;
+    color: #fff;
+    text-align: left;
+    padding: 0.6rem 1rem;
+    font-weight: 600;
+  }
+  td {
+    padding: 0.55rem 1rem;
+    border-bottom: 1px solid #eee;
+  }
+  tr:nth-child(even) td { background: #fafafa; }
+  tr:last-child td { border-bottom: none; }
+</style>
