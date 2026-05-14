@@ -28,6 +28,16 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <div class="badge badge-confirmed">&#10003; Confirmed Working</div>
   </div>
 
+  <!-- What This Guide Builds On -->
+  <div class="prereq-box">
+    <h3>What this guide builds on</h3>
+    <ul>
+      <li><a href="/guides/how-to-check-a-new-esp32" class="term-link">How to check a new ESP32</a> - board setup in Arduino IDE, confirming the board is working before you build on it</li>
+      <li><a href="/guides/how-to-find-your-i2c-address" class="term-link">How to find your I2C address</a> - how I2C addressing works and how to scan the bus to confirm your device is connected before writing a single line of project code</li>
+      <li><a href="/guides/how-to-use-ssd1306-oled-esp32" class="term-link">How to use the SSD1306 OLED display with ESP32</a> - I2C wiring, library setup, and a test sketch to confirm the display is working</li>
+    </ul>
+  </div>
+
   <!-- What You Will Learn -->
   <div class="section" id="what-youll-learn">
     <h2>What You Will Learn</h2>
@@ -415,6 +425,26 @@ void loop() {
 </GuideLayout>
 
 <style>
+  .prereq-box {
+    background: #f0f4ff;
+    border-left: 3px solid #6366f1;
+    border-radius: 0 6px 6px 0;
+    padding: 0.75rem 1rem 0.75rem 1.25rem;
+    margin: 1.5rem 0;
+  }
+  .prereq-box h3 {
+    margin: 0 0 0.5rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #3730a3;
+  }
+  .prereq-box ul {
+    margin: 0;
+    padding-left: 1.2rem;
+    font-size: 0.9rem;
+  }
+  .prereq-box li { margin-bottom: 0.3rem; }
+
   .table-wrap { overflow-x: auto; margin: 1rem 0 1.5rem; }
   table {
     width: 100%;
