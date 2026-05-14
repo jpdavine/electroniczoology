@@ -43,27 +43,17 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <h2>How it works</h2>
     <p>Every ESP32 stores a factory MAC address in eFuse, a one-time-programmable memory region on the chip. The WiFi driver reads that value at boot and loads it into the radio. <code>esp_wifi_set_mac()</code> replaces the value the radio is using without touching eFuse. The factory address is always there underneath. Power cycle the board without calling <code>esp_wifi_set_mac()</code> and it returns to the factory MAC.</p>
     <p>The call has to happen after <code>WiFi.mode()</code> and before <code>esp_now_init()</code> or any other WiFi operation. The radio needs to be initialised before you can set the MAC, and it needs the correct MAC in place before ESP-NOW registers peers.</p>
+    <p>Note: <code>esp_base_mac_addr_set()</code> looks like the right call for this but does not reliably propagate to the active interface on either the C3 or WROOM. Use <code>esp_wifi_set_mac(WIFI_IF_STA, ...)</code> directly.</p>
   </div>
 
   <!-- Rules for Valid MAC Bytes -->
   <div class="section" id="valid-mac-bytes">
     <h2>Rules for valid MAC bytes</h2>
-    <p>Not every 6-byte value is a valid unicast MAC. Two bits in the first byte matter:</p>
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>Bit</th><th>Position</th><th>Meaning</th><th>Required value</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>LSB (bit 0)</td><td>First byte</td><td>0 = unicast, 1 = multicast</td><td>Must be 0</td></tr>
-          <tr><td>Bit 1</td><td>First byte</td><td>0 = globally unique, 1 = locally administered</td><td>Should be 1</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p>Setting bit 1 to 1 marks the address as locally administered, which is the correct way to signal that this is a software-assigned address rather than a factory one. Setting bit 0 to 1 makes it a multicast address and <code>esp_wifi_set_mac()</code> will reject it.</p>
-    <p><code>0xAA</code> is a safe first byte for custom MACs. In binary it is <code>10101010</code>: bit 0 is 0 (unicast), bit 1 is 1 (locally administered). The remaining five bytes can be anything.</p>
-    <p><code>0x02</code> also works and is commonly used: <code>00000010</code>, bit 0 = 0, bit 1 = 1.</p>
-    <p>Avoid first bytes with an odd value (0x01, 0xAB, 0xFF, etc.) as those have bit 0 set and will be rejected.</p>
+    <p>A MAC address is made up of six groups of 2 values, each using only <code>0-9</code> and <code>A-F</code>. The five groups after the first can be anything you like. The first group has one rule.</p>
+    <p><strong>The second value of the first group must be one of: <code>0, 2, 4, 6, 8, A, C, E</code>.</strong></p>
+    <p>For example, in <code>0xC0</code> the second value is <code>0</code> - valid. In <code>0xC1</code> the second value is <code>1</code> - invalid, <code>esp_wifi_set_mac()</code> will reject it.</p>
+    <p>Those eight values are the even ones. Any of them in that position means the address is unicast, which is required. An odd value in that position makes it a multicast address, which the driver will refuse.</p>
+    <p><code>0xC0</code>, <code>0xAA</code>, <code>0x02</code>, <code>0xFE</code> are all valid first groups. <code>0xC1</code>, <code>0xFF</code>, <code>0xAB</code> are not.</p>
   </div>
 
   <!-- Set MAC Sketch -->
@@ -80,13 +70,15 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
  *
  * ESP32 - Set Custom MAC Address
  * --------------------------------
- * Overrides the active WiFi MAC at runtime using esp_wifi_set_mac().
+ * Sets the active WiFi MAC at runtime using esp_wifi_set_mac().
  * The factory MAC in eFuse is not changed. Override applies until reboot.
- * Call this in setup() before esp_now_init() or any WiFi operation.
+ * Call WiFi.mode() first to initialise the stack, then set MAC before
+ * any connection attempt.
  *
- * First byte rules:
- *   Bit 0 must be 0 (unicast). Bit 1 should be 1 (locally administered).
- *   0xAA and 0x02 are safe first bytes.
+ * Allowed values: 0 1 2 3 4 5 6 7 8 9 A B C D E F
+ * One rule: the second value of the first group must be
+ *   0, 2, 4, 6, 8, A, C, or E.
+ *   C0:FF:EE:C0:FF:EE is valid. C1:FF:EE:C0:FF:EE is not.
  *
  * Works on: ESP32 Dev Board, ESP32-C3, ESP32-S3, ESP32-S2
  *
@@ -98,38 +90,38 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
 #include <WiFi.h>
 #include "esp_wifi.h"
 
-// Custom MAC - change the last three bytes to whatever you want.
-// First byte 0xAA: bit 0 = 0 (unicast), bit 1 = 1 (locally administered).
-uint8_t customMAC[] = { 0xAA, 0xBB, 0xCC, 0x11, 0x22, 0x33 };
+// Custom MAC - change to whatever you want.
+// C0:FF:EE = "coffee" - drug of choice.
+uint8_t customMAC[] = { 0xC0, 0xFF, 0xEE, 0xC0, 0xFF, 0xEE };
 
 void setup() {
   Serial.begin(115200);
   delay(500);
 
+  // Initialize Wi-Fi stack
   WiFi.mode(WIFI_STA);
-
-  // Read factory MAC before overriding
-  uint8_t factoryMAC[6];
-  esp_wifi_get_mac(WIFI_IF_STA, factoryMAC);
+  delay(100);
 
   Serial.print("Factory MAC: ");
-  for (int i = 0; i < 6; i++) {
-    if (factoryMAC[i] < 0x10) Serial.print("0");
-    Serial.print(factoryMAC[i], HEX);
-    if (i < 5) Serial.print(":");
-  }
-  Serial.println();
+  Serial.println(WiFi.macAddress());
 
-  // Set the custom MAC
+  // Set MAC directly on the STA interface
   esp_err_t result = esp_wifi_set_mac(WIFI_IF_STA, customMAC);
-
   if (result == ESP_OK) {
-    Serial.print("Custom MAC set: ");
-    Serial.println(WiFi.macAddress());
+    Serial.print("Custom MAC set! Verifying via system driver: ");
+
+    uint8_t currentMAC[6];
+    esp_wifi_get_mac(WIFI_IF_STA, currentMAC);
+
+    char macStr[18];
+    sprintf(macStr, "%02X:%02X:%02X:%02X:%02X:%02X",
+            currentMAC[0], currentMAC[1], currentMAC[2],
+            currentMAC[3], currentMAC[4], currentMAC[5]);
+    Serial.println(macStr);
+
   } else {
-    Serial.print("Failed to set MAC. Error: ");
-    Serial.println(result);
-    Serial.println("Check that first byte bit 0 is 0 (not a multicast address).");
+    Serial.print("MAC set failed, error: ");
+    Serial.println(esp_err_to_name(result));
   }
 }
 
@@ -141,9 +133,8 @@ void loop() {}`}</code></pre>
   <!-- Verify It Worked -->
   <div class="section" id="verify">
     <h2>Verify it worked</h2>
-    <p>Expected output:</p>
-    <pre style="background:#f4f4f4;padding:0.75rem 1rem;border-radius:6px;font-size:0.9rem;margin:1rem 0;">Factory MAC: A0:B7:65:11:22:33
-Custom MAC set: AA:BB:CC:11:22:33</pre>
+    <p>If the custom MAC is accepted you will see your factory MAC on the first line, then <code>Custom MAC set! Verifying via system driver:</code> followed by <code>C0:FF:EE:C0:FF:EE</code>. The sketch reads back using <code>esp_wifi_get_mac()</code> directly rather than <code>WiFi.macAddress()</code> - on some Arduino-ESP32 core versions <code>WiFi.macAddress()</code> can return zeros even after a successful <code>WiFi.mode()</code> call, so reading from the driver is the reliable way to verify.</p>
+    <img src="/images/esp32-set-custom-mac/serial-output.png" alt="Arduino IDE Serial Monitor showing factory MAC and custom coffee MAC C0:FF:EE:C0:FF:EE set successfully" style="width:100%;border-radius:6px;margin:1rem 0;" />
     <p>If you see a failure message instead, the most likely cause is an invalid first byte. Check that bit 0 of your first byte is 0. <code>0xAA</code> is always safe.</p>
     <p>Reboot the board without the custom MAC call in <code>setup()</code> and <code>WiFi.macAddress()</code> will return the factory address again. The override is not persistent.</p>
   </div>
