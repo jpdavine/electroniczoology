@@ -7,9 +7,9 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
   toc={[
     {href: '#what-youll-learn', label: 'What You Will Learn'},
     {href: '#unicast', label: 'How Unicast Differs From Broadcast'},
+    {href: '#get-mac', label: "Get the Receiver's MAC"},
     {href: '#hardware', label: 'Hardware'},
     {href: '#wiring', label: 'Wiring'},
-    {href: '#get-mac', label: "Get the Receiver's MAC"},
     {href: '#sender-sketch', label: 'The Sender Sketch'},
     {href: '#receiver-sketch', label: 'The Receiver Sketch'},
     {href: '#what-youll-see', label: 'What You Will See'},
@@ -56,6 +56,17 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     <p>In broadcast mode the sender uses <code>FF:FF:FF:FF:FF:FF</code> as the destination. Any ESP-NOW device nearby picks up the packet. The send callback always reports success because there is no specific recipient to confirm delivery.</p>
     <p>Unicast changes both of those things. You replace the broadcast address with a single receiver's MAC, register that MAC as a named peer, and send only to it. The send callback now tells you something real: <code>ESP_NOW_SEND_SUCCESS</code> means the receiver acknowledged the packet at the radio layer. <code>FAIL</code> means it did not. Walk the sender out of range and you will see <code>FAIL</code> appear in serial.</p>
     <p>The receiver side does not change much. The receive callback works the same way regardless of whether the packet came from a broadcast or a unicast sender. The difference is entirely on the sender: you have to know the receiver's MAC before you flash, and you have to paste it into the sketch.</p>
+  </div>
+
+  <!-- Get the Receiver's MAC -->
+  <div class="section" id="get-mac">
+    <h2>Get the Receiver's MAC</h2>
+    <p>Before you flash the sender, you need the receiver's MAC address. Flash the <a href="/guides/how-to-use-esp-now-two-esp32s#get-mac-sketch" class="term-link">get-your-MAC sketch from the first ESP-NOW guide</a> to the receiver board, open serial monitor at 115200, and copy the address it prints.</p>
+    <p>It looks like this:</p>
+    <div class="code-wrap">
+      <pre><code>{`MAC address: AA:BB:CC:DD:EE:FF`}</code></pre>
+    </div>
+    <p>Copy it into a text editor or write it down. You will paste it into the sender sketch before flashing.</p>
   </div>
 
   <!-- Hardware -->
@@ -129,17 +140,6 @@ import GuideLayout from '../../layouts/GuideLayout.astro';
     </div>
   </div>
 
-  <!-- Get the Receiver's MAC -->
-  <div class="section" id="get-mac">
-    <h2>Get the Receiver's MAC</h2>
-    <p>Before you flash the sender, you need the receiver's MAC address. Flash the <a href="/guides/how-to-use-esp-now-two-esp32s#get-mac-sketch" class="term-link">get-your-MAC sketch from the first ESP-NOW guide</a> to the receiver board, open serial monitor at 115200, and copy the address it prints.</p>
-    <p>It looks like this:</p>
-    <div class="code-wrap">
-      <pre><code>{`MAC address: AA:BB:CC:DD:EE:FF`}</code></pre>
-    </div>
-    <p>Copy it into a text editor or write it down. You will paste it into the sender sketch before flashing.</p>
-  </div>
-
   <!-- The Sender Sketch -->
   <div class="section" id="sender-sketch">
     <h2>The Sender Sketch</h2>
@@ -196,7 +196,7 @@ PacketData outgoing;
 esp_now_peer_info_t peerInfo;
 Adafruit_INA219 ina219;
 
-void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
+void OnDataSent(const wifi_tx_info_t *tx_info, esp_now_send_status_t status) {
   Serial.print("Send status: ");
   Serial.println(status == ESP_NOW_SEND_SUCCESS ? "OK" : "FAIL");
 }
@@ -206,6 +206,7 @@ void setup() {
   delay(500);
 
   WiFi.mode(WIFI_STA);
+  delay(100);
 
   Serial.print("Sender MAC: ");
   Serial.println(WiFi.macAddress());
@@ -267,7 +268,7 @@ void loop() {
     <h2>The Receiver Sketch</h2>
     <p>Two things to understand about the receive callback:</p>
     <p><strong><code>volatile bool newPacket</code>.</strong> The callback runs in a different execution context from <code>loop()</code>. Marking the flag <code>volatile</code> tells the compiler not to cache it in a register. Without it, <code>loop()</code> might check a stale copy and miss packets. Set the flag in the callback, do the work in <code>loop()</code>.</p>
-    <p><strong>The <code>mac</code> parameter.</strong> This is the sender's hardware MAC from the radio frame, separate from the data inside the packet. You do not need to do anything with it here, but it is available if you want to verify which board sent the packet or log it to serial.</p>
+    <p><strong>The <code>recv_info</code> parameter.</strong> ESP32 core v3.x changed the callback signature - the first argument is now <code>esp_now_recv_info_t *recv_info</code> instead of <code>uint8_t *mac</code>. The sender's MAC is still available at <code>recv_info-&gt;src_addr</code> if you need it.</p>
     <div class="code-wrap">
       <pre><code>{`/*
  * We stand on the shoulders of giants when we build
@@ -342,10 +343,11 @@ uint8_t chargeHead = 0;
 bool    chargeFull = false;
 
 bool showLive = true;
+uint32_t lastPacket = 0;
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
-void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len) {
+void OnDataRecv(const esp_now_recv_info_t *recv_info, const uint8_t *incomingData, int len) {
   memcpy(&incoming, incomingData, sizeof(incoming));
   newPacket = true;
 }
@@ -442,6 +444,7 @@ void setup() {
   delay(500);
 
   WiFi.mode(WIFI_STA);
+  delay(100);
 
   Serial.print("Receiver MAC: ");
   Serial.println(WiFi.macAddress());
@@ -472,10 +475,11 @@ void setup() {
   esp_now_register_recv_cb(OnDataRecv);
 
   Serial.println("Receiver ready - waiting for packets");
+
+  lastPacket = millis();
 }
 
 void loop() {
-  static uint32_t lastPacket = 0;
   static uint32_t lastCharge = 0;
   static uint32_t lastRotate = 0;
   static bool signalLost = false;
