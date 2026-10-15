@@ -49,7 +49,7 @@ If the board cannot join the home network within 15 seconds of boot, it falls ba
 
 ## The code
 
-Two files: `DavesWf.ino` is the logic, `page.h` is the web page, kept separate for the reason explained below. Fill in your own WiFi details at the top before flashing.
+Two files: `DavesWf.ino` is the logic, `page.h` is the web page, kept separate for the reason explained below. Fill in your own WiFi details at the top before flashing. You can also open [page.h as a standalone file](/sketches/daveswf/page.h) - it is just a header, not a page that does anything on its own, but handy if you want to grab it directly.
 
 ```cpp
 // DavesWf.ino

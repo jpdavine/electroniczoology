@@ -1,0 +1,78 @@
+#ifndef DAVESWF_PAGE_H
+#define DAVESWF_PAGE_H
+
+// Web UI page for DavesWf, kept in its own header.
+// Deliberately NOT in the .ino: Arduino's ctags-based prototype generator
+// misparses the embedded JS "function"/"async function" definitions as
+// real C++ functions and injects garbage forward-declarations + #line
+// directives into this string if it lives in the .ino file, corrupting
+// the HTML/JS actually served to the browser. .h/.cpp files are not
+// scanned by that pass, so keeping it here avoids the bug.
+
+const char INDEX_HTML[] PROGMEM = R"rawliteral(<!DOCTYPE html><html><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Valves</title>
+<style>
+:root{--bg:#f4f5f2;--card:#fff;--tx:#1d2320;--mut:#6b736e;--on:#1f8a4c;--ac:#2d6cdf;--bd:#dfe3dd}
+@media(prefers-color-scheme:dark){:root{--bg:#121513;--card:#1c201d;--tx:#e8ece9;--mut:#9aa39d;--bd:#2e342f}}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,sans-serif;background:var(--bg);color:var(--tx)}
+header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--bd);z-index:2}
+h1{font-size:18px;margin:0}#clk{color:var(--mut);font-size:14px;margin-right:6px}
+main{padding:12px 16px;max-width:600px;margin:auto}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:12px}
+.top{display:flex;justify-content:space-between;align-items:center}
+.nm{font-weight:600;font-size:16px}
+.st{font-size:13px;padding:3px 10px;border-radius:99px;background:var(--bd);color:var(--mut)}
+.st.on{background:var(--on);color:#fff}
+.row{display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap}
+input,button{font:inherit;padding:9px 10px;border-radius:8px;border:1px solid var(--bd);background:var(--bg);color:var(--tx)}
+input[type=number]{width:76px}
+button{cursor:pointer}.go{background:var(--on);color:#fff;border:0}.stop{background:#c0392b;color:#fff;border:0}.pri{background:var(--ac);color:#fff;border:0}
+details{margin-top:10px}summary{color:var(--ac);cursor:pointer}
+.slot{border-top:1px solid var(--bd);padding-top:6px;margin-top:10px}
+.days{gap:4px}.days label{width:36px;text-align:center;padding:7px 0;border:1px solid var(--bd);border-radius:6px;font-size:13px;user-select:none;cursor:pointer}
+.days input{display:none}.days label.sel{background:var(--ac);color:#fff;border-color:var(--ac)}
+.warn{background:#c98a00;color:#fff;padding:8px 12px;border-radius:8px;margin-bottom:12px;display:none}
+small{color:var(--mut)}
+</style></head><body>
+<header><h1>Valves</h1><div><span id="clk">--:--</span><button class="stop" onclick="stopAll()">Stop all</button></div></header>
+<main><div class="warn" id="warn">Clock not set. Syncing from this phone.</div><div id="v"></div></main>
+<script>
+let S=null;const DN=['S','M','T','W','T','F','S'];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const p2=n=>String(n).padStart(2,'0');
+// 24h HH:MM auto-format as the user types digits into a timer field
+function timeFmt(el){let d=el.value.replace(/\D/g,'').slice(0,4);
+if(d.length>=3)d=d.slice(0,2)+':'+d.slice(2);
+if(d.length>=2){let h=+d.slice(0,2);if(h>23)d='23'+d.slice(2)}
+if(d.length===5){let m=+d.slice(3);if(m>59)d=d.slice(0,3)+'59'}
+el.value=d}
+const fmt=t=>Math.floor(t/60)+':'+p2(t%60);
+async function post(u){try{await fetch(u,{method:'POST'})}catch(e){}load(false)}
+async function load(full){try{const r=await fetch('/api/state');S=await r.json();if(full||!$('c0'))build();update()}catch(e){$('clk').textContent='offline'}}
+function build(){$('v').innerHTML=S.valves.map((v,i)=>`
+<div class="card" id="c${i}"><div class="top"><span class="nm" id="n${i}">${esc(v.name)}</span><span class="st" id="s${i}">Off</span></div>
+<div class="row"><input type="number" id="m${i}" min="1" max="${S.maxRun}" value="10"><small>min</small>
+<button class="go" onclick="run(${i})">Run</button><button class="stop" onclick="post('/api/stop?v=${i}')">Stop</button></div>
+<details><summary>Timers and name</summary>
+<div class="row"><input id="nm${i}" maxlength="19" value="${esc(v.name)}" style="flex:1"></div>
+${v.slots.map((s,j)=>`<div class="slot"><div class="row"><label><input type="checkbox" id="e${i}_${j}" ${s.en?'checked':''}> Timer ${j+1}</label>
+<input type="text" inputmode="numeric" pattern="([01][0-9]|2[0-3]):[0-5][0-9]" placeholder="HH:MM" maxlength="5" style="width:64px" id="t${i}_${j}" value="${p2(s.h)}:${p2(s.m)}" oninput="timeFmt(this)"><input type="number" id="d${i}_${j}" min="1" max="${S.maxRun}" value="${s.dur}"><small>min</small></div>
+<div class="row days">${DN.map((d,k)=>`<label class="${(s.days>>k)&1?'sel':''}"><input type="checkbox" id="w${i}_${j}_${k}" ${(s.days>>k)&1?'checked':''} onchange="this.parentNode.classList.toggle('sel',this.checked)">${d}</label>`).join('')}</div></div>`).join('')}
+<div class="row"><button class="pri" onclick="save(${i})">Save</button><small id="ok${i}"></small></div></details></div>`).join('')}
+function update(){$('clk').textContent=S.timeValid?S.time:'no clock';$('warn').style.display=S.timeValid?'none':'block';
+if(!S.timeValid&&!window.synced){window.synced=1;post('/api/settime?epoch='+Math.floor(Date.now()/1000))}
+S.valves.forEach((v,i)=>{const s=$('s'+i);s.className='st'+(v.on?' on':'');s.textContent=v.on?'On '+fmt(v.remaining):'Off';$('n'+i).textContent=v.name})}
+function run(i){post(`/api/run?v=${i}&min=${$('m'+i).value}`)}
+function stopAll(){post('/api/stop?v=all')}
+async function save(i){let q=`/api/config?v=${i}&name=${encodeURIComponent($('nm'+i).value)}`;
+for(let j=0;j<S.slots;j++){const t=$(`t${i}_${j}`).value.split(':');let days=0;
+for(let k=0;k<7;k++)if($(`w${i}_${j}_${k}`).checked)days|=1<<k;
+q+=`&s${j}en=${$(`e${i}_${j}`).checked?1:0}&s${j}h=${+t[0]||0}&s${j}m=${+t[1]||0}&s${j}dur=${$(`d${i}_${j}`).value}&s${j}days=${days}`}
+let ok=false;try{ok=(await fetch(q,{method:'POST'})).ok}catch(e){}
+$('ok'+i).textContent=ok?'Saved':'Error';setTimeout(()=>$('ok'+i).textContent='',2000);load(false)}
+load(true);setInterval(()=>load(false),2000);
+</script></body></html>)rawliteral";
+
+#endif
