@@ -49,7 +49,9 @@ If the board cannot join the home network within 15 seconds of boot, it falls ba
 
 ## The code
 
-Two files: `DavesWf.ino` is the logic, `page.h` is the web page, kept separate for the reason explained below. Fill in your own WiFi details at the top before flashing. You can also open [page.h as a standalone file](/sketches/daveswf/page.h) - it is just a header, not a page that does anything on its own, but handy if you want to grab it directly.
+Two files: `DavesWf.ino` is the logic, `page.h` is the web page, kept separate for the reason explained below. Fill in your own WiFi details at the top before flashing.
+
+Want to see it before you build it? [Open a live demo of the web UI](/sketches/daveswf/preview.html) - the exact page the ESP32 serves, running in your browser with a stand-in instead of a real board so the buttons and schedules actually work. You can also grab [page.h as a plain file](/sketches/daveswf/page.h) if you just want the source.
 
 ```cpp
 // DavesWf.ino
